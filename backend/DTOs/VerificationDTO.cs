@@ -6,7 +6,7 @@
         //User submits a verification request with their government ID
         public class CreateVerificationRequestDTO
         {
-            public string DocumentUrl { get; set; } = string.Empty;    //URL to uploaded ID image
+            public string DocumentUrl { get; set; } = string.Empty; //URL to uploaded ID image
             public string DocumentType { get; set; } = string.Empty;  //"Passport", "NationalId", "DrivingLicense"
         }
 

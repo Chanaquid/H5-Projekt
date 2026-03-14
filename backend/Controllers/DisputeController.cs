@@ -18,7 +18,7 @@ namespace backend.Controllers
             _disputeService = disputeService;
         }
 
-        // GET /api/disputes/my
+        // GET - all disputes
         [HttpGet("my")]
         public async Task<IActionResult> GetMyDisputes()
         {
@@ -27,7 +27,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // GET /api/disputes/{id}
+        // GET get dispute by id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -47,7 +47,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/disputes
+        // POST create a dispute
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DisputeDTO.CreateDisputeDTO dto)
         {
@@ -71,7 +71,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/disputes/{id}/respond
+        //POST respond to dispute
         [HttpPost("{id}/respond")]
         public async Task<IActionResult> Respond(int id, [FromBody] DisputeDTO.DisputeResponseDTO dto)
         {
@@ -95,7 +95,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/disputes/{id}/photos
+        //POST - add pic to the dispute
         [HttpPost("{id}/photos")]
         public async Task<IActionResult> AddPhoto(int id, [FromBody] DisputeDTO.AddDisputePhotoDTO dto)
         {
@@ -119,7 +119,7 @@ namespace backend.Controllers
             }
         }
 
-        // GET /api/disputes/admin/open
+        // GET - get all opem disputes
         [HttpGet("admin/open")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOpen()
@@ -128,7 +128,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // POST /api/disputes/admin/{id}/verdict
+        // POST - issue verdict
         [HttpPost("admin/{id}/verdict")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> IssueVerdict(int id, [FromBody] DisputeDTO.AdminVerdictDTO dto)

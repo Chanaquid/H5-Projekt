@@ -8,6 +8,7 @@ namespace backend.Interfaces
         Task<UserFavoriteItem?> GetAsync(string userId, int itemId);
         Task<bool> ExistsAsync(string userId, int itemId);
         Task AddAsync(UserFavoriteItem favorite);
+        Task<List<string>> GetUsersToNotifyAsync(int itemId);
         void Remove(UserFavoriteItem favorite);
         Task SaveChangesAsync();
     }

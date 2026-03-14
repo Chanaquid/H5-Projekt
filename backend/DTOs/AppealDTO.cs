@@ -9,7 +9,7 @@ namespace backend.DTOs
         //User files an appeal when their score drops below 20
         public class CreateScoreAppealDTO
         {
-            public string Message { get; set; } = string.Empty; //Their explanation / apology
+            public string Message { get; set; } = string.Empty; //Their explanation/apology
         }
 
         //User submits a fine appeal

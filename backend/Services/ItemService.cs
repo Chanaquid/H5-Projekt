@@ -11,20 +11,23 @@ namespace backend.Services
         private readonly IItemRepository _itemRepository;
         private readonly INotificationService _notificationService;
         private readonly IUserRepository _userRepository;
+        private readonly ILoanService _loanService;
         private readonly ICategoryRepository _categoryRepository;
         public ItemService(
             IItemRepository itemRepository,
             INotificationService notificationService,
             IUserRepository userRepository,
+            ILoanService loanService,
             ICategoryRepository categoryRepository)
         {
             _itemRepository = itemRepository;
             _notificationService = notificationService;
             _userRepository = userRepository;
+            _loanService = loanService;
             _categoryRepository = categoryRepository;
         }
 
-        //Get all approved items
+        //Get all approved and active items
         public async Task<List<ItemDTO.ItemSummaryDTO>> GetAllApprovedAsync()
         {
             var items = await _itemRepository.GetAllApprovedAsync();
@@ -276,7 +279,7 @@ namespace backend.Services
             };
         }
 
-
+        /*
         //scan qr code
         public async Task<ItemDTO.ItemDetailDTO> ScanQrCodeAsync(string qrCode, string scannedByUserId, bool isAdmin = false)
         {
@@ -309,20 +312,13 @@ namespace backend.Services
             }
             else if (activeLoan.Status == LoanStatus.Active)
             {
-                //Return scan — borrower scans to confirm return
+                //Return scan — delegate to LoanService.HandleLoanReturnAsync
                 if (!isAdmin && activeLoan.BorrowerId != scannedByUserId)
                     throw new UnauthorizedAccessException("Only the borrower can confirm the return.");
 
-                activeLoan.Status = LoanStatus.Returned;
-                activeLoan.ActualReturnDate = DateTime.UtcNow;
+                //Use the loan service method for proper handling
+                await _loanService.HandleLoanReturnAsync(activeLoan);
 
-                await _notificationService.SendAsync(
-                    activeLoan.BorrowerId,
-                    NotificationType.LoanActive,
-                    $"Your return of '{item.Title}' has been confirmed.",
-                    activeLoan.Id,
-                    NotificationReferenceType.Loan
-                );
             }
 
             _itemRepository.Update(item);
@@ -331,6 +327,67 @@ namespace backend.Services
             var updated = await _itemRepository.GetByIdWithDetailsAsync(item.Id);
             return MapToDetailDTO(updated!);
         }
+        */
+
+        public async Task<ItemDTO.ItemDetailDTO> ScanQrCodeAsync(string qrCode, string scannedByUserId, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByQrCodeAsync(qrCode);
+            if (item == null)
+                throw new KeyNotFoundException("Invalid QR code.");
+
+            // Find the relevant active or approved loan for this item
+            var loan = item.Loans
+                .FirstOrDefault(l => l.Status == LoanStatus.Approved ||
+                                     l.Status == LoanStatus.Active ||
+                                     l.Status == LoanStatus.Late);
+
+            if (loan == null)
+                throw new InvalidOperationException("No active or approved loan found for this item.");
+
+            // Only borrower can confirm pickup or return
+            if (!isAdmin && loan.BorrowerId != scannedByUserId)
+                throw new UnauthorizedAccessException("Only the borrower can scan this item.");
+
+            // --- PICKUP LOGIC ---
+            if (loan.Status == LoanStatus.Approved)
+            {
+                if (DateTime.UtcNow < loan.StartDate)
+                    throw new InvalidOperationException("This loan cannot be picked up before the start date.");
+
+                loan.Status = LoanStatus.Active;
+                loan.UpdatedAt = DateTime.UtcNow;
+
+                _itemRepository.Update(item);
+                await _itemRepository.SaveChangesAsync();
+
+                await _notificationService.SendAsync(
+                    item.OwnerId,
+                    NotificationType.LoanActive,
+                    $"'{item.Title}' has been picked up by the borrower.",
+                    loan.Id,
+                    NotificationReferenceType.Loan
+                );
+            }
+            // --- RETURN LOGIC ---
+            else if (loan.Status == LoanStatus.Active || loan.Status == LoanStatus.Late)
+            {
+                await _loanService.HandleLoanReturnAsync(loan);
+
+            }
+            else
+            {
+                throw new InvalidOperationException("Loan is not in a state that can be picked up or returned.");
+            }
+
+
+            _itemRepository.Update(item);
+            await _itemRepository.SaveChangesAsync();
+
+            // Return updated item details
+            var updatedItem = await _itemRepository.GetByIdWithDetailsAsync(item.Id);
+            return MapToDetailDTO(updatedItem!);
+        }
+
 
         //ADmin pending approvals
         public async Task<List<ItemDTO.AdminPendingItemDTO>> GetPendingApprovalsAsync()
@@ -407,6 +464,22 @@ namespace backend.Services
             throw new InvalidOperationException("Failed to generate a unique QR code. Please try again.");
         }
 
+        public async Task DeactivateExpiredItemsAsync()
+        {
+            var expiredItems = await _itemRepository.GetActiveItemsExpiredBeforeAsync(DateTime.UtcNow.Date);
+
+            foreach (var item in expiredItems)
+            {
+                item.IsActive = false;
+                item.UpdatedAt = DateTime.UtcNow;
+                _itemRepository.Update(item);
+            }
+
+            await _itemRepository.SaveChangesAsync();
+        }
+
+
+
         //MAPPERS
         private static ItemDTO.ItemDetailDTO MapToDetailDTO(Item i)
         {
@@ -450,8 +523,10 @@ namespace backend.Services
                 Photos = i.Photos?.OrderBy(p => p.DisplayOrder).Select(MapToPhotoDTO).ToList() ?? new(),
                 AverageRating = approvedReviews.Any() ? Math.Round(approvedReviews.Average(r => r.Rating), 1) : 0,
                 ReviewCount = approvedReviews.Count,
-                IsCurrentlyOnLoan = activeLoans.Any()
-            };
+                IsCurrentlyOnLoan = i.Loans?.Any(l =>
+                    l.Status == LoanStatus.Active ||
+                    l.Status == LoanStatus.Late) ?? false
+                };
         }
 
         private static ItemDTO.ItemSummaryDTO MapToSummaryDTO(Item i)

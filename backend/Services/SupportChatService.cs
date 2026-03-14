@@ -17,10 +17,10 @@ namespace backend.Services
             _notificationService = notificationService;
         }
 
-        // User creates a new support thread with an initial message
+        //User creates a new support thread with an initial message
         public async Task<SupportChatDTO.SupportThreadDetailDTO> CreateThreadAsync(string userId, SupportChatDTO.CreateSupportThreadDTO dto)
         {
-            // FIX 1: Validate message is not empty or whitespace
+            //Validate message is not empty or whitespace
             if (string.IsNullOrWhiteSpace(dto.InitialMessage))
                 throw new ArgumentException("Initial message is required.");
 
@@ -49,10 +49,10 @@ namespace backend.Services
             return MapToDetailDTO(created!);
         }
 
-        // Either party sends a message in an existing thread
+        //Either party sends a message in an existing thread
         public async Task<SupportChatDTO.SupportMessageResponseDTO> SendMessageAsync(string senderId, SupportChatDTO.SendSupportMessageDTO dto)
         {
-            // FIX 1: Validate message is not empty or whitespace
+            //Validate message is not empty or whitespace
             if (string.IsNullOrWhiteSpace(dto.Content))
                 throw new ArgumentException("Message content is required.");
 
@@ -93,8 +93,7 @@ namespace backend.Services
                 );
             }
 
-            // FIX 3: Return the already-constructed message directly — no need to
-            // reload the thread just to find the message we just built.
+            //Return the already-constructed message directly — no need to reload the thread
             return MapToMessageDTO(message, thread.ClaimedByAdminId);
         }
 
@@ -122,9 +121,6 @@ namespace backend.Services
         }
 
         // Admin gets all open/claimed threads.
-        // UnreadCount is not calculated here — no viewing user context is available
-        // without an interface change. Admins see unread counts per-thread only
-        // when opening a thread via GetThreadAsync.
         public async Task<List<SupportChatDTO.SupportThreadSummaryDTO>> GetAllOpenThreadsAsync()
         {
             var threads = await _supportChatRepository.GetAllOpenThreadsAsync();
@@ -187,8 +183,7 @@ namespace backend.Services
             return MapToDetailDTO(thread);
         }
 
-        // Admin reopens a closed thread — always reopens as Claimed under the
-        // calling admin to avoid threads being silently re-claimed under a stale admin.
+        //Admin reopens a closed thread — always reopens as Claimed under the callign admin
         public async Task<SupportChatDTO.SupportThreadDetailDTO> ReopenThreadAsync(int threadId, string adminId)
         {
             var thread = await _supportChatRepository.GetThreadWithMessagesAsync(threadId);
@@ -215,8 +210,7 @@ namespace backend.Services
             return MapToDetailDTO(thread);
         }
 
-        // Mark messages as read — intentionally allowed on closed threads so users
-        // can mark closing messages as read after the thread is resolved.
+        //Mark messages as read — intentionally allowed on closed threads so users can mark closing messages as read after the thread is resolved.
         public async Task MarkReadAsync(int threadId, string userId)
         {
             var thread = await _supportChatRepository.GetThreadByIdAsync(threadId);
@@ -230,7 +224,7 @@ namespace backend.Services
             await _supportChatRepository.SaveChangesAsync();
         }
 
-        // ── Mappers ──────────────────────────────────────────────────
+        //Mappers
 
         private static SupportChatDTO.SupportThreadDetailDTO MapToDetailDTO(SupportThread t)
         {

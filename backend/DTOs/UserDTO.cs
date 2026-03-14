@@ -39,17 +39,17 @@ namespace backend.DTOs
             public string? FullName { get; set; }
             public string? Username { get; set; }// null = no change
             public string? Email { get; set; }
-            public string? NewPassword { get; set; }                 // null = no change
+            public string? NewPassword { get; set; } // null = no change
             public string? Address { get; set; }
             public string? Gender { get; set; }
             public string? AvatarUrl { get; set; }
             public double? Latitude { get; set; }
             public double? Longitude { get; set; }
             public bool? IsVerified { get; set; }
-            public string? Role { get; set; } = string.Empty;         // "User" or "Admin"
-            public int? Score { get; set; }                          // null = no change
-            public string? ScoreNote { get; set; }                   // Required if Score is set
-            public decimal? UnpaidFinesTotal { get; set; }           // null = no change
+            public string? Role { get; set; } = string.Empty; // "User" or "Admin"
+            public int? Score { get; set; } // null = no change
+            public string? ScoreNote { get; set; } // Required if Score is set
+            public decimal? UnpaidFinesTotal { get; set; } // null = no change
         }
 
         public class AdminDeleteResultDTO

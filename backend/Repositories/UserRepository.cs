@@ -63,7 +63,6 @@ namespace backend.Repositories
         //Entity is already tracked from GetByIdAsync — no need to call Update().
         public Task UpdateAsync(ApplicationUser user)
         {
-            // No-op — EF change tracking handles it
             return Task.CompletedTask;
         }
 

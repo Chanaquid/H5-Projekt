@@ -15,6 +15,8 @@ namespace backend.Interfaces
         Task<List<Item>> GetByOwnerAsync(string ownerId);
         Task<List<Item>> GetPendingApprovalsAsync();
         Task<bool> QrCodeExistsAsync(string qrCode);
+        Task<List<Item>> GetActiveItemsExpiredBeforeAsync(DateTime date);
+
 
         //CRUD
         Task AddAsync(Item item);

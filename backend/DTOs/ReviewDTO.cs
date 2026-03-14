@@ -7,8 +7,8 @@
         //Borrower leaves a review for the item after loan is completed
         public class CreateItemReviewDTO
         {
-            public int? LoanId { get; set; }  //Optional for admin
-            public int ItemId { get; set; }   //Admin specifies item directly
+            public int? LoanId { get; set; } //Optional for admin
+            public int ItemId { get; set; } //Admin specifies item directly
             public int Rating { get; set; }
             public string? Comment { get; set; }
         }

@@ -90,7 +90,7 @@ namespace backend.Controllers
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] AuthDTO.ForgotPasswordDTO dto)
         {
-            //Always returns 200 — never reveal whether the email exists
+            //Always returns 200 — so it doesnt reveal whether the email exists
             await _authService.ForgotPasswordAsync(dto.Email);
             return Ok(new ApiDTO.ApiResponse { Message = "If an account with that email exists, a reset link has been sent." });
         }
@@ -110,7 +110,6 @@ namespace backend.Controllers
         [HttpPost("resend-confirmation")]
         public async Task<IActionResult> ResendConfirmation([FromBody] AuthDTO.ForgotPasswordDTO dto)
         {
-            //Always returns 200 — never reveal whether the email exists or is already confirmed
             await _authService.ResendConfirmationEmailAsync(dto.Email);
             return Ok(new ApiDTO.ApiResponse { Message = "If your email is registered and unconfirmed, a new confirmation link has been sent." });
         }

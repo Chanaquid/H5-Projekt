@@ -17,6 +17,8 @@ namespace backend.Tests.Services
         private readonly Mock<INotificationService> _notificationServiceMock;
         private readonly Mock<IUserRepository> _userRepoMock;
         private readonly Mock<ICategoryRepository> _categoryRepoMock;
+        private readonly Mock<ILoanService> _loanServiceMock;
+
         private readonly ItemService _service;
 
         public ItemServiceTests()
@@ -25,12 +27,15 @@ namespace backend.Tests.Services
             _notificationServiceMock = new Mock<INotificationService>();
             _userRepoMock = new Mock<IUserRepository>();
             _categoryRepoMock = new Mock<ICategoryRepository>();
+            _loanServiceMock = new Mock<ILoanService>();
 
             _service = new ItemService(
                 _itemRepoMock.Object,
                 _notificationServiceMock.Object,
                 _userRepoMock.Object,
-                _categoryRepoMock.Object);
+                _loanServiceMock.Object,
+                _categoryRepoMock.Object
+                );
         }
 
 

@@ -19,7 +19,7 @@ namespace backend.Controllers
             _recentlyViewedService = recentlyViewedService;
         }
 
-        //GET every approved items in db
+        //GET every approved and active items in db
         [HttpGet]
         [AllowAnonymous]
         public async Task<IActionResult> GetAll()
@@ -28,7 +28,7 @@ namespace backend.Controllers
             return Ok(items);
         }
 
-        //GET every item in db regardless of status - ADMIN 
+        //GET every item in db regardless of status - ADMIN only 
         [HttpGet("admin/all")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllAdmin([FromQuery] bool includeInactive = false)
@@ -115,7 +115,7 @@ namespace backend.Controllers
             return Ok(item);
         }
 
-        //update api/items/admin/{id}/status — admin changes item status
+        //update — admin changes item status
         [HttpPatch("admin/{id}/status")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> UpdateStatus(int id, [FromBody] ItemDTO.AdminItemStatusDTO dto)

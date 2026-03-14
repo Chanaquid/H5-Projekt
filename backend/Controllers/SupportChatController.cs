@@ -18,7 +18,7 @@ namespace backend.Controllers
             _supportChatService = supportChatService;
         }
 
-        // GET /api/support/my — user gets their own threads
+        //GET — user gets their own threads
         [HttpGet("my")]
         public async Task<IActionResult> GetMyThreads()
         {
@@ -27,7 +27,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // GET /api/support/{id} — get full thread with messages
+        //GET — get full thread with messages
         [HttpGet("{id}")]
         public async Task<IActionResult> GetThread(int id)
         {
@@ -48,7 +48,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/support — user opens a new thread
+        // POST — user opens a new thread
         [HttpPost]
         public async Task<IActionResult> CreateThread([FromBody] SupportChatDTO.CreateSupportThreadDTO dto)
         {
@@ -57,7 +57,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // POST /api/support/messages — send a message in a thread
+        //POST — send a message in a thread
         [HttpPost("messages")]
         public async Task<IActionResult> SendMessage([FromBody] SupportChatDTO.SendSupportMessageDTO dto)
         {
@@ -81,7 +81,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/support/{id}/read — mark messages as read
+        // POST — mark messages as read
         [HttpPost("{id}/read")]
         public async Task<IActionResult> MarkRead(int id)
         {
@@ -101,9 +101,9 @@ namespace backend.Controllers
             }
         }
 
-        // ── Admin endpoints ──────────────────────────────────────────
+        //Admin endpoints
 
-        // GET /api/support/admin/open — all open/claimed threads
+        //GET  — all open/claimed threads
         [HttpGet("admin/open")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllOpen()
@@ -112,7 +112,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // POST /api/support/admin/{id}/claim — admin claims a thread
+        //POST — admin claims a thread
         [HttpPost("admin/{id}/claim")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ClaimThread(int id)
@@ -133,7 +133,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/support/admin/{id}/close — admin closes a thread
+        // POST — admin closes a thread
         [HttpPost("admin/{id}/close")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> CloseThread(int id)
@@ -154,7 +154,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/support/admin/{id}/reopen — admin reopens a closed thread
+        //POST  — admin reopens a closed thread
         [HttpPost("admin/{id}/reopen")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> ReopenThread(int id)

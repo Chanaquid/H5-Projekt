@@ -170,3 +170,5 @@ C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\backend.Tests.pdb
 C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\backend.Tests.genruntimeconfig.cache
 C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\ref\backend.Tests.dll
 C:\Users\subar\Desktop\LoanApp\backend.Tests\bin\Debug\net9.0\FluentAssertions.dll
+C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\backend.Tests.sourcelink.json
+C:\Users\subar\Desktop\LoanApp\backend.Tests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll

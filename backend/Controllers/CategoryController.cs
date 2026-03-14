@@ -26,7 +26,7 @@ namespace backend.Controllers
             return Ok(categories);
         }
 
-        // GET category by id (only active for users | all for admin)
+        //GET category by id (only active for users | all for admin)
         [HttpGet("{id}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetById(int id)
@@ -62,17 +62,5 @@ namespace backend.Controllers
             await _categoryService.DeleteAsync(id);
             return NoContent();
         }
-
-
-
-
-
-
-
-
-
-
-
-
     }
 }

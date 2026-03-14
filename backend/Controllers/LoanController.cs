@@ -18,7 +18,7 @@ namespace backend.Controllers
             _loanService = loanService;
         }
 
-        // GET /api/loans/borrowed — loans where I am the borrower
+        //GET — loans where I am the borrower
         [HttpGet("borrowed")]
         public async Task<IActionResult> GetBorrowed()
         {
@@ -27,7 +27,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // GET /api/loans/owned — loan requests on my items
+        //GET — loan requests on my items
         [HttpGet("owned")]
         public async Task<IActionResult> GetOwned()
         {
@@ -36,7 +36,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // GET /api/loans/{id}
+        // GET - get loan by id
         [HttpGet("{id}")]
         public async Task<IActionResult> GetById(int id)
         {
@@ -56,7 +56,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/loans — borrower requests a loan
+        //POST — borrower requests a loan
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] LoanDTO.CreateLoanDTO dto)
         {
@@ -80,7 +80,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/loans/{id}/cancel — borrower cancels their own pending/approved loan
+        //POST  — borrower cancels their own pending/approved loan
         [HttpPost("{id}/cancel")]
         public async Task<IActionResult> Cancel(int id, [FromBody] LoanDTO.CancelLoanDTO dto)
         {
@@ -104,7 +104,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/loans/{id}/decide — owner approves or rejects a loan request
+        // POST — owner approves or rejects a loan request
         [HttpPost("{id}/decide")]
         public async Task<IActionResult> Decide(int id, [FromBody] LoanDTO.LoanDecisionDTO dto)
         {
@@ -128,7 +128,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/loans/{id}/request-extension — borrower requests extended end date
+        // POST — borrower requests extended end date for a loan
         [HttpPost("{id}/request-extension")]
         public async Task<IActionResult> RequestExtension(int id, [FromBody] LoanDTO.RequestExtensionDTO dto)
         {
@@ -156,7 +156,7 @@ namespace backend.Controllers
             }
         }
 
-        // POST /api/loans/{id}/decide-extension — owner approves or rejects extension request
+        //POST  — owner approves or rejects extension request
         [HttpPost("{id}/decide-extension")]
         public async Task<IActionResult> DecideExtension(int id, [FromBody] LoanDTO.ExtensionDecisionDTO dto)
         {
@@ -180,9 +180,9 @@ namespace backend.Controllers
             }
         }
 
-        // ── Admin endpoints ─────────────────────────────────────────
+        //Admin endpoints
 
-        // GET /api/loans/admin/all
+        // GET - Get all loans
         [HttpGet("admin/all")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAll()
@@ -191,7 +191,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // GET /api/loans/admin/pending — low-score users awaiting admin approval
+        //GET — low-score users awaiting admin approval
         [HttpGet("admin/pending")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetPendingApprovals()
@@ -200,7 +200,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // POST /api/loans/admin/{id}/decide — admin approves/rejects low-score loan
+        // POST  — admin approves/rejects low-score loan
         [HttpPost("admin/{id}/decide")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminDecide(int id, [FromBody] LoanDTO.LoanDecisionDTO dto)

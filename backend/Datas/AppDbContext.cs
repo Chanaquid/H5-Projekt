@@ -353,7 +353,7 @@ namespace backend.Data
                       .OnDelete(DeleteBehavior.Restrict);
             });
 
-            //LoanMessage (renamed from Message)
+            //LoanMessage 
             builder.Entity<LoanMessage>(entity =>
             {
                 entity.HasKey(m => m.Id);

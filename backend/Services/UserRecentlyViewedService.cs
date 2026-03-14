@@ -24,8 +24,6 @@ namespace backend.Services
             return entries.Select(MapToDTO).ToList();
         }
 
-        // Upsert: update ViewedAt if record exists, create new if not
-        // Also silently ignores own items — no point tracking views on your own listings
         public async Task TrackViewAsync(string userId, int itemId)
         {
             var item = await _itemRepository.GetByIdAsync(itemId);
@@ -61,7 +59,7 @@ namespace backend.Services
             await _recentlyViewedRepository.SaveChangesAsync();
         }
 
-        // Mapper — same pattern as FavoriteService
+        //Mapper
         private static RecentlyViewedDTO.RecentlyViewedResponseDTO MapToDTO(UserRecentlyViewedItem r)
         {
             var item = r.Item;

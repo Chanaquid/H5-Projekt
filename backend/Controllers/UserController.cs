@@ -18,7 +18,7 @@ namespace backend.Controllers
             _userService = userService;
         }
 
-        //GET /api/users/me
+        //GET - Get your own profile
         [HttpGet("me")]
         public async Task<IActionResult> GetProfile()
         {
@@ -37,7 +37,7 @@ namespace backend.Controllers
         }
 
 
-        //GET /api/users/{id}/profile — public profile, any authenticated user
+        //GET — public profile, any authenticated user
         [HttpGet("{id}/profile")]
         public async Task<IActionResult> GetPublicProfile(string id)
         {
@@ -53,7 +53,7 @@ namespace backend.Controllers
         }
 
 
-        //PUT /api/users/me
+        //PUT - update own profile
         [HttpPut("me")]
         public async Task<IActionResult> UpdateProfile([FromBody] UserDTO.UpdateProfileDTO dto)
         {
@@ -75,7 +75,7 @@ namespace backend.Controllers
             }
         }
 
-        //DELETE /api/users/me
+        //DELETE - delete own account
         [HttpDelete("me")]
         public async Task<IActionResult> DeleteAccount([FromBody] UserDTO.DeleteAccountDTO dto)
         {
@@ -101,7 +101,7 @@ namespace backend.Controllers
             }
         }
 
-        //GET /api/users/me/score-history
+        //GET - get own score history
         [HttpGet("me/score-history")]
         public async Task<IActionResult> GetScoreHistory()
         {
@@ -121,7 +121,7 @@ namespace backend.Controllers
 
         //Admin endpoints
 
-        // GET /api/users
+        // GET - get all users
         [HttpGet]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
@@ -130,7 +130,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        //GET /api/users/{id}
+        //GET - get user by id
         [HttpGet("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById(string id)
@@ -146,7 +146,7 @@ namespace backend.Controllers
             }
         }
 
-        //POST /api/users/{id}/adjust-score
+        //POST - Adjust score for an user
         [HttpPost("{id}/adjust-score")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdjustScore(string id, [FromBody] UserDTO.AdminScoreAdjustDTO dto)
@@ -166,7 +166,7 @@ namespace backend.Controllers
             }
         }
 
-        //PUT /api/users/{id}
+        //PUT - Admin edits user
         [HttpPut("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminEditUser(string id, [FromBody] UserDTO.AdminEditUserDTO dto)
@@ -176,7 +176,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        //DELETE /api/users/{id}
+        //DELETE - admin can delete any user
         [HttpDelete("{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminDeleteUser(string id)

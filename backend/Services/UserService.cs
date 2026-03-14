@@ -214,7 +214,6 @@ namespace backend.Services
         }
 
         // Admin gets single user — full detail view including all related data
-        // Uses IgnoreQueryFilters so deleted users are still retrievable
         public async Task<UserDTO.AdminUserDetailDTO> GetUserByIdAsync(string userId)
         {
             var user = await _userRepository.GetByIdIgnoreFiltersAsync(userId);
@@ -224,7 +223,6 @@ namespace backend.Services
             var roles = await _userManager.GetRolesAsync(user);
             var role = roles.FirstOrDefault() ?? Roles.User;
 
-            // Sequential fetches — EF Core does not support concurrent operations on the same DbContext
             var blocks = await _userBlockRepository.GetBlocksByUserIdAsync(userId);
             var loanMessages = await _loanMessageRepository.GetByUserIdAsync(userId);
             var conversations = await _directMessageRepository.GetConversationsByUserIdAsync(userId);
@@ -526,9 +524,6 @@ namespace backend.Services
 
             await _userRepository.SaveChangesAsync();
 
-            //Reload fresh — UserManager calls (SetUserNameAsync, role changes) update their own
-            //store independently, so the tracked entity may have stale UserName/NormalizedUserName
-
             var updatedUser = await _userRepository.GetByIdIgnoreFiltersAsync(targetUserId)
                 ?? throw new KeyNotFoundException("User not found after update.");
 
@@ -547,11 +542,11 @@ namespace backend.Services
             var warnings = new List<string>();
             var ongoingStatuses = new[] { LoanStatus.Pending, LoanStatus.AdminPending, LoanStatus.Approved, LoanStatus.Active, LoanStatus.Late };
 
-            // Unpaid fines — warn but allow
+            //Unpaid fines — warn but allow
             if (user.UnpaidFinesTotal > 0)
                 warnings.Add($"User had {user.UnpaidFinesTotal:C} in unpaid fines at time of deletion.");
 
-            // Borrowed loans — block if active/late (item is physically with them)
+            //Borrowed loans — block if active/late (item is physically with them)
             var borrowedLoans = await _loanRepository.GetByBorrowerIdAsync(targetUserId);
             var activeBorrowedLoans = borrowedLoans
                 .Where(l => l.Status == LoanStatus.Active || l.Status == LoanStatus.Late)
@@ -579,8 +574,7 @@ namespace backend.Services
             var ownedItems = await _itemRepository.GetByOwnerAsync(targetUserId);
             foreach (var item in ownedItems)
             {
-                //Guard against item.Loans not being loaded — fail clearly
-
+                //Guard against item.Loans not being loaded
                 if (item.Loans == null)
                     throw new InvalidOperationException(
                         $"Loan data missing for item '{item.Title}'. " +
@@ -592,7 +586,7 @@ namespace backend.Services
 
                 if (isCurrentlyOut)
                 {
-                    // Transfer ownership to admin so they can oversee the return
+                    //Transfer ownership to admin so they can oversee the return
                     item.OwnerId = adminId;
                     _itemRepository.Update(item);
                     warnings.Add($"Item '{item.Title}' was transferred to admin because it is currently on loan.");

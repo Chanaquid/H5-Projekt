@@ -19,7 +19,7 @@ namespace backend.Models
 
         public DateTime DateOfBirth { get; set; }
 
-        // Calculated property so we don't have to store Age in the DB
+        //Calculated property so we don't have to store Age in the DB
         public int Age
         {
             get

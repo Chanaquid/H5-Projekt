@@ -29,22 +29,18 @@ namespace backend.Middleware
             catch (UnauthorizedAccessException ex)
             {
                 //User is authenticated but doesn't have permission — 403
-                //e.g. trying to edit someone else's item, or borrowing while blocked
                 _logger.LogWarning(ex, "Forbidden: {Message}", ex.Message);
                 await HandleExceptionAsync(context, HttpStatusCode.Forbidden, ex.Message);
             }
             catch (KeyNotFoundException ex)
             {
                 //Resource not found in DB — 404
-                //e.g. item ID doesn't exist, loan ID doesn't exist
                 _logger.LogWarning(ex, "Not found: {Message}", ex.Message);
                 await HandleExceptionAsync(context, HttpStatusCode.NotFound, ex.Message);
             }
             catch (InvalidOperationException ex)
             {
                 //Business rule violations — 409 Conflict
-                //e.g. trying to borrow an item that's already on loan,
-                //trying to delete account with active loans,
                 //Trying to borrow with score below 20
                 _logger.LogWarning(ex, "Conflict: {Message}", ex.Message);
                 await HandleExceptionAsync(context, HttpStatusCode.Conflict, ex.Message);
@@ -59,7 +55,6 @@ namespace backend.Middleware
             catch (Exception ex)
             {
                 //Anything unexpected — 500
-                //Log the full exception server-side always
                 _logger.LogError(ex, "Unhandled exception: {Message}", ex.Message);
 
                 // Only expose real message in development — hide it in production

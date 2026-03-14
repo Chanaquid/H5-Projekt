@@ -14,7 +14,7 @@ namespace backend.Repositories
             _context = context;
         }
 
-        // Get recently viewed items for a user, most recent first, capped at limit
+        //Get recently viewed items for a user, most recent first, capped at limit
         public async Task<List<UserRecentlyViewedItem>> GetAllByUserIdAsync(string userId, int limit = 20)
         {
             return await _context.UserRecentlyViewedItems

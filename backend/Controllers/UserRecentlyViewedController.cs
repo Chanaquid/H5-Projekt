@@ -17,7 +17,7 @@ namespace backend.Controllers
             _recentlyViewedService = recentlyViewedService;
         }
 
-        // GET /api/recently-viewed
+        //GET - Get all recently viewed (10)
         [HttpGet]
         public async Task<IActionResult> GetMyRecentlyViewed()
         {

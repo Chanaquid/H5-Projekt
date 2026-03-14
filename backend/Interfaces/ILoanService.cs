@@ -1,4 +1,5 @@
 ﻿using backend.DTOs;
+using backend.Models;
 
 namespace backend.Interfaces
 {
@@ -17,14 +18,16 @@ namespace backend.Interfaces
 
         //Shared
         Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId);
+        Task HandleLoanReturnAsync(Loan loan); // handles loan return
 
         //Admin actions
         Task<List<LoanDTO.AdminPendingLoanDTO>> GetPendingApprovalsAsync();
         Task<LoanDTO.LoanDetailDTO> AdminDecideAsync(int loanId, string adminId, LoanDTO.LoanDecisionDTO dto);
         Task<List<LoanDTO.LoanSummaryDTO>> GetAllLoansAsync();
 
-        //Late loan
-        //Called by a background job — marks overdue loans Late and applies score penalties
+
+        //Late loan - daily background servuce
+
         Task ProcessLateLoansAsync();
     }
 }

@@ -11,9 +11,10 @@ namespace backend.Services
         private readonly IUserRepository _userRepository;
         private readonly IFineService _fineService;
         private readonly INotificationService _notificationService;
+        private readonly IUserFavoriteRepository _favoriteRepository;
 
         //Score change amounts — mirrors business rules
-        private const int OnTimeReturnScore = 5; //+5 on time
+        public const int OnTimeReturnScore = 5; //+5 on time
         private const int LatePenaltyPerDay = -5; //-5 per day late
         private const int MaxLatePenalty = -25; //Cap at -25 per item
 
@@ -22,13 +23,15 @@ namespace backend.Services
             IItemRepository itemRepository,
             IUserRepository userRepository,
             IFineService fineService,
-            INotificationService notificationService)
+            INotificationService notificationService,
+            IUserFavoriteRepository favoriteRepository)
         {
             _loanRepository = loanRepository;
             _itemRepository = itemRepository;
             _userRepository = userRepository;
             _fineService = fineService;
             _notificationService = notificationService;
+            _favoriteRepository = favoriteRepository;
         }
 
         //Craate loan
@@ -373,9 +376,87 @@ namespace backend.Services
             return loans.Select(l => MapToSummaryDTO(l, null)).ToList();
         }
 
+        public async Task HandleLoanReturnAsync(Loan loan)
+        {
+            var borrower = loan.Borrower; 
+            var item = loan.Item;         
+
+            loan.Status = LoanStatus.Returned;
+            loan.ActualReturnDate = DateTime.UtcNow;
+            loan.UpdatedAt = DateTime.UtcNow;
+
+            _loanRepository.Update(loan);
+
+            var returnedOnTime = DateTime.UtcNow.Date <= loan.EndDate.Date;
+
+            if (returnedOnTime && borrower != null)
+            {
+                var newScore = borrower.Score + OnTimeReturnScore;
+
+                await _userRepository.AddScoreHistoryAsync(new ScoreHistory
+                {
+                    UserId = borrower.Id,
+                    PointsChanged = OnTimeReturnScore,
+                    ScoreAfterChange = newScore,
+                    Reason = ScoreChangeReason.OnTimeReturn,
+                    LoanId = loan.Id,
+                    Note = $"On-time return of '{item.Title}'.",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                borrower.Score = newScore;
+                await _userRepository.UpdateAsync(borrower);
+
+                await _notificationService.SendAsync(
+                    borrower.Id,
+                    NotificationType.LoanReturned,
+                    $"Your return of '{item.Title}' has been confirmed. +{OnTimeReturnScore} points for returning on time!",
+                    loan.Id,
+                    NotificationReferenceType.Loan
+                );
+            }
+            else if (borrower != null)
+            {
+                await _notificationService.SendAsync(
+                    borrower.Id,
+                    NotificationType.LoanReturned,
+                    $"Your return of '{item.Title}' has been confirmed.",
+                    loan.Id,
+                    NotificationReferenceType.Loan
+                );
+            }
+
+            await _notificationService.SendAsync(
+                item.OwnerId,
+                NotificationType.LoanReturned,
+                $"'{item.Title}' has been returned by the borrower.",
+                loan.Id,
+                NotificationReferenceType.Loan
+            );
+
+            //Notify users who favorited this item
+            var usersToNotify = await _favoriteRepository.GetUsersToNotifyAsync(item.Id);
+            foreach (var userId in usersToNotify)
+            {
+                //Don't notify the borrower who just returned it or the owner
+                if (userId == borrower?.Id || userId == item.OwnerId)
+                    continue;
+
+                await _notificationService.SendAsync(
+                    userId,
+                    NotificationType.ItemAvailable,
+                    $"'{item.Title}' is now available to borrow!",
+                    item.Id,
+                    NotificationReferenceType.Item
+                );
+            }
+
+
+            await _loanRepository.SaveChangesAsync();
+        }
+
 
         //process late loans - background job
-        //Designed to be idempotent: safe to run multiple times per day or after downtime.
         public async Task ProcessLateLoansAsync()
         {
             var overdueLoans = await _loanRepository.GetActiveAndOverdueAsync();

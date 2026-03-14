@@ -48,6 +48,14 @@ namespace backend.Repositories
                 .AnyAsync(f => f.UserId == userId && f.ItemId == itemId);
         }
 
+        public async Task<List<string>> GetUsersToNotifyAsync(int itemId)
+        {
+            return await _context.UserFavoriteItems
+                .Where(f => f.ItemId == itemId && f.NotifyWhenAvailable)
+                .Select(f => f.UserId)
+                .ToListAsync();
+        }
+
         public async Task AddAsync(UserFavoriteItem favorite)
         {
             await _context.UserFavoriteItems.AddAsync(favorite);

@@ -18,7 +18,7 @@ namespace backend.Controllers
             _favoriteService = favoriteService;
         }
 
-        // GET /api/favorites
+        //GET - get all my favorite´items
         [HttpGet]
         public async Task<IActionResult> GetMyFavorites()
         {
@@ -29,7 +29,7 @@ namespace backend.Controllers
             return Ok(result);
         }
 
-        // POST /api/favorites/{itemId}
+        //POST - add an item to favorite
         [HttpPost("{itemId}")]
         public async Task<IActionResult> AddFavorite(int itemId)
         {
@@ -51,7 +51,7 @@ namespace backend.Controllers
             }
         }
 
-        // DELETE /api/favorites/{itemId}
+        // DELETE - remove an item from favorite
         [HttpDelete("{itemId}")]
         public async Task<IActionResult> RemoveFavorite(int itemId)
         {
@@ -69,7 +69,7 @@ namespace backend.Controllers
             }
         }
 
-        // PATCH /api/favorites/{itemId}/notify
+        // PATCH - toggle notify when an item is active/available
         [HttpPatch("{itemId}/notify")]
         public async Task<IActionResult> ToggleNotify(int itemId, [FromBody] FavoriteDTO.ToggleNotifyDTO dto)
         {

@@ -142,7 +142,10 @@
             //Messages
             MessageReceived = 20, //New loan chat message
             DirectMessageReceived = 21, //New direct message
-            SupportMessageReceived = 22 //New message in support thread
+            SupportMessageReceived = 22, //New message in support thread
+
+            LoanReturned = 23,
+             ItemAvailable = 24
         }
 
         //Type of notification

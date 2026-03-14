@@ -264,8 +264,8 @@ namespace backend
                 app.UseSwaggerUI();
             }
 
-            app.UseHttpsRedirection();
             app.UseMiddleware<ExceptionMiddleware>();
+            app.UseHttpsRedirection();
             app.UseCors("CorsPolicy");
 
             app.UseAuthentication();

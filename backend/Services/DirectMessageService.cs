@@ -132,7 +132,7 @@ namespace backend.Services
         }
 
 
-        //Get all conversations for inbox — ordered by most recent message
+        //Get all conversations for inbox — sorted by most recent message
         public async Task<List<DirectMessageDTO.DirectConversationSummaryDTO>> GetInboxAsync(string userId)
         {
             var conversations = await _directMessageRepository.GetConversationsByUserIdAsync(userId);

@@ -61,7 +61,7 @@ namespace backend.Services
 
             return new AdminDTO.AdminDashboardDTO
             {
-                //Action queues — drive the red badge counts in the sidebar
+                //Action queues — the red badge counts in the sidebar
                 PendingItemApprovals = pendingItemsTask.Result.Count,
                 PendingLoanApprovals = pendingLoansTask.Result.Count,
                 OpenDisputes = openDisputesTask.Result.Count,

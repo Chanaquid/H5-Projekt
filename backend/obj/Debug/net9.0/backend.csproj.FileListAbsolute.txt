@@ -175,3 +175,5 @@ C:\Users\subar\Desktop\LoanApp\backend\bin\Debug\net9.0\MockQueryable.EntityFram
 C:\Users\subar\Desktop\LoanApp\backend\bin\Debug\net9.0\MockQueryable.Moq.dll
 C:\Users\subar\Desktop\LoanApp\backend\bin\Debug\net9.0\Moq.dll
 C:\Users\subar\Desktop\LoanApp\backend\bin\Debug\net9.0\FluentAssertions.dll
+C:\Users\subar\Desktop\LoanApp\backend\obj\Debug\net9.0\backend.sourcelink.json
+C:\Users\subar\Desktop\LoanApp\backend\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll

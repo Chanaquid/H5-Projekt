@@ -8,7 +8,7 @@
         {
             //Action queues
             public int PendingItemApprovals { get; set; }
-            public int PendingLoanApprovals { get; set; }    //Low-score users waiting for admin approval
+            public int PendingLoanApprovals { get; set; }  //Low-score users waiting for admin approval
             public int OpenDisputes { get; set; }
             public int PendingAppeals { get; set; }
             public int PendingVerifications { get; set; } //New users waiting to be verified

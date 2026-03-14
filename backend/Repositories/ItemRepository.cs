@@ -14,16 +14,16 @@ namespace backend.Repositories
             _context = context;
         }
 
-        //get all approved items
+        //get all approved and active items
         public async Task<List<Item>> GetAllApprovedAsync()
         {
             return await _context.Items
+                .Where(i => i.Status == ItemStatus.Approved && i.IsActive)
                 .Include(i => i.Owner)
                 .Include(i => i.Category)
                 .Include(i => i.Photos)
                 .Include(i => i.Loans)
                 .Include(i => i.Reviews)
-                .Where(i => i.Status == ItemStatus.Approved && i.IsActive)
                 .OrderByDescending(i => i.CreatedAt)
                 .ToListAsync();
         }
@@ -79,7 +79,13 @@ namespace backend.Repositories
         {
             return await _context.Items
                 .Include(i => i.Owner)
+                .Include(i => i.Photos)
                 .Include(i => i.Loans)
+                    .ThenInclude(l => l.Borrower)
+                .Include(i => i.Loans)
+                    .ThenInclude(l => l.Fines)
+                .Include(i => i.Loans)
+                    .ThenInclude(l => l.SnapshotPhotos)
                 .FirstOrDefaultAsync(i => i.QrCode == qrCode);
         }
 
@@ -107,6 +113,14 @@ namespace backend.Repositories
                 .OrderBy(i => i.CreatedAt)   //Oldest first — FIFO queue
                 .ToListAsync();
         }
+
+        public async Task<List<Item>> GetActiveItemsExpiredBeforeAsync(DateTime date)
+        {
+            return await _context.Items
+                .Where(i => i.IsActive && i.AvailableUntil < date)
+                .ToListAsync();
+        }
+
 
         //Checks if qrcode already exists in db.
         public async Task<bool> QrCodeExistsAsync(string qrCode)

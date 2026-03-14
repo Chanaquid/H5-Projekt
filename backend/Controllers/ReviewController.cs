@@ -17,7 +17,7 @@ namespace backend.Controllers
             _reviewService = reviewService;
         }
 
-        // POST api/reviews/items
+        //POST - create item review
         [HttpPost("items")]
         [Authorize]
         public async Task<IActionResult> CreateItemReview([FromBody] ReviewDTO.CreateItemReviewDTO dto)
@@ -28,7 +28,7 @@ namespace backend.Controllers
             return Ok(review); //return Ok instead of CreatedAtAction
         }
 
-        // GET api/reviews/items/{itemId}
+        //GET - Get item review 
         [HttpGet("items/{itemId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetItemReviews(int itemId)
@@ -37,7 +37,7 @@ namespace backend.Controllers
             return Ok(reviews);
         }
 
-        // PUT api/reviews/items/{id} — admin only
+        //PUT  — admin only
         [HttpPut("items/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditItemReview(int id, [FromBody] ReviewDTO.EditReviewDTO dto)
@@ -46,7 +46,7 @@ namespace backend.Controllers
             return Ok(review);
         }
 
-        // DELETE api/reviews/items/{id} — admin only
+        //DELETE  — admin only
         [HttpDelete("items/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteItemReview(int id)
@@ -55,7 +55,7 @@ namespace backend.Controllers
             return NoContent();
         }
 
-        // POST api/reviews/users
+        //POST - create user review 
         [HttpPost("users")]
         [Authorize]
         public async Task<IActionResult> CreateUserReview([FromBody] ReviewDTO.CreateUserReviewDTO dto)
@@ -66,7 +66,7 @@ namespace backend.Controllers
             return Ok(review); //just return Ok instead of CreatedAtAction
         }
 
-        // GET api/reviews/users/{userId}
+        //GET - Get user review by id
         [HttpGet("users/{userId}")]
         [AllowAnonymous]
         public async Task<IActionResult> GetUserReviews(string userId)
@@ -75,7 +75,7 @@ namespace backend.Controllers
             return Ok(reviews);
         }
 
-        // PUT api/reviews/users/{id} — admin only
+        //PUT  — admin only
         [HttpPut("users/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> EditUserReview(int id, [FromBody] ReviewDTO.EditReviewDTO dto)
@@ -84,7 +84,7 @@ namespace backend.Controllers
             return Ok(review);
         }
 
-        // DELETE api/reviews/users/{id} — admin only
+        //DELETE — admin only
         [HttpDelete("users/{id}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> DeleteUserReview(int id)
