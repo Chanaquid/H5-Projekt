@@ -236,11 +236,25 @@ namespace backend
                 // Default categories
                 var defaultCategories = new[]
                 {
-                    ("Electronics", "📱"), ("Tools", "🔧"), ("Sports", "⚽"),
-                    ("Music", "🎸"), ("Books", "📚"), ("Camping", "⛺"),
-                    ("Photography", "📷"), ("Gaming", "🎮"), ("Other", "📦")
+                    ("Electronics", "📱"),
+                    ("Tools", "🔧"),
+                    ("Sports", "⚽"),
+                    ("Music", "🎸"),
+                    ("Books", "📚"),
+                    ("Camping", "⛺"),
+                    ("Photography", "📷"),
+                    ("Gaming", "🎮"),
+                    ("Gardening", "🌱"),
+                    ("Biking", "🚲"),
+                    ("Kitchen", "🍳"),
+                    ("Cleaning", "🧹"),
+                    ("Fashion", "👗"),
+                    ("Art", "🎨"),
+                    ("Baby", "👶"),
+                    ("Events", "🎉"),
+                    ("Auto", "🚗"),
+                    ("Other", "📦")
                 };
-
                 foreach (var (name, icon) in defaultCategories)
                 {
                     if (!context.Categories.Any(c => c.Name == name))

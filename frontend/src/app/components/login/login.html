@@ -1,0 +1,111 @@
+<div class="min-h-screen bg-zinc-950 flex items-center justify-center px-4">
+
+  <!-- Background grid texture -->
+  <div
+    class="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.03)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.03)_1px,transparent_1px)] bg-[size:48px_48px]">
+  </div>
+
+  <!-- Glow blob -->
+  <div
+    class="absolute top-1/3 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-amber-500/10 rounded-full blur-3xl pointer-events-none">
+  </div>
+
+  <div class="relative w-full max-w-sm">
+
+    <!-- Logo / brand mark -->
+    <div class="mb-8 text-center">
+      <span class="inline-block w-10 h-10 rounded-xl bg-amber-400 mb-4"></span>
+      <p class="text-zinc-400 text-sm tracking-widest uppercase font-mono">Welcome back</p>
+    </div>
+
+    <!-- Card -->
+    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-8 shadow-2xl shadow-black/60">
+
+      <h2 class="text-white text-2xl font-semibold tracking-tight mb-6">Sign in</h2>
+
+      <form (ngSubmit)="login()" #loginForm="ngForm" class="space-y-5">
+
+        <!-- Email -->
+        <div class="space-y-1.5">
+          <label class="text-zinc-400 text-xs tracking-widest uppercase font-mono">Email</label>
+          <input type="email" name="email" [(ngModel)]="email" required placeholder="you@example.com" class="w-full bg-zinc-800 border border-zinc-700 text-white text-sm rounded-lg px-4 py-3
+                   placeholder-zinc-600 outline-none
+                   focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30
+                   transition-all duration-200" />
+        </div>
+
+        <!-- Password -->
+        <div class="space-y-1.5">
+  <label class="text-zinc-400 text-xs tracking-widest uppercase font-mono">Password</label>
+  
+  <div class="relative">
+    <input 
+      [type]="showPassword ? 'text' : 'password'" 
+      name="password" 
+      [(ngModel)]="password" 
+      required
+      placeholder="••••••••" 
+      class="w-full bg-zinc-800 border border-zinc-700 text-white text-sm rounded-lg px-4 py-3 pr-12
+             placeholder-zinc-600 outline-none
+             focus:border-amber-400 focus:ring-1 focus:ring-amber-400/30
+             transition-all duration-200" 
+    />
+    
+    <button 
+      type="button" 
+      (click)="togglePassword()"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-500 hover:text-zinc-300 transition-colors p-1 cursor-pointer"
+      title="Toggle Password Visibility">
+      
+      <svg *ngIf="!showPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z" />
+        <circle cx="12" cy="12" r="3" />
+      </svg>
+
+      <svg *ngIf="showPassword" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24"
+        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M9.88 9.88a3 3 0 1 0 4.24 4.24" />
+        <path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68" />
+        <path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61" />
+        <line x1="2" y1="2" x2="22" y2="22" />
+      </svg>
+    </button>
+  </div>
+</div>
+        <!-- Error message -->
+        <p *ngIf="errorMessage"
+          class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+          {{ errorMessage }}
+        </p>
+
+        <!-- Submit -->
+        <button type="submit" [disabled]="loginForm.invalid || isLoading" class="w-full bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500
+                 text-zinc-900 font-semibold text-sm rounded-lg px-4 py-3
+                 transition-all duration-200 disabled:cursor-not-allowed
+                 active:scale-[0.98] cursor-pointer">
+          <span *ngIf="!isLoading">Sign in</span>
+          <span *ngIf="isLoading" class="flex items-center justify-center gap-2">
+            <svg class="animate-spin w-4 h-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4" />
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z" />
+            </svg>
+            Signing in...
+          </span>
+        </button>
+
+      </form>
+
+    </div>
+
+    <!-- Footer link -->
+    <p class="text-center text-zinc-500 text-sm mt-6">
+      Not registered yet?
+      <a routerLink="/register"
+        class="text-amber-400 hover:text-amber-300 transition-colors duration-150 font-medium ml-1">
+        Register now
+      </a>
+    </p>
+
+  </div>
+</div>
