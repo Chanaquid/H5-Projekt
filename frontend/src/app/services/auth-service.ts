@@ -47,6 +47,14 @@ export class AuthService {
       .pipe(tap(() => this.clearTokens()));
   }
 
+  // POST /api/auth/change-password
+    changePassword(currentPassword: string, newPassword: string): Observable<ApiResponseDTO> {
+      return this.http.post<ApiResponseDTO>(`${this.baseUrl}/change-password`, {
+        currentPassword,
+        newPassword,
+      });
+    }
+
   //POST /api/auth/forgot-password
   forgotPassword(email: string): Observable<ApiResponseDTO> {
     const dto: AuthDTO.ForgotPasswordDTO = { email };

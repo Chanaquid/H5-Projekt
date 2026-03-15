@@ -1,0 +1,487 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div
+    class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
+
+<!-- ── NAVBAR ── -->
+<nav
+    class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16 bg-zinc-950/85 backdrop-blur-xl border-b border-zinc-800/80">
+    <a routerLink="/home" class="flex items-center gap-2.5 no-underline shrink-0">
+        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-zinc-900 font-black text-sm">L
+        </div>
+        <span class="font-black text-lg text-white tracking-tight hidden sm:block"
+            style="font-family:'Syne',sans-serif">LoanIt</span>
+    </a>
+    <a routerLink="/home"
+        class="flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition-colors no-underline">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+        </svg>
+        Back to home
+    </a>
+</nav>
+
+<!-- ── MAIN ── -->
+<main class="pt-16 min-h-screen">
+
+    <!-- ── PROFILE HEADER ── -->
+    <div class="relative px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+        <div class="flex flex-col md:flex-row items-start md:items-center gap-6">
+
+            <!-- Avatar -->
+            <div class="relative">
+                <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-zinc-700 bg-zinc-800">
+                    <img *ngIf="profile?.avatarUrl" [src]="profile!.avatarUrl!" [alt]="profile?.fullName"
+                        class="w-full h-full object-cover" />
+                    <div *ngIf="!profile?.avatarUrl"
+                        class="w-full h-full flex items-center justify-center text-3xl font-black text-amber-400 bg-amber-400/10"
+                        style="font-family:'Syne',sans-serif">
+                        {{ getInitials(profile?.fullName || '') }}
+                    </div>
+                </div>
+                <!-- Verified badge -->
+                <div *ngIf="profile?.isVerified"
+                    class="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-emerald-400 rounded-full flex items-center justify-center border-2 border-zinc-950"
+                    title="Verified">
+                    <svg class="w-3 h-3 text-zinc-900" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1">
+                <div class="flex items-center gap-3 mb-1 flex-wrap">
+                    <h1 class="font-black text-2xl md:text-3xl text-white tracking-tight"
+                        style="font-family:'Syne',sans-serif">
+                        {{ profile?.fullName }}
+                    </h1>
+                    <span *ngIf="profile?.isVerified"
+                        class="text-[10px] font-bold uppercase tracking-widest bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full">
+                        Verified
+                    </span>
+                </div>
+                <p class="text-zinc-500 text-sm mb-1">@{{ profile?.username }}</p>
+                <p class="text-zinc-500 text-sm">📍 {{ profile?.address || 'No address set' }}</p>
+                <p class="text-zinc-600 text-xs mt-1">Member since {{ profile?.membershipDate | date:'MMMM yyyy' }}</p>
+            </div>
+
+            <!-- Cards row -->
+            <div class="flex flex-col sm:flex-row gap-3">
+
+                <!-- Trust Score -->
+                <div
+                    class="flex flex-col items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4 min-w-[120px]">
+                    <span class="text-2xl mb-1">🏅</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest font-medium mb-1">Trust Score</span>
+                    <span class="font-black text-4xl leading-none"
+                        [class.text-emerald-400]="(profile?.score ?? 0) >= 70"
+                        [class.text-amber-400]="(profile?.score ?? 0) >= 40 && (profile?.score ?? 0) < 70"
+                        [class.text-red-400]="(profile?.score ?? 0) < 40" style="font-family:'Syne',sans-serif">
+                        {{ profile?.score ?? 0 }}
+                    </span>
+                    <div class="w-full bg-zinc-800 rounded-full h-1.5 mt-2">
+                        <div class="h-1.5 rounded-full transition-all duration-500"
+                            [class.bg-emerald-400]="(profile?.score ?? 0) >= 70"
+                            [class.bg-amber-400]="(profile?.score ?? 0) >= 40 && (profile?.score ?? 0) < 70"
+                            [class.bg-red-400]="(profile?.score ?? 0) < 40" [style.width.%]="profile?.score ?? 0">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Unpaid Fines -->
+                <div class="flex flex-col items-center rounded-2xl px-6 py-4 min-w-[120px] border transition-all duration-200"
+                    [class.bg-red-500/10]="(profile?.unpaidFinesTotal ?? 0) > 0"
+                    [class.border-red-500/30]="(profile?.unpaidFinesTotal ?? 0) > 0"
+                    [class.bg-zinc-900]="(profile?.unpaidFinesTotal ?? 0) === 0"
+                    [class.border-zinc-800]="(profile?.unpaidFinesTotal ?? 0) === 0">
+                    <span class="text-2xl mb-1">{{ (profile?.unpaidFinesTotal ?? 0) > 0 ? '⚠️' : '✅' }}</span>
+                    <span class="text-xs uppercase tracking-widest font-medium mb-1"
+                        [class.text-red-400]="(profile?.unpaidFinesTotal ?? 0) > 0"
+                        [class.text-zinc-500]="(profile?.unpaidFinesTotal ?? 0) === 0">
+                        Unpaid Fines
+                    </span>
+                    <span class="font-black text-2xl leading-none"
+                        [class.text-red-400]="(profile?.unpaidFinesTotal ?? 0) > 0"
+                        [class.text-emerald-400]="(profile?.unpaidFinesTotal ?? 0) === 0"
+                        style="font-family:'Syne',sans-serif">
+                        {{ (profile?.unpaidFinesTotal ?? 0) > 0 ? ('kr ' + profile?.unpaidFinesTotal) : 'None' }}
+                    </span>
+                    <p class="text-[12px] mt-1.5" [class.text-red-400]="(profile?.unpaidFinesTotal ?? 0) > 0"
+                        [class.text-zinc-600]="(profile?.unpaidFinesTotal ?? 0) === 0">
+                        {{ (profile?.unpaidFinesTotal ?? 0) > 0 ? 'Payment required' : 'All clear' }}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+    <div class="px-6 md:px-10 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+            <!-- ── LEFT COLUMN ── -->
+            <div class="lg:col-span-2 space-y-6">
+
+                <!-- Stats grid -->
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div *ngFor="let stat of stats"
+                        class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 text-center">
+                        <span class="text-2xl block mb-1">{{ stat.icon }}</span>
+                        <span class="flex items-baseline justify-center gap-1 font-black text-white"
+                            style="font-family:'Syne',sans-serif">
+                            <span *ngIf="stat.currency" class="text-sm text-zinc-400">{{ stat.currency }}</span>
+                            <span class="text-2xl">{{ stat.value }}</span>
+                        </span>
+                        <span class="text-md text-zinc-500">{{ stat.label }}</span>
+                    </div>
+                </div>
+
+                <!-- ── TABS ── -->
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+                    <!-- Tab header -->
+                    <div class="flex border-b border-zinc-800">
+                        <button *ngFor="let tab of tabs" (click)="activeTab = tab.key"
+                            [class.border-b-2]="activeTab === tab.key" [class.border-amber-400]="activeTab === tab.key"
+                            [class.text-white]="activeTab === tab.key" [class.text-zinc-500]="activeTab !== tab.key"
+                            class="flex-1 py-3.5 text-xs font-semibold uppercase tracking-widest transition-colors duration-200 hover:text-zinc-300 cursor-pointer">
+                            {{ tab.label }}
+                        </button>
+                    </div>
+
+                    <!-- Tab: My Items -->
+                    <div *ngIf="activeTab === 'items'" class="p-4">
+                        <div *ngIf="myItems.length === 0" class="py-12 text-center">
+                            <p class="text-4xl mb-3">📦</p>
+                            <p class="text-zinc-500 text-sm">You haven't listed any items yet.</p>
+                            <a routerLink="/items/new"
+                                class="mt-4 inline-flex items-center gap-2 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-xs rounded-xl transition-all no-underline">
+                                List your first item
+                            </a>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                            <div *ngFor="let item of myItems" (click)="goToItem(item.id)"
+                                class="flex items-center gap-3 bg-zinc-800 hover:bg-zinc-700/80 border border-zinc-700 rounded-xl p-3 transition-colors cursor-pointer">
+                                <div
+                                    class="w-14 h-14 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-2xl">
+                                    <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl" [alt]="item.title"
+                                        class="w-full h-full object-cover" />
+                                    <span *ngIf="!item.primaryPhotoUrl">{{ getCategoryEmoji(item.categoryName) }}</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white text-sm font-semibold truncate">{{ item.title }}</p>
+                                    <p class="text-zinc-500 text-xs">{{ item.categoryName }}</p>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shrink-0"
+                                    [class.bg-emerald-400/10]="item.status === 'Approved'"
+                                    [class.text-emerald-400]="item.status === 'Approved'"
+                                    [class.bg-amber-400/10]="item.status === 'Pending'"
+                                    [class.text-amber-400]="item.status === 'Pending'"
+                                    [class.bg-red-400/10]="item.status === 'Rejected'"
+                                    [class.text-red-400]="item.status === 'Rejected'">
+                                    {{ item.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Loan History -->
+                    <div *ngIf="activeTab === 'loans'" class="p-4">
+                        <div *ngIf="myLoans.length === 0" class="py-12 text-center">
+                            <p class="text-4xl mb-3">📋</p>
+                            <p class="text-zinc-500 text-sm">No loan history yet.</p>
+                        </div>
+                        <div class="space-y-3">
+                            <div *ngFor="let loan of myLoans"
+                                class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3">
+                                <div
+                                    class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
+                                    <img *ngIf="loan.itemPrimaryPhoto" [src]="loan.itemPrimaryPhoto"
+                                        class="w-full h-full object-cover" />
+                                    <span *ngIf="!loan.itemPrimaryPhoto">📦</span>
+                                </div>
+                                <div class="flex-1 min-w-0">
+                                    <p class="text-white text-sm font-semibold truncate">{{ loan.itemTitle }}</p>
+                                    <p class="text-zinc-500 text-xs">{{ loan.startDate | date:'MMM d' }} → {{
+                                        loan.actualReturnDate | date:'MMM d, yyyy' }}</p>
+                                </div>
+                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shrink-0"
+                                    [ngClass]="getLoanStatusClass(loan.status)">
+                                    {{ loan.status }}
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tab: Score History -->
+                    <div *ngIf="activeTab === 'score'" class="p-4">
+                        <div *ngIf="scoreHistory.length === 0" class="py-12 text-center">
+                            <p class="text-4xl mb-3">📊</p>
+                            <p class="text-zinc-500 text-sm">No score changes yet.</p>
+                        </div>
+                        <div class="space-y-2">
+                            <div *ngFor="let entry of scoreHistory"
+                                class="flex items-center justify-between bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-3">
+                                <div class="flex items-center gap-3">
+                                    <div class="w-8 h-8 rounded-lg flex items-center justify-center text-sm font-bold shrink-0"
+                                        [class.bg-emerald-400/10]="entry.pointsChanged > 0"
+                                        [class.text-emerald-400]="entry.pointsChanged > 0"
+                                        [class.bg-red-400/10]="entry.pointsChanged < 0"
+                                        [class.text-red-400]="entry.pointsChanged < 0"
+                                        [class.bg-zinc-700]="entry.pointsChanged === 0"
+                                        [class.text-zinc-400]="entry.pointsChanged === 0">
+                                        {{ entry.pointsChanged > 0 ? '↑' : entry.pointsChanged < 0 ? '↓' : '–' }} </div>
+                                            <div>
+                                                <p class="text-white text-xs font-medium">{{ entry.reason }}</p>
+                                                <p *ngIf="entry.note" class="text-zinc-500 text-xs">{{ entry.note }}</p>
+                                            </div>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="font-bold text-sm"
+                                            [class.text-emerald-400]="entry.pointsChanged > 0"
+                                            [class.text-red-400]="entry.pointsChanged < 0"
+                                            [class.text-zinc-400]="entry.pointsChanged === 0">
+                                            {{ entry.pointsChanged > 0 ? '+' : '' }}{{ entry.pointsChanged }}
+                                        </span>
+                                        <p class="text-zinc-600 text-[10px]">{{ entry.createdAt | date:'MMM d, yyyy' }}
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+                <!-- ── RIGHT COLUMN ── -->
+                <div class="space-y-5">
+
+                    <!-- Edit Profile -->
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                        <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
+                            <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Edit Profile
+                            </h3>
+                            <button (click)="editMode = !editMode"
+                                class="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors cursor-pointer">
+                                {{ editMode ? 'Cancel' : 'Edit' }}
+                            </button>
+                        </div>
+                        <div class="p-5 space-y-4">
+                            <!-- Fullname -->
+                            <div class="space-y-1.5">
+                                <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Full
+                                    Name</label>
+                                <input type="text" [(ngModel)]="editForm.fullName" [disabled]="!editMode"
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"
+                                    [class.border-zinc-700]="!editMode" [class.border-amber-400/50]="editMode"
+                                    [class.opacity-50]="!editMode" />
+                            </div>
+                            <!-- Username -->
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Username</label>
+                                <input type="text" [(ngModel)]="editForm.userName" [disabled]="!editMode"
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"
+                                    [class.border-zinc-700]="!editMode" [class.border-amber-400/50]="editMode"
+                                    [class.opacity-50]="!editMode" />
+                            </div>
+                            <!-- Gender -->
+                            <div class="space-y-1.5">
+                                <label
+                                    class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Gender</label>
+                                <select [(ngModel)]="editForm.gender" [disabled]="!editMode"
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"
+                                    [class.border-zinc-700]="!editMode" [class.border-amber-400/50]="editMode"
+                                    [class.opacity-50]="!editMode">
+                                    <option value="">Prefer not to say</option>
+                                    <option value="Male">Male</option>
+                                    <option value="Female">Female</option>
+                                    <option value="Other">Other</option>
+                                </select>
+                            </div>
+                            <!-- profilePic -->
+                            <div class="space-y-1.5">
+                                <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Avatar
+                                    URL</label>
+                                <input type="text" [(ngModel)]="editForm.avatarUrl" [disabled]="!editMode"
+                                    placeholder="https://..."
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200 placeholder-zinc-600"
+                                    [class.border-zinc-700]="!editMode" [class.border-amber-400/50]="editMode"
+                                    [class.opacity-50]="!editMode" />
+                            </div>
+
+                            <div class="space-y-1.5 relative">
+                                <label
+                                    class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Address</label>
+                                <input type="text" [(ngModel)]="editForm.address"
+                                    (ngModelChange)="onAddressInput($event)" [disabled]="!editMode" autocomplete="off"
+                                    placeholder="Start typing your address..."
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200 placeholder-zinc-600"
+                                    [class.border-zinc-700]="!editMode" [class.border-amber-400/50]="editMode"
+                                    [class.opacity-50]="!editMode" />
+
+                                <!-- Suggestions dropdown -->
+                                <ul *ngIf="editMode && showAddressSuggestions && addressSuggestions.length"
+                                    class="absolute z-50 w-full mt-1 bg-zinc-800 border border-zinc-700 rounded-xl overflow-hidden shadow-2xl shadow-black/60">
+                                    <li *ngFor="let place of addressSuggestions" (mousedown)="selectAddress(place)"
+                                        class="px-4 py-2.5 text-sm text-zinc-300 hover:bg-zinc-700 hover:text-white cursor-pointer truncate transition-colors duration-150">
+                                        {{ place.display_name }}
+                                    </li>
+                                </ul>
+
+                                <!-- Lat/lng confirmation -->
+                                <p *ngIf="editForm.latitude && editForm.longitude && editMode"
+                                    class="text-green-400 text-[12px] mt-1">
+                                    📍 {{ editForm.latitude?.toFixed(4) }}, {{ editForm.longitude?.toFixed(4) }}
+                                </p>
+                            </div>
+
+                            <p *ngIf="updateSuccess"
+                                class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                                Profile updated successfully.
+                            </p>
+                            <p *ngIf="updateError"
+                                class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                {{ updateError }}
+                            </p>
+                            <button *ngIf="editMode" (click)="saveProfile()" [disabled]="isSaving"
+                                class="w-full bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-semibold text-sm rounded-xl py-2.5 transition-all duration-200">
+                                {{ isSaving ? 'Saving...' : 'Save changes' }}
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Change Password -->
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+                        <div class="px-5 py-4 border-b border-zinc-800 flex items-center justify-between">
+                            <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Change
+                                Password</h3>
+                            <button (click)="passwordMode = !passwordMode; resetPasswordForm()"
+                                class="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors">
+                                {{ passwordMode ? 'Cancel' : 'Change' }}
+                            </button>
+                        </div>
+                        <div *ngIf="passwordMode" class="p-5 space-y-4">
+
+                            <div class="space-y-1.5">
+                                <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Current
+                                    Password</label>
+                                <input type="password" [(ngModel)]="passwordForm.currentPassword" placeholder="••••••••"
+                                    class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200" />
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">New
+                                    Password</label>
+                                <input type="password" [(ngModel)]="passwordForm.newPassword" placeholder="••••••••"
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
+                                    [class.border-zinc-700]="!passwordForm.newPassword"
+                                    [class.border-amber-400/50]="passwordForm.newPassword && passwordForm.newPassword === passwordForm.confirmPassword"
+                                    [class.border-red-400/50]="passwordForm.newPassword && passwordForm.newPassword !== passwordForm.confirmPassword" />
+                            </div>
+
+                            <div class="space-y-1.5">
+                                <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Confirm
+                                    New Password</label>
+                                <input type="password" [(ngModel)]="passwordForm.confirmPassword" placeholder="••••••••"
+                                    class="w-full bg-zinc-800 border text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200"
+                                    [class.border-zinc-700]="!passwordForm.confirmPassword"
+                                    [class.border-emerald-400/50]="passwordForm.confirmPassword && passwordForm.newPassword === passwordForm.confirmPassword"
+                                    [class.border-red-400/50]="passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword" />
+                                <p *ngIf="passwordForm.confirmPassword && passwordForm.newPassword !== passwordForm.confirmPassword"
+                                    class="text-red-400 text-[10px] mt-1">
+                                    Passwords do not match.
+                                </p>
+                                <p *ngIf="passwordForm.confirmPassword && passwordForm.newPassword === passwordForm.confirmPassword"
+                                    class="text-emerald-400 text-[10px] mt-1">
+                                    Passwords match ✓
+                                </p>
+                            </div>
+
+                            <p *ngIf="passwordError"
+                                class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                {{ passwordError }}
+                            </p>
+                            <p *ngIf="passwordSuccess"
+                                class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                                Password updated successfully.
+                            </p>
+
+                            <button (click)="changePassword()"
+                                [disabled]="isSavingPassword || !passwordForm.currentPassword || !passwordForm.newPassword || passwordForm.newPassword !== passwordForm.confirmPassword"
+                                class="w-full bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-zinc-900 font-semibold text-sm rounded-xl py-2.5 transition-all duration-200">
+                                {{ isSavingPassword ? 'Updating...' : 'Update password' }}
+                            </button>
+                        </div>
+                        <div *ngIf="!passwordMode" class="px-5 py-4">
+                            <p class="text-zinc-500 text-xs">Keep your account secure with a strong password.</p>
+                        </div>
+                    </div>
+
+                    <!-- Account Info -->
+                    <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+                        <h3 class="font-bold text-white text-sm mb-3" style="font-family:'Syne',sans-serif">Account Info
+                        </h3>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Username</span>
+                            <span class="text-white text-xs font-medium truncate ml-4">{{ profile?.email }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Email</span>
+                            <span class="text-white text-xs font-medium truncate ml-4">{{ profile?.email }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Age</span>
+                            <span class="text-white text-xs font-medium">{{ profile?.age }}</span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Borrowing status</span>
+                            <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md"
+                                [class.bg-emerald-400/10]="profile?.borrowingStatus === 'Free'"
+                                [class.text-emerald-400]="profile?.borrowingStatus === 'Free'"
+                                [class.bg-amber-400/10]="profile?.borrowingStatus === 'AdminApproval'"
+                                [class.text-amber-400]="profile?.borrowingStatus === 'AdminApproval'"
+                                [class.bg-red-400/10]="profile?.borrowingStatus === 'Blocked'"
+                                [class.text-red-400]="profile?.borrowingStatus === 'Blocked'">
+                                {{ profile?.borrowingStatus }}
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Gender</span>
+                            <span class="text-white text-xs font-medium">{{ profile?.gender || '—' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Danger Zone -->
+                    <div class="bg-zinc-900 border border-red-500/20 rounded-2xl p-5">
+                        <h3 class="font-bold text-red-400 text-sm mb-1" style="font-family:'Syne',sans-serif">Danger
+                            Zone</h3>
+                        <p class="text-zinc-500 text-xs mb-4">Permanently delete your account.</p>
+                        <button (click)="showDeleteConfirm = !showDeleteConfirm"
+                            class="w-full border border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-300 font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
+                            Delete my account
+                        </button>
+                        <div *ngIf="showDeleteConfirm" class="mt-4 space-y-3">
+                            <p class="text-zinc-400 text-xs">Enter your password to confirm:</p>
+                            <input type="password" [(ngModel)]="deletePassword" placeholder="Your password"
+                                class="w-full bg-zinc-800 border border-red-500/30 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 transition-all duration-200" />
+                            <p *ngIf="deleteError"
+                                class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+                                {{ deleteError }}
+                            </p>
+                            <button (click)="deleteAccount()" [disabled]="isDeletingAccount"
+                                class="w-full bg-red-500 hover:bg-red-400 disabled:opacity-50 text-white font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
+                                {{ isDeletingAccount ? 'Deleting...' : 'Confirm — delete my account' }}
+                            </button>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+</main>

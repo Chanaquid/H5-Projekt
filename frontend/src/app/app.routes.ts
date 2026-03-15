@@ -8,6 +8,7 @@ import { Home } from './components/home/home';
 import { Item } from './components/item/item';
 import { ItemDetails } from './components/item-details/item-details';
 import { PageNotFound } from './components/page-not-found/page-not-found';
+import { Profile } from './components/profile/profile';
 
 export const authGuard : CanActivateFn = () => {
     const auth = inject(AuthService);
@@ -21,6 +22,7 @@ export const routes: Routes = [
     {path:'register', component: Register},
     {path:'home', component: Home, canActivate: [authGuard]},
     {path:'item', component: Item, canActivate: [authGuard]},
+    {path:'profile', component: Profile, canActivate: [authGuard]},
     {path: 'items/:id', component: ItemDetails, canActivate: [authGuard]},
 
 

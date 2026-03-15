@@ -57,6 +57,7 @@ export namespace LoanDTO {
     otherPartyName: string;
     startDate: string;
     endDate: string;
+    actualReturnDate?: string;
     status: string;
     hasUnreadMessages: boolean;
     daysOverdue?: number;
