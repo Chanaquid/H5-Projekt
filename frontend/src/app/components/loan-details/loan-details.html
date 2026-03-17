@@ -1,6 +1,8 @@
 <!-- Background -->
 <div class="fixed inset-0 bg-zinc-950 -z-10"></div>
-<div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10"></div>
+<div
+  class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
 
 <app-navbar></app-navbar>
 
@@ -21,20 +23,34 @@
       <div class="flex items-start justify-between gap-4 flex-wrap">
         <div>
           <div class="flex items-center gap-2 mb-2">
-            <a routerLink="/my-loans" class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors no-underline">
+            <a routerLink="/my-loans"
+              class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors no-underline">
               <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
               </svg>
               My Loans
             </a>
             <span class="text-zinc-700">/</span>
             <span class="text-zinc-500 text-xs">Loan #{{ loan.id }}</span>
           </div>
-          <h1 class="font-black text-2xl md:text-3xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
-            {{ loan.item.title }}
-          </h1>
+
+          <div class="flex items-center gap-3 flex-wrap">
+            <h1 class="font-black text-2xl md:text-3xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
+              {{ loan.item.title }}
+            </h1>
+            <button *ngIf="effectiveRole === 'Owner'" (click)="openQrModal()"
+              class="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 hover:border-amber-400/30 text-zinc-300 hover:text-amber-400 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M12 4v1m6 11h2m-6 0h-2v4m0-11v3m0 0h.01M12 12h4.01M16 20h2M4 16h2m0 0v4m0-4h4m-4 0V8m0 0H4m4 0V4" />
+              </svg>
+              QR Code
+            </button>
+          </div>
+
           <p class="text-zinc-500 text-sm mt-1">
-            {{ effectiveRole === 'Owner' ? 'Lent to' : effectiveRole === 'Borrower' ? 'Borrowed from' : 'Viewing loan for' }}
+            {{ effectiveRole === 'Owner' ? 'Lent to' : effectiveRole === 'Borrower' ? 'Borrowed from' : 'Viewing loan
+            for' }}
             <span class="text-zinc-300 font-medium">
               {{ effectiveRole === 'Owner' ? loan.borrower.fullName : loan.owner.fullName }}
             </span>
@@ -47,7 +63,8 @@
             class="flex items-center gap-1.5 bg-red-500/10 border border-red-500/20 text-red-400 text-xs font-bold px-3 py-1.5 rounded-xl">
             ⚠️ {{ loan.daysOverdue }} day{{ loan.daysOverdue > 1 ? 's' : '' }} overdue
           </span>
-          <span class="text-sm font-bold uppercase px-3 py-1.5 rounded-xl border" [ngClass]="getLoanStatusClass(loan.status)">
+          <span class="text-sm font-bold uppercase px-3 py-1.5 rounded-xl border"
+            [ngClass]="getLoanStatusClass(loan.status)">
             {{ loan.status }}
           </span>
         </div>
@@ -64,7 +81,8 @@
           <div *ngIf="loan.snapshotPhotos && loan.snapshotPhotos.length > 0"
             class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
             <div class="px-5 py-4 border-b border-zinc-800">
-              <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Item Snapshot at Loan Creation</h3>
+              <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Item Snapshot at Loan
+                Creation</h3>
               <p class="text-zinc-500 text-xs mt-0.5">Photos frozen at time of loan — used for dispute resolution</p>
             </div>
             <div class="p-4">
@@ -72,7 +90,7 @@
                 <div *ngFor="let photo of loan.snapshotPhotos"
                   class="shrink-0 w-40 h-40 rounded-xl overflow-hidden bg-zinc-800 cursor-pointer hover:opacity-90 transition-opacity"
                   (click)="openPhoto(photo.photoUrl)">
-                  <img [src]="photo.photoUrl" class="w-full h-full object-cover"/>
+                  <img [src]="photo.photoUrl" class="w-full h-full object-cover" />
                 </div>
               </div>
             </div>
@@ -88,16 +106,14 @@
               </div>
               <div>
                 <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Due Date</p>
-                <p class="text-sm font-semibold"
-                  [class.text-red-400]="loan.daysOverdue && loan.daysOverdue > 0"
+                <p class="text-sm font-semibold" [class.text-red-400]="loan.daysOverdue && loan.daysOverdue > 0"
                   [class.text-white]="!loan.daysOverdue">
                   {{ loan.endDate | date:'MMM d, yyyy' }}
                 </p>
               </div>
               <div>
                 <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Returned</p>
-                <p class="text-sm font-semibold"
-                  [class.text-emerald-400]="loan.actualReturnDate"
+                <p class="text-sm font-semibold" [class.text-emerald-400]="loan.actualReturnDate"
                   [class.text-zinc-600]="!loan.actualReturnDate">
                   {{ loan.actualReturnDate ? (loan.actualReturnDate | date:'MMM d, yyyy') : '—' }}
                 </p>
@@ -112,8 +128,10 @@
             <div *ngIf="loan.requestedExtensionDate" class="mt-4 pt-4 border-t border-zinc-800">
               <div class="flex items-center justify-between flex-wrap gap-2">
                 <div>
-                  <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Extension Requested</p>
-                  <p class="text-white text-sm font-semibold">Until {{ loan.requestedExtensionDate | date:'MMM d, yyyy' }}</p>
+                  <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Extension Requested
+                  </p>
+                  <p class="text-white text-sm font-semibold">Until {{ loan.requestedExtensionDate | date:'MMM d, yyyy'
+                    }}</p>
                 </div>
                 <span class="text-xs font-bold uppercase px-2 py-1 rounded-lg"
                   [class.bg-amber-400/10]="loan.extensionRequestStatus === 'Pending'"
@@ -130,12 +148,14 @@
 
           <!-- Decision note -->
           <div *ngIf="loan.decisionNote" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
-            <h3 class="font-bold text-white text-sm mb-2" style="font-family:'Syne',sans-serif">Owner's decision note:</h3>
+            <h3 class="font-bold text-white text-sm mb-2" style="font-family:'Syne',sans-serif">Owner's decision note:
+            </h3>
             <p class="text-zinc-400 text-sm leading-relaxed">{{ loan.decisionNote }}</p>
           </div>
 
           <!-- Borrower actions — QR code pickup / return -->
-          <div *ngIf="effectiveRole === 'Borrower' && (loan.status === 'Approved' || loan.status === 'Active' || loan.status === 'Late')"
+          <div
+            *ngIf="effectiveRole === 'Borrower' && (loan.status === 'Approved' || loan.status === 'Active' || loan.status === 'Late')"
             class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
             <div class="px-5 py-4 border-b border-zinc-800">
               <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">
@@ -143,15 +163,15 @@
               </h3>
               <p class="text-zinc-500 text-xs mt-0.5">
                 {{ loan.status === 'Approved'
-                  ? 'Enter the QR code from the owner to confirm you picked up the item.'
-                  : 'Enter the QR code from the owner to confirm you returned the item.' }}
+                ? 'Enter the QR code from the owner to confirm you picked up the item.'
+                : 'Enter the QR code from the owner to confirm you returned the item.' }}
               </p>
             </div>
             <div class="p-5 space-y-3">
               <div class="space-y-1.5">
                 <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">QR Code</label>
                 <input type="text" [(ngModel)]="qrCodeInput" placeholder="Enter QR code..."
-                  class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 tracking-widest uppercase transition-all duration-200"/>
+                  class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 tracking-widest uppercase transition-all duration-200" />
               </div>
 
               <p *ngIf="activateError || completeError"
@@ -160,21 +180,22 @@
               </p>
 
               <!-- Pickup button -->
-              <button *ngIf="loan.status === 'Approved'"
-                (click)="activateLoan()" [disabled]="isActivatingLoan || !qrCodeInput.trim()"
+              <button *ngIf="loan.status === 'Approved'" (click)="activateLoan()"
+                [disabled]="isActivatingLoan || !qrCodeInput.trim()"
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                 </svg>
                 {{ isActivatingLoan ? 'Confirming...' : 'Confirm Pickup' }}
               </button>
 
               <!-- Return button -->
-              <button *ngIf="loan.status === 'Active' || loan.status === 'Late'"
-                (click)="completeLoan()" [disabled]="isCompletingLoan || !qrCodeInput.trim()"
+              <button *ngIf="loan.status === 'Active' || loan.status === 'Late'" (click)="completeLoan()"
+                [disabled]="isCompletingLoan || !qrCodeInput.trim()"
                 class="w-full flex items-center justify-center gap-2 px-4 py-2.5 bg-blue-500/10 hover:bg-blue-500/20 border border-blue-500/20 hover:border-blue-500/40 text-blue-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                 </svg>
                 {{ isCompletingLoan ? 'Confirming...' : 'Confirm Return' }}
               </button>
@@ -194,21 +215,22 @@
                 <textarea [(ngModel)]="decisionNote" rows="3" placeholder="Add a note to the borrower..."
                   class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
               </div>
-              <p *ngIf="decisionError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              <p *ngIf="decisionError"
+                class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
                 {{ decisionError }}
               </p>
               <div class="flex gap-3">
                 <button (click)="decide(false)" [disabled]="isDeciding"
                   class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-800 hover:bg-red-500/10 border border-zinc-700 hover:border-red-500/30 text-zinc-300 hover:text-red-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                   </svg>
                   Reject
                 </button>
                 <button (click)="decide(true)" [disabled]="isDeciding"
                   class="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 hover:border-emerald-500/40 text-emerald-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
                   <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
                   </svg>
                   {{ isDeciding ? 'Processing...' : 'Approve' }}
                 </button>
@@ -221,7 +243,8 @@
             class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
             <div class="px-5 py-4 border-b border-zinc-800 flex items-center gap-2">
               <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Fines</h3>
-              <span class="text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded-full">
+              <span
+                class="text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded-full">
                 {{ loan.fines.length }}
               </span>
             </div>
@@ -233,11 +256,14 @@
                   <p *ngIf="fine.rejectionReason" class="text-red-400 text-xs mt-0.5">{{ fine.rejectionReason }}</p>
                 </div>
                 <div class="text-right">
-                  <p class="text-white font-black text-lg" style="font-family:'Syne',sans-serif">kr {{ fine.amount }}</p>
+                  <p class="text-white font-black text-lg" style="font-family:'Syne',sans-serif">kr {{ fine.amount }}
+                  </p>
                   <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md"
                     [class.bg-red-400/10]="fine.status === 'Unpaid'" [class.text-red-400]="fine.status === 'Unpaid'"
-                    [class.bg-amber-400/10]="fine.status === 'PendingVerification'" [class.text-amber-400]="fine.status === 'PendingVerification'"
-                    [class.bg-emerald-400/10]="fine.status === 'Paid'" [class.text-emerald-400]="fine.status === 'Paid'">
+                    [class.bg-amber-400/10]="fine.status === 'PendingVerification'"
+                    [class.text-amber-400]="fine.status === 'PendingVerification'"
+                    [class.bg-emerald-400/10]="fine.status === 'Paid'"
+                    [class.text-emerald-400]="fine.status === 'Paid'">
                     {{ fine.status }}
                   </span>
                 </div>
@@ -260,10 +286,11 @@
                   <p class="text-zinc-500 text-sm">No messages yet</p>
                 </div>
               </div>
-              <div *ngFor="let msg of thread?.messages" class="flex gap-2.5"
+              <div *ngFor="let msg of thread?.messages; trackBy: trackMessage" class="flex gap-2.5"
                 [class.flex-row-reverse]="msg.senderId === currentUserId">
-                <div class="w-7 h-7 rounded-lg shrink-0 overflow-hidden bg-zinc-700 flex items-center justify-center text-xs font-bold text-amber-400">
-                  <img *ngIf="msg.senderAvatarUrl" [src]="msg.senderAvatarUrl" class="w-full h-full object-cover"/>
+                <div
+                  class="w-7 h-7 rounded-lg shrink-0 overflow-hidden bg-zinc-700 flex items-center justify-center text-xs font-bold text-amber-400">
+                  <img *ngIf="msg.senderAvatarUrl" [src]="msg.senderAvatarUrl" class="w-full h-full object-cover" />
                   <span *ngIf="!msg.senderAvatarUrl">{{ getInitials(msg.senderName) }}</span>
                 </div>
                 <div class="max-w-[70%]">
@@ -286,12 +313,14 @@
 
             <!-- Message input -->
             <div class="px-4 py-3 border-t border-zinc-800 flex items-center gap-2">
-              <input type="text" [(ngModel)]="newMessage" (keydown.enter)="sendMessage()" placeholder="Type a message..."
-                class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2 outline-none placeholder-zinc-600 transition-all duration-200"/>
+              <input type="text" [(ngModel)]="newMessage" (keydown.enter)="sendMessage()"
+                placeholder="Type a message..."
+                class="flex-1 bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2 outline-none placeholder-zinc-600 transition-all duration-200" />
               <button (click)="sendMessage()" [disabled]="!newMessage.trim() || isSending"
                 class="w-9 h-9 flex items-center justify-center bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 rounded-xl transition-all duration-200 shrink-0">
                 <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
                 </svg>
               </button>
             </div>
@@ -306,24 +335,28 @@
           <div class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
             <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden cursor-pointer" (click)="goToItem()">
               <img *ngIf="loan.item.primaryPhotoUrl" [src]="loan.item.primaryPhotoUrl"
-                class="w-full h-full object-cover hover:scale-105 transition-transform duration-500"/>
-              <div *ngIf="!loan.item.primaryPhotoUrl" class="w-full h-full flex items-center justify-center text-5xl">📦</div>
+                class="w-full h-full object-cover hover:scale-105 transition-transform duration-500" />
+              <div *ngIf="!loan.item.primaryPhotoUrl" class="w-full h-full flex items-center justify-center text-5xl">📦
+              </div>
               <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
               <div class="absolute bottom-3 left-3 right-3">
-                <p class="text-white font-bold text-sm truncate" style="font-family:'Syne',sans-serif">{{ loan.item.title }}</p>
+                <p class="text-white font-bold text-sm truncate" style="font-family:'Syne',sans-serif">{{
+                  loan.item.title }}</p>
                 <p class="text-zinc-300 text-xs">{{ loan.item.categoryName }} · {{ loan.item.condition }}</p>
               </div>
             </div>
             <div class="p-4 space-y-2">
               <div class="flex items-center justify-between">
                 <span class="text-zinc-500 text-xs">Condition at pickup</span>
-                <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md border" [ngClass]="getConditionClass(loan.snapshotCondition)">
+                <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md border"
+                  [ngClass]="getConditionClass(loan.snapshotCondition)">
                   {{ loan.snapshotCondition }}
                 </span>
               </div>
               <div class="flex items-center justify-between">
                 <span class="text-zinc-500 text-xs">Pickup address</span>
-                <span class="text-white text-xs font-medium text-right ml-4 truncate max-w-[60%]">{{ loan.item.pickupAddress }}</span>
+                <span class="text-white text-xs font-medium text-right ml-4 truncate max-w-[60%]">{{
+                  loan.item.pickupAddress }}</span>
               </div>
             </div>
           </div>
@@ -334,9 +367,10 @@
               {{ effectiveRole === 'Owner' ? 'Borrower' : 'Owner' }}
             </h3>
             <div class="flex items-center gap-3">
-              <div class="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-sm font-bold text-amber-400 cursor-pointer"
+              <div
+                class="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-sm font-bold text-amber-400 cursor-pointer"
                 (click)="router.navigate(['/users', otherParty?.id])">
-                <img *ngIf="otherParty?.avatarUrl" [src]="otherParty!.avatarUrl!" class="w-full h-full object-cover"/>
+                <img *ngIf="otherParty?.avatarUrl" [src]="otherParty!.avatarUrl!" class="w-full h-full object-cover" />
                 <span *ngIf="!otherParty?.avatarUrl">{{ getInitials(otherParty?.fullName || '') }}</span>
               </div>
               <div>
@@ -351,11 +385,9 @@
               </div>
               <div class="ml-auto text-right">
                 <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Score</p>
-                <p class="font-black text-lg leading-none"
-                  [class.text-emerald-400]="(otherParty?.score ?? 0) >= 70"
+                <p class="font-black text-lg leading-none" [class.text-emerald-400]="(otherParty?.score ?? 0) >= 70"
                   [class.text-amber-400]="(otherParty?.score ?? 0) >= 40 && (otherParty?.score ?? 0) < 70"
-                  [class.text-red-400]="(otherParty?.score ?? 0) < 40"
-                  style="font-family:'Syne',sans-serif">
+                  [class.text-red-400]="(otherParty?.score ?? 0) < 40" style="font-family:'Syne',sans-serif">
                   {{ otherParty?.score }}
                 </p>
               </div>
@@ -372,20 +404,28 @@
             <div class="flex items-center justify-between">
               <span class="text-zinc-300 text-xs">Your role</span>
               <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md"
-                [class.bg-amber-400/10]="effectiveRole === 'Admin'"
-                [class.text-amber-400]="effectiveRole === 'Admin'"
-                [class.bg-blue-400/10]="effectiveRole === 'Owner'"
-                [class.text-blue-400]="effectiveRole === 'Owner'"
-                [class.bg-zinc-700]="effectiveRole === 'Borrower'"
-                [class.text-zinc-300]="effectiveRole === 'Borrower'">
+                [class.bg-amber-400/10]="effectiveRole === 'Admin'" [class.text-amber-400]="effectiveRole === 'Admin'"
+                [class.bg-blue-400/10]="effectiveRole === 'Owner'" [class.text-blue-400]="effectiveRole === 'Owner'"
+                [class.bg-zinc-700]="effectiveRole === 'Borrower'" [class.text-zinc-300]="effectiveRole === 'Borrower'">
                 {{ effectiveRole }}
               </span>
             </div>
+
+            <!-- Open dispute notice -->
             <div *ngIf="loan.hasOpenDispute"
-              class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2 mt-2">
+              class="flex items-center gap-2 bg-red-500/10 border border-red-500/20 rounded-xl px-3 py-2">
               <span class="text-base">⚖️</span>
               <span class="text-red-400 text-xs font-medium">This loan has an open dispute</span>
             </div>
+
+            <!-- File dispute button — only for active parties on disputable statuses -->
+            <button
+              *ngIf="!loan.hasOpenDispute && effectiveRole !== 'Admin' && (loan.status === 'Active' || loan.status === 'Late' || loan.status === 'Returned')"
+              (click)="showDisputeModal = true"
+              class="w-full flex items-center justify-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-red-500/10 border border-zinc-700 hover:border-red-500/30 text-zinc-400 hover:text-red-400 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer">
+              <span>⚖️</span>
+              File a Dispute
+            </button>
           </div>
 
           <!-- Reviews -->
@@ -393,12 +433,17 @@
             class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-4">
             <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Leave a Review</h3>
 
-            <p *ngIf="itemReviewSuccess" class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{ itemReviewSuccess }}</p>
-            <p *ngIf="userReviewSuccess" class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{ userReviewSuccess }}</p>
+            <p *ngIf="itemReviewSuccess"
+              class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{
+              itemReviewSuccess }}</p>
+            <p *ngIf="userReviewSuccess"
+              class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{
+              userReviewSuccess }}</p>
 
             <!-- Review item -->
             <div>
-              <button *ngIf="!hasReviewedItem && effectiveRole === 'Borrower'" (click)="showReviewItem = !showReviewItem"
+              <button *ngIf="!hasReviewedItem && effectiveRole === 'Borrower'"
+                (click)="showReviewItem = !showReviewItem"
                 class="w-full flex items-center justify-between px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-all duration-200 cursor-pointer">
                 <div class="flex items-center gap-2">
                   <span class="text-base">📦</span>
@@ -407,7 +452,7 @@
                 </div>
                 <svg class="w-4 h-4 text-zinc-500 transition-transform duration-200" [class.rotate-180]="showReviewItem"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               <div *ngIf="hasReviewedItem" class="flex items-center gap-2 px-4 py-3 bg-zinc-800/50 rounded-xl">
@@ -425,7 +470,8 @@
                   </div>
                 </div>
                 <div class="space-y-1.5">
-                  <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Comment (optional)</label>
+                  <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Comment
+                    (optional)</label>
                   <textarea [(ngModel)]="itemReviewComment" rows="2" placeholder="Share your experience..."
                     class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2 outline-none placeholder-zinc-500 resize-none transition-all duration-200"></textarea>
                 </div>
@@ -443,12 +489,13 @@
                 class="w-full flex items-center justify-between px-4 py-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-all duration-200 cursor-pointer">
                 <div class="flex items-center gap-2">
                   <span class="text-base">👤</span>
-                  <span class="text-white text-xs font-semibold">Review {{ effectiveRole === 'Owner' ? 'Borrower' : 'Owner' }}</span>
+                  <span class="text-white text-xs font-semibold">Review {{ effectiveRole === 'Owner' ? 'Borrower' :
+                    'Owner' }}</span>
                   <span class="text-zinc-500 text-xs">{{ otherParty?.fullName }}</span>
                 </div>
                 <svg class="w-4 h-4 text-zinc-500 transition-transform duration-200" [class.rotate-180]="showReviewUser"
                   fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
                 </svg>
               </button>
               <div *ngIf="hasReviewedUser" class="flex items-center gap-2 px-4 py-3 bg-zinc-800/50 rounded-xl">
@@ -466,7 +513,8 @@
                   </div>
                 </div>
                 <div class="space-y-1.5">
-                  <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Comment (optional)</label>
+                  <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Comment
+                    (optional)</label>
                   <textarea [(ngModel)]="userReviewComment" rows="2" placeholder="Share your experience..."
                     class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2 outline-none placeholder-zinc-500 resize-none transition-all duration-200"></textarea>
                 </div>
@@ -496,16 +544,115 @@
   </div>
 </main>
 
+<!-- Dispute modal -->
+<div *ngIf="showDisputeModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showDisputeModal = false"></div>
+  <div class="relative z-10 w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-5">
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">File a Dispute</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">Loan #{{ loan?.id }} · {{ loan?.item?.title }}</p>
+      </div>
+      <button (click)="showDisputeModal = false"
+        class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
+      <p class="text-amber-400 text-xs leading-relaxed">
+        Filing as <span class="font-bold">{{ effectiveRole }}</span>. The other party will have 72 hours to submit their
+        response before an admin issues the dispute verdict.
+      </p>
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">
+        Describe the issue <span class="text-red-400">*</span>
+      </label>
+      <textarea [(ngModel)]="disputeForm.description" rows="4" placeholder="Explain what happened in detail..."
+        class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
+    </div>
+
+    <p *ngIf="disputeError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+      {{ disputeError }}
+    </p>
+
+    <div class="flex gap-3">
+      <button (click)="showDisputeModal = false"
+        class="flex-1 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+        Cancel
+      </button>
+      <button (click)="fileDispute()" [disabled]="isFilingDispute || !disputeForm.description.trim()"
+        class="flex-1 py-2.5 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 disabled:opacity-50 text-red-400 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+        {{ isFilingDispute ? 'Filing...' : 'Submit Dispute' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- QR Code modal -->
+<div *ngIf="showQrModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showQrModal = false"></div>
+  <div class="relative z-10 w-full max-w-sm bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-5">
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">Item QR Code</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">{{ loan?.item?.title }}</p>
+      </div>
+      <button (click)="showQrModal = false"
+        class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoadingQr" class="flex items-center justify-center py-8">
+      <div class="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+
+    <!-- QR code display -->
+    <div *ngIf="!isLoadingQr && qrCode" class="space-y-4">
+      <div class="bg-zinc-800 rounded-xl p-4 text-center">
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">QR Code</p>
+        <p class="text-amber-400 font-mono font-black text-2xl tracking-widest break-all">{{ qrCode }}</p>
+      </div>
+      <div class="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
+        <p class="text-amber-400 text-xs leading-relaxed">
+          Share this code with the borrower to confirm pickup and return.
+        </p>
+      </div>
+    </div>
+
+    <!-- Error -->
+    <div *ngIf="!isLoadingQr && !qrCode" class="text-center py-4">
+      <p class="text-zinc-500 text-sm">Failed to load QR code.</p>
+    </div>
+
+    <button (click)="showQrModal = false"
+      class="w-full py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+      Close
+    </button>
+  </div>
+</div>
+
 <!-- Photo lightbox -->
-<div *ngIf="selectedPhoto" class="fixed inset-0 z-[100] flex items-center justify-center p-4" (click)="selectedPhoto = null">
+<div *ngIf="selectedPhoto" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+  (click)="selectedPhoto = null">
   <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
   <div class="relative z-10" (click)="$event.stopPropagation()">
     <button (click)="selectedPhoto = null"
       class="absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
       <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
       </svg>
     </button>
-    <img [src]="selectedPhoto" class="max-w-[90vw] max-h-[85vh] rounded-2xl object-contain shadow-2xl"/>
+    <img [src]="selectedPhoto" class="max-w-[90vw] max-h-[85vh] rounded-2xl object-contain shadow-2xl" />
   </div>
 </div>

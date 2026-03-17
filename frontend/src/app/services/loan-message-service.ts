@@ -11,7 +11,7 @@ export class LoanMessageService {
 
   // GET /api/messages/loan/{loanId}
   getThread(loanId: number): Observable<ChatDTO.LoanMessageDTO.LoanMessageThreadDTO> {
-    return this.http.get<ChatDTO.LoanMessageDTO.LoanMessageThreadDTO>(`${this.baseUrl}/${loanId}/thread`);
+    return this.http.get<ChatDTO.LoanMessageDTO.LoanMessageThreadDTO>(`${this.baseUrl}/${loanId}`);
   }
 
   // POST /api/messages/loan

@@ -7,6 +7,7 @@ import { UserService } from '../../services/user-service';
 import { NotificationDTO } from '../../dtos/notificationDTO';
 import { NotificationService } from '../../services/notification-service';
 import { filter } from 'rxjs/operators';
+import { SignalRService } from '../../services/signal-r-service';
 
 
 @Component({
@@ -33,22 +34,22 @@ export class Navbar implements OnInit {
 
   searchQuery = '';
   isHomePage = false;
+  isAdmin = false;
 
-isAdmin = false;
+  currentUserId = '';
 
   constructor(
     private authService: AuthService,
-    private router: Router,
+    public router: Router,
     private userService: UserService,
+    private signalRService: SignalRService,
     private notificationService: NotificationService,
     private cdr: ChangeDetectorRef
   ) { }
 
   ngOnInit(): void {
-    this.loadUserInfo();
-    this.loadSummary();
     this.isAdmin = this.authService.isAdmin();
-
+    this.isHomePage = this.router.url.startsWith('/home');
 
     this.router.events.pipe(
       filter(e => e instanceof NavigationEnd)
@@ -57,9 +58,18 @@ isAdmin = false;
       this.cdr.detectChanges();
     });
 
-    // Set initial value on first load
-    this.isHomePage = this.router.url.startsWith('/home');
+    if(this.authService.isLoggedIn()) {
+      this.loadUserInfo();
+      this.loadSummary();
+      this.connectNotificationSignalR();
+    }
   }
+
+  ngOnDestroy(): void {
+    this.signalRService.offNewNotification();
+    this.signalRService.leaveUserNotifications();
+  }
+
 
   private loadUserInfo(): void {
     this.userService.getMe().subscribe({
@@ -68,6 +78,7 @@ isAdmin = false;
         this.userEmail = user.email;
         this.userInitials = this.getInitials(this.userName);
         this.userAvatarUrl = user.avatarUrl ?? null;
+        this.currentUserId = user.id;
         this.cdr.detectChanges();
 
       },
@@ -75,23 +86,52 @@ isAdmin = false;
     });
   }
 
+  private connectNotificationSignalR(): void {
+    this.signalRService.startConnection().then(() => {
+      this.signalRService.joinUserNotifications().catch(err =>
+        console.warn('Could not join user notifications:', err)
+      );
+
+      this.signalRService.onNewNotification((notification) => {
+        const exists = this.notifications.some(n => n.id === notification.id);
+        if (!exists) {
+          this.notifications.unshift({
+            id: notification.id,
+            message: notification.message,
+            type: notification.type,
+            referenceId: notification.referenceId,
+            referenceType: notification.referenceType,
+            isRead: false,
+            createdAt: notification.createdAt
+          });
+          this.unreadCount++;
+          this.cdr.detectChanges();
+        }
+      });
+
+    }).catch(err => console.warn('Navbar SignalR failed:', err));
+  }
+
   loadSummary(): void {
-    this.notificationService.getSummary().subscribe(res => {
-      this.unreadCount = res.unreadCount;
-      this.notifications = res.recent;
-      this.cdr.detectChanges();
+    this.notificationService.getSummary().subscribe({
+      next: (res) => {
+        this.unreadCount = res.unreadCount;
+        this.notifications = res.recent;
+        this.cdr.detectChanges();
+      },
+      error: () => {}
     });
   }
 
   onNotificationClick(n: NotificationDTO.NotificationResponseDTO): void {
     if (!n.isRead) {
-      n.isRead = true; // update UI immediately
+      n.isRead = true;
       this.unreadCount = Math.max(0, this.unreadCount - 1);
       this.notificationService.markAsRead(n.id).subscribe({
         error: () => {
-          // revert if API fails
           n.isRead = false;
           this.unreadCount++;
+          this.cdr.detectChanges();
         }
       });
     }
@@ -113,6 +153,9 @@ isAdmin = false;
   }
 
   logout(): void {
+    this.signalRService.offNewNotification();
+    this.signalRService.leaveUserNotifications();
+    this.signalRService.stopConnection();
     this.authService.logout().subscribe({
       next: () => this.router.navigate(['/']),
       error: () => {

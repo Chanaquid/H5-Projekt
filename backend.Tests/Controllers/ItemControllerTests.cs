@@ -23,10 +23,6 @@ namespace backend.Tests.Controllers
             SetUser("user-1", "User");
         }
 
-        // ───────────────────────────────────────────
-        // Helpers
-        // ───────────────────────────────────────────
-
         private void SetUser(string? userId, string role = "User")
         {
             var claims = new List<Claim>
@@ -88,10 +84,6 @@ namespace backend.Tests.Controllers
             QrCode = "TESTQR123456"
         };
 
-        // ───────────────────────────────────────────
-        // GetAll
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task GetAll_ReturnsOk_WithItems()
         {
@@ -125,10 +117,6 @@ namespace backend.Tests.Controllers
             Assert.Empty((List<ItemDTO.ItemSummaryDTO>)ok.Value!);
         }
 
-        // ───────────────────────────────────────────
-        // GetAllAdmin
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task GetAllAdmin_ReturnsOk_WithAllItems()
         {
@@ -161,10 +149,6 @@ namespace backend.Tests.Controllers
 
             _itemServiceMock.Verify(s => s.GetAllForAdminAsync(true), Times.Once);
         }
-
-        // ───────────────────────────────────────────
-        // GetById
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task GetById_AuthenticatedUser_ReturnsOk_AndTracksView()
@@ -227,10 +211,6 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _controller.GetById(999));
         }
 
-        // ───────────────────────────────────────────
-        // GetMyItems
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task GetMyItems_ReturnsOk_WithOwnerItems()
         {
@@ -263,10 +243,6 @@ namespace backend.Tests.Controllers
             _itemServiceMock.Verify(s => s.GetByOwnerAsync("specific-user"), Times.Once);
         }
 
-        // ───────────────────────────────────────────
-        // GetByUser (Admin)
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task GetByUser_ReturnsOk_WithUserItems()
         {
@@ -296,9 +272,6 @@ namespace backend.Tests.Controllers
             _itemServiceMock.Verify(s => s.GetByOwnerAsync("target-user"), Times.Once);
         }
 
-        // ───────────────────────────────────────────
-        // GetByUserPublic
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task GetByUserPublic_ReturnsOk_WithPublicItems()
@@ -315,10 +288,6 @@ namespace backend.Tests.Controllers
             var returned = Assert.IsAssignableFrom<List<ItemDTO.ItemSummaryDTO>>(ok.Value);
             Assert.Single(returned);
         }
-
-        // ───────────────────────────────────────────
-        // GetNearby
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task GetNearby_ReturnsOk_WithNearbyItems()
@@ -347,10 +316,6 @@ namespace backend.Tests.Controllers
 
             _itemServiceMock.Verify(s => s.GetNearbyAsync(55.0, 12.0, 5), Times.Once);
         }
-
-        // ───────────────────────────────────────────
-        // Create
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task Create_ReturnsCreatedAtAction_WithItem()
@@ -399,10 +364,6 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<ArgumentException>(() => _controller.Create(dto));
         }
 
-        // ───────────────────────────────────────────
-        // Update
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task Update_ReturnsOk_WithUpdatedItem()
         {
@@ -442,10 +403,6 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _controller.Update(999, dto));
         }
 
-        // ───────────────────────────────────────────
-        // UpdateStatus (Admin)
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task UpdateStatus_ReturnsOk_WithUpdatedItem()
         {
@@ -473,10 +430,6 @@ namespace backend.Tests.Controllers
 
             _itemServiceMock.Verify(s => s.UpdateStatusAsync(3, dto), Times.Once);
         }
-
-        // ───────────────────────────────────────────
-        // Delete
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task Delete_ReturnsNoContent()
@@ -512,10 +465,6 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<InvalidOperationException>(() => _controller.Delete(999));
         }
 
-        // ───────────────────────────────────────────
-        // GetQrCode
-        // ───────────────────────────────────────────
-
         [Fact]
         public async Task GetQrCode_ReturnsOk_WithQrCode()
         {
@@ -541,10 +490,7 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<UnauthorizedAccessException>(() => _controller.GetQrCode(1));
         }
 
-        // ───────────────────────────────────────────
-        // Scan
-        // ───────────────────────────────────────────
-
+   
         [Fact]
         public async Task Scan_ReturnsOk_WithItemDetail()
         {
@@ -583,10 +529,7 @@ namespace backend.Tests.Controllers
             await Assert.ThrowsAsync<KeyNotFoundException>(() => _controller.Scan("INVALID"));
         }
 
-        // ───────────────────────────────────────────
-        // GetPendingApprovals (Admin)
-        // ───────────────────────────────────────────
-
+ 
         [Fact]
         public async Task GetPendingApprovals_ReturnsOk_WithPendingItems()
         {
@@ -606,10 +549,6 @@ namespace backend.Tests.Controllers
             var returned = Assert.IsAssignableFrom<List<ItemDTO.AdminPendingItemDTO>>(ok.Value);
             Assert.Equal(2, returned.Count);
         }
-
-        // ───────────────────────────────────────────
-        // AdminDecide (Admin)
-        // ───────────────────────────────────────────
 
         [Fact]
         public async Task AdminDecide_Approve_ReturnsOk()

@@ -83,6 +83,7 @@ namespace backend.Services
                     PrimaryPhotoUrl = item.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
                     CategoryName = item.Category?.Name ?? string.Empty,
                     CategoryIcon = item.Category?.Icon,
+                    OwnerId = item.OwnerId,
                     OwnerName = item.Owner?.FullName ?? string.Empty,
                     AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
                     ReviewCount = reviews.Count,

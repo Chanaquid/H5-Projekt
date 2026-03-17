@@ -86,6 +86,7 @@ export namespace ItemDTO {
     primaryPhotoUrl?: string;
     categoryName: string;
     categoryIcon?: string;
+    ownerId: string;
     ownerName: string;
     averageRating: number;
     reviewCount: number;

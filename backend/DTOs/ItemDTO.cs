@@ -98,6 +98,8 @@ namespace backend.DTOs
             public string? PrimaryPhotoUrl { get; set; }
             public string CategoryName { get; set; } = string.Empty;
             public string? CategoryIcon { get; set; }
+            public string OwnerId { get; set; } = string.Empty;
+
             public string OwnerName { get; set; } = string.Empty;
             public double AverageRating { get; set; }
             public int ReviewCount { get; set; }

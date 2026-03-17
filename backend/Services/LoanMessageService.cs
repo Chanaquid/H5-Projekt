@@ -71,7 +71,21 @@ namespace backend.Services
             var otherPartyId = isOwner ? loan.BorrowerId : loan.Item.OwnerId;
             var otherPartyOnline = _onlineTracker.IsUserInLoanGroup(otherPartyId, dto.LoanId);
 
-            if (!otherPartyOnline)
+            if (otherPartyOnline)
+            {
+                //Other party is viewing the chat — mark the message as read immediately
+                message.IsRead = true;
+                await _loanMessageRepository.SaveChangesAsync();
+
+                //Push read receipt to the sender immediately
+                await _hubContext.Clients
+                    .Group($"loan_{dto.LoanId}")
+                    .SendAsync("MessagesRead", new { loanId = dto.LoanId, readBy = otherPartyId });
+
+
+            }
+
+            else
             {
                 await _notificationService.SendAsync(
                     otherPartyId,
@@ -117,7 +131,12 @@ namespace backend.Services
                 m.IsRead = true;
 
             if (unread.Any())
+            {
                 await _loanMessageRepository.SaveChangesAsync();
+                await _hubContext.Clients
+                   .Group($"loan_{loanId}")
+                   .SendAsync("MessagesRead", new { LoanId = loanId, ReadBy = requestingUserId });
+            }
 
             var otherParty = isOwner ? loan.Borrower : loan.Item.Owner;
 
@@ -157,7 +176,7 @@ namespace backend.Services
             //Push read receipt so sender's UI can show a checkmark
             await _hubContext.Clients
                 .Group($"loan_{loanId}")
-                .SendAsync("MessagesRead", new { LoanId = loanId, ReadBy = userId });
+                .SendAsync("MessagesRead", new { loanId = loanId, readBy = userId });
         }
 
         //Used by ChatHub to validate the connecting user before joining a loan group

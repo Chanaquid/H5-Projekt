@@ -5,34 +5,55 @@ using System.Security.Claims;
 
 namespace backend.Hubs
 {
-    [Authorize]  //JWT required to connect — anonymous users cannot join
-
+    [Authorize]
     public class ChatHub : Hub
     {
         private readonly ILoanMessageService _messageService;
-        private readonly OnlineTracker _onlineTracker;
+        private readonly IOnlineTracker _onlineTracker;
+        private readonly ILogger<ChatHub> _logger;
 
-        public ChatHub(ILoanMessageService messageService, OnlineTracker onlineTracker)
+        public ChatHub(ILoanMessageService messageService, IOnlineTracker onlineTracker, ILogger<ChatHub> logger)
         {
             _messageService = messageService;
             _onlineTracker = onlineTracker;
-
+            _logger = logger;
         }
 
-        //join loan chat
+        public override async Task OnConnectedAsync()
+        {
+            try
+            {
+                _logger.LogInformation("[ChatHub] Client connected: {ConnectionId}, User: {UserId}",
+                    Context.ConnectionId,
+                    Context.User?.FindFirstValue(ClaimTypes.NameIdentifier) ?? "unknown");
+                await base.OnConnectedAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "[ChatHub] OnConnectedAsync failed");
+                throw;
+            }
+        }
+
         public async Task JoinLoanChat(int loanId)
         {
             try
             {
                 var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+                _logger.LogInformation("[ChatHub] JoinLoanChat called. LoanId: {LoanId}, UserId: {UserId}", loanId, userId);
+
                 if (userId == null)
                 {
                     await Clients.Caller.SendAsync("Error", "Unauthorized.");
                     return;
                 }
 
+                var isAdmin = Context.User?.IsInRole("Admin") ?? false;
                 var isParty = await _messageService.IsPartyToLoanAsync(loanId, userId);
-                if (!isParty)
+
+                _logger.LogInformation("[ChatHub] isAdmin: {IsAdmin}, isParty: {IsParty}", isAdmin, isParty);
+
+                if (!isParty && !isAdmin)
                 {
                     await Clients.Caller.SendAsync("Error", "You are not a party to this loan.");
                     return;
@@ -40,66 +61,47 @@ namespace backend.Hubs
 
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"loan_{loanId}");
 
-                //Track this user as online in this loan group
-                _onlineTracker.Add(Context.ConnectionId, userId, loanId);
+                if (isParty)
+                    _onlineTracker.Add(Context.ConnectionId, userId, loanId);
 
-                //Also join their personal notification group for cross-page toasts
                 await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
-
                 await Clients.Caller.SendAsync("JoinedChat", new { LoanId = loanId });
+
+                _logger.LogInformation("[ChatHub] Successfully joined loan_{LoanId}", loanId);
             }
             catch (Exception ex)
             {
+                _logger.LogError(ex, "[ChatHub] JoinLoanChat failed for LoanId: {LoanId}", loanId);
                 await Clients.Caller.SendAsync("Error", $"Failed to join chat: {ex.Message}");
             }
         }
 
-        //Leave loanchat
-        public async Task LeaveLoanChat(int loanId)
-        {
-            try
-            {
-                var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-
-                await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"loan_{loanId}");
-                _onlineTracker.Remove(Context.ConnectionId);
-
-                await Clients.Caller.SendAsync("LeftChat", new { LoanId = loanId });
-            }
-            catch (Exception ex)
-            {
-                await Clients.Caller.SendAsync("Error", $"Failed to leave chat: {ex.Message}");
-            }
-        }
-
-        //Typing indicator
-        public async Task Typing(int loanId)
-        {
-            try
-            {
-                var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
-                if (userId == null) return;
-
-                await Clients.OthersInGroup($"loan_{loanId}")
-                    .SendAsync("UserTyping", new { LoanId = loanId, UserId = userId });
-            }
-            catch
-            {
-                //Typing indicator failure is silent — not worth surfacing to user
-            }
-        }
-
-        //Disconnect
         public override async Task OnDisconnectedAsync(Exception? exception)
         {
+            _logger.LogInformation("[ChatHub] Client disconnected: {ConnectionId}, Error: {Error}",
+                Context.ConnectionId,
+                exception?.Message ?? "none");
             _onlineTracker.Remove(Context.ConnectionId);
             await base.OnDisconnectedAsync(exception);
         }
 
+        public async Task JoinUserGroup()
+        {
+            var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return;
+            await Groups.AddToGroupAsync(Context.ConnectionId, $"user_{userId}");
+            _logger.LogInformation("[ChatHub] User {UserId} joined personal notification group", userId);
+        }
 
-
-
+        public async Task LeaveUserGroup()
+        {
+            var userId = Context.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return;
+            await Groups.RemoveFromGroupAsync(Context.ConnectionId, $"user_{userId}");
+            _logger.LogInformation("[ChatHub] User {UserId} left personal notification group", userId);
+        }
 
 
     }
+
 }

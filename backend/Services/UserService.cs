@@ -322,6 +322,7 @@ namespace backend.Services
                 PrimaryPhotoUrl = i.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
                 CategoryName = i.Category?.Name ?? string.Empty,
                 CategoryIcon = i.Category?.Icon,
+                OwnerId = i.OwnerId,
                 OwnerName = user.FullName,
                 AverageRating = i.Reviews?.Any() == true ? i.Reviews.Average(r => r.Rating) : 0,
                 IsActive = i.IsActive,

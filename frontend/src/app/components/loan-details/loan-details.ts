@@ -1,4 +1,4 @@
-import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { AfterViewChecked, ChangeDetectorRef, Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
@@ -7,11 +7,13 @@ import { LoanService } from '../../services/loan-service';
 import { LoanMessageService } from '../../services/loan-message-service';
 import { UserService } from '../../services/user-service';
 import { ReviewService } from '../../services/review-service';
+import { ItemService } from '../../services/item-service';
+import { DisputeService } from '../../services/dispute-service';
+import { SignalRService } from '../../services/signal-r-service';
 import { LoanDTO } from '../../dtos/loanDTO';
 import { ChatDTO } from '../../dtos/chatDTO';
 import { UserDTO } from '../../dtos/userDTO';
 import { Navbar } from '../navbar/navbar';
-import { ItemService } from '../../services/item-service';
 
 @Component({
   selector: 'app-loan-details',
@@ -19,7 +21,7 @@ import { ItemService } from '../../services/item-service';
   templateUrl: './loan-details.html',
   styleUrl: './loan-details.css',
 })
-export class LoanDetails implements OnInit, AfterViewChecked {
+export class LoanDetails implements OnInit, OnDestroy {
 
   @ViewChild('messageContainer') messageContainer!: ElementRef;
 
@@ -30,9 +32,15 @@ export class LoanDetails implements OnInit, AfterViewChecked {
   isSending = false;
   newMessage = '';
   selectedPhoto: string | null = null;
-  private shouldScrollToBottom = false;
+  private loanId = 0;
 
   isAdmin = false;
+
+  //qr code
+  showQrModal = false;
+  qrCode = '';
+  isLoadingQr = false;
+
 
   // Decision
   decisionNote = '';
@@ -55,13 +63,18 @@ export class LoanDetails implements OnInit, AfterViewChecked {
   hasReviewedItem = false;
   hasReviewedUser = false;
 
-
-  //starting a loan (active)
+  // Loan activation
   isActivatingLoan = false;
   isCompletingLoan = false;
   activateError = '';
   completeError = '';
   qrCodeInput = '';
+
+  // Dispute
+  showDisputeModal = false;
+  disputeForm = { description: '' };
+  isFilingDispute = false;
+  disputeError = '';
 
   constructor(
     private route: ActivatedRoute,
@@ -72,6 +85,8 @@ export class LoanDetails implements OnInit, AfterViewChecked {
     private userService: UserService,
     private reviewService: ReviewService,
     private itemService: ItemService,
+    private disputeService: DisputeService,
+    private signalRService: SignalRService,
     private cdr: ChangeDetectorRef,
   ) { }
 
@@ -82,24 +97,77 @@ export class LoanDetails implements OnInit, AfterViewChecked {
       return;
     }
 
-    const id = Number(this.route.snapshot.paramMap.get('id'));
+    this.loanId = Number(this.route.snapshot.paramMap.get('id'));
 
     this.userService.getMe().subscribe({
       next: (user) => {
         this.currentUserId = user.id;
-        this.loadLoan(id);
+        this.loadLoan(this.loanId);
       },
       error: () => {
-        this.loadLoan(id);
+        this.loadLoan(this.loanId);
       }
     });
   }
 
-  ngAfterViewChecked(): void {
-    if (this.shouldScrollToBottom) {
-      this.scrollToBottom();
-      this.shouldScrollToBottom = false;
+  ngOnDestroy(): void {
+    this.signalRService.leaveLoanGroup(this.loanId);
+    this.signalRService.offReceiveMessage();
+    this.signalRService.offMessagesRead();
+  }
+
+  private startSignalR(loanId: number): void {
+    // Register handlers first regardless of connection state
+    this.signalRService.onReceiveMessage((msg) => {
+      if (!this.thread) {
+        this.thread = {
+          loanId,
+          itemTitle: this.loan?.item.title ?? '',
+          otherPartyName: '',
+          otherPartyAvatarUrl: undefined,
+          messages: []
+        };
+      }
+      const exists = this.thread.messages.some(m => m.id === msg.id);
+      if (!exists) {
+        this.thread.messages.push(msg);
+        this.cdr.detectChanges();
+        this.triggerScroll();
+        if (msg.senderId !== this.currentUserId) {
+          this.loanMessageService.markThreadAsRead(loanId).subscribe();
+        }
+      }
+      this.cdr.detectChanges();
+    });
+
+    this.signalRService.onMessagesRead((data) => {
+      const id = data.loanId ?? data.LoanId;
+      if (this.thread && id === loanId) {
+        this.thread.messages.forEach(m => {
+          if (m.senderId === this.currentUserId) m.isRead = true;
+        });
+        this.cdr.detectChanges();
+      }
+    });
+
+    // If already connected, just join the group
+    if (this.signalRService.isConnected) {
+      if (this.effectiveRole !== 'Admin') {
+        this.signalRService.joinLoanGroup(loanId).catch(err =>
+          console.warn('Could not join loan group:', err)
+        );
+      }
+      return;
     }
+
+    // Otherwise start and then join
+    this.signalRService.startConnection().then(() => {
+      if (this.effectiveRole !== 'Admin') {
+        this.signalRService.joinLoanGroup(loanId).catch(err =>
+          console.warn('Could not join loan group:', err)
+        );
+      }
+    }).catch(err => console.error('SignalR connection failed:', err));
   }
 
   private loadLoan(id: number): void {
@@ -109,6 +177,7 @@ export class LoanDetails implements OnInit, AfterViewChecked {
         this.isLoading = false;
         this.cdr.detectChanges();
         this.loadThread(id);
+        this.startSignalR(id);
         if (loan.status === 'Returned' || loan.status === 'Late') {
           this.checkExistingReviews(id);
         }
@@ -125,8 +194,8 @@ export class LoanDetails implements OnInit, AfterViewChecked {
     this.loanMessageService.getThread(loanId).subscribe({
       next: (thread) => {
         this.thread = thread;
-        this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
+        this.triggerScroll();
       },
       error: () => { }
     });
@@ -135,18 +204,14 @@ export class LoanDetails implements OnInit, AfterViewChecked {
   private checkExistingReviews(loanId: number): void {
     if (!this.loan) return;
 
-    // Check if current user already reviewed the item
     this.reviewService.getItemReviews(this.loan.item.id).subscribe({
       next: (reviews) => {
-        this.hasReviewedItem = reviews.some((r: any) =>
-          r.loanId === loanId
-        );
+        this.hasReviewedItem = reviews.some((r: any) => r.loanId === loanId);
         this.cdr.detectChanges();
       },
       error: () => { }
     });
 
-    // Check if current user already reviewed the other party
     if (this.otherParty?.id) {
       this.reviewService.getUserReviews(this.otherParty.id).subscribe({
         next: (reviews) => {
@@ -156,6 +221,42 @@ export class LoanDetails implements OnInit, AfterViewChecked {
         error: () => { }
       });
     }
+  }
+
+  private triggerScroll(): void {
+    setTimeout(() => {
+      this.scrollToBottom();
+      this.cdr.detectChanges();
+    }, 50);
+  }
+
+  private scrollToBottom(): void {
+    try {
+      const el = this.messageContainer.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    } catch { }
+  }
+
+  trackMessage(_index: number, msg: any): number {
+    return msg.id;
+  }
+
+  openQrModal(): void {
+    this.showQrModal = true;
+    if (this.qrCode) return; // already loaded
+    this.isLoadingQr = true;
+
+    this.itemService.getQrCode(this.loan!.item.id).subscribe({
+      next: (res) => {
+        this.qrCode = res.qrCode;
+        this.isLoadingQr = false;
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.isLoadingQr = false;
+        this.cdr.detectChanges();
+      }
+    });
   }
 
   decide(isApproved: boolean): void {
@@ -181,29 +282,93 @@ export class LoanDetails implements OnInit, AfterViewChecked {
   sendMessage(): void {
     if (!this.newMessage.trim() || !this.loan || this.isSending) return;
     this.isSending = true;
+    const content = this.newMessage.trim();
+    this.newMessage = '';
 
-    this.loanMessageService.send({ loanId: this.loan.id, content: this.newMessage.trim() }).subscribe({
-      next: (msg) => {
-        if (!this.thread) {
-          this.thread = {
-            loanId: this.loan!.id,
-            itemTitle: this.loan!.item.title,
-            otherPartyName: '',
-            otherPartyAvatarUrl: undefined,
-            messages: []
-          };
-        }
-        this.thread.messages.push(msg);
-        this.newMessage = '';
+    this.loanMessageService.send({ loanId: this.loan.id, content }).subscribe({
+      next: () => {
+        // SignalR delivers the message via ReceiveMessage — no manual push needed
         this.isSending = false;
-        this.shouldScrollToBottom = true;
         this.cdr.detectChanges();
       },
-      error: () => { this.isSending = false; }
+      error: () => {
+        this.newMessage = content;
+        this.isSending = false;
+        this.cdr.detectChanges();
+      }
     });
   }
 
+  activateLoan(): void {
+    if (!this.qrCodeInput.trim()) return;
+    this.isActivatingLoan = true;
+    this.activateError = '';
+
+    this.itemService.scan(this.qrCodeInput.trim().toUpperCase()).subscribe({
+      next: () => {
+        this.isActivatingLoan = false;
+        this.qrCodeInput = '';
+        this.loadLoan(this.loan!.id);
+      },
+      error: (err) => {
+        this.activateError = err.error?.message ?? 'Invalid QR code.';
+        this.isActivatingLoan = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  completeLoan(): void {
+    if (!this.qrCodeInput.trim()) return;
+    this.isCompletingLoan = true;
+    this.completeError = '';
+
+    this.itemService.scan(this.qrCodeInput.trim().toUpperCase()).subscribe({
+      next: () => {
+        this.isCompletingLoan = false;
+        this.qrCodeInput = '';
+        this.loadLoan(this.loan!.id);
+      },
+      error: (err) => {
+        this.completeError = err.error?.message ?? 'Invalid QR code.';
+        this.isCompletingLoan = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  fileDispute(): void {
+    if (!this.loan || !this.disputeForm.description.trim()) {
+      this.disputeError = 'Please describe the issue.';
+      return;
+    }
+    this.isFilingDispute = true;
+    this.disputeError = '';
+
+    const filedAs = this.effectiveRole === 'Owner' ? 'AsOwner' : 'AsBorrower';
+
+    this.disputeService.create({
+      loanId: this.loan.id,
+      filedAs,
+      description: this.disputeForm.description.trim()
+    }).subscribe({
+      next: () => {
+        this.isFilingDispute = false;
+        this.showDisputeModal = false;
+        this.disputeForm.description = '';
+        this.loadLoan(this.loan!.id);
+      },
+      error: (err) => {
+        this.disputeError = err.error?.message ?? 'Failed to file dispute.';
+        this.isFilingDispute = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+
   setItemRating(r: number): void { this.itemReviewRating = r; }
+
   setUserRating(r: number): void { this.userReviewRating = r; }
 
   submitItemReview(): void {
@@ -268,13 +433,6 @@ export class LoanDetails implements OnInit, AfterViewChecked {
     });
   }
 
-  private scrollToBottom(): void {
-    try {
-      const el = this.messageContainer.nativeElement;
-      el.scrollTop = el.scrollHeight;
-    } catch { }
-  }
-
   get isOwner(): boolean {
     return this.loan?.owner?.id === this.currentUserId;
   }
@@ -328,42 +486,5 @@ export class LoanDetails implements OnInit, AfterViewChecked {
   }
 
 
-  activateLoan(): void {
-    if (!this.qrCodeInput.trim()) return;
-    this.isActivatingLoan = true;
-    this.activateError = '';
-
-    this.itemService.scan(this.qrCodeInput.trim().toUpperCase()).subscribe({
-      next: () => {
-        this.isActivatingLoan = false;
-        this.qrCodeInput = '';
-        this.loadLoan(this.loan!.id);
-      },
-      error: (err) => {
-        this.activateError = err.error?.message ?? 'Invalid QR code.';
-        this.isActivatingLoan = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
-
-  completeLoan(): void {
-    if (!this.qrCodeInput.trim()) return;
-    this.isCompletingLoan = true;
-    this.completeError = '';
-
-    this.itemService.scan(this.qrCodeInput.trim().toUpperCase()).subscribe({
-      next: () => {
-        this.isCompletingLoan = false;
-        this.qrCodeInput = '';
-        this.loadLoan(this.loan!.id);
-      },
-      error: (err) => {
-        this.completeError = err.error?.message ?? 'Invalid QR code.';
-        this.isCompletingLoan = false;
-        this.cdr.detectChanges();
-      }
-    });
-  }
 
 }

@@ -583,6 +583,7 @@ namespace backend.Services
                     AvailableFrom = l.Item.AvailableFrom,
                     AvailableUntil = l.Item.AvailableUntil,
                     PrimaryPhotoUrl = l.SnapshotPhotos?.OrderBy(p => p.DisplayOrder).FirstOrDefault()?.PhotoUrl,
+                    OwnerId = l.Item.OwnerId,
                     OwnerName = l.Item.Owner?.FullName ?? string.Empty
                 },
                 Owner = new UserDTO.UserSummaryDTO

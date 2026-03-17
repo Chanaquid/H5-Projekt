@@ -1,16 +1,21 @@
 ﻿using backend.DTOs;
+using backend.Hubs;
 using backend.Interfaces;
 using backend.Models;
+using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Services
 {
     public class NotificationService : INotificationService
     {
         private readonly INotificationRepository _notificationRepository;
+        private readonly IHubContext<ChatHub> _hubContext;
 
-        public NotificationService(INotificationRepository notificationRepository)
+        public NotificationService(INotificationRepository notificationRepository,
+            IHubContext<ChatHub> hubContext)
         {
             _notificationRepository = notificationRepository;
+            _hubContext = hubContext;
 
         }
 
@@ -82,6 +87,21 @@ namespace backend.Services
 
             await _notificationRepository.AddAsync(notification);
             await _notificationRepository.SaveChangesAsync();
+
+            await _hubContext.Clients
+               .Group($"user_{userId}")
+               .SendAsync("NewNotification", new
+               {
+                   id = notification.Id,
+                   message = notification.Message,
+                   type = notification.Type.ToString(),
+                   referenceId = notification.ReferenceId,
+                   referenceType = notification.ReferenceType?.ToString(),
+                   isRead = false,
+                   createdAt = notification.CreatedAt
+               });
+
+
         }
 
         //Map to DTO

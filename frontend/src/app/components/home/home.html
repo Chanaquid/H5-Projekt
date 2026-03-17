@@ -1,191 +1,230 @@
 <!-- Background -->
 <div class="fixed inset-0 bg-zinc-950 -z-10"></div>
-<div
-    class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
-</div>
+<div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10"></div>
 
-<!-- ── NAVBAR ── -->
 <app-navbar></app-navbar>
 
-<!-- ── MAIN ── -->
 <main class="pt-16 min-h-screen">
 
-    <!-- ── HERO STRIP ── -->
-    <div class="relative px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60 overflow-hidden">
-        <div class="flex items-center justify-between gap-6 flex-wrap">
-            <div>
-                <p class="text-zinc-500 text-sm font-medium mb-1">Good to see you back,</p>
-                <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight"
-                    style="font-family:'Syne',sans-serif">
-                    {{ userName }} <span class="text-amber-400">👋</span>
-                </h1>
-            </div>
-           
-        </div>
+  <!-- Hero strip -->
+  <div class="relative px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60 overflow-hidden">
+    <div class="flex items-center justify-between gap-6 flex-wrap">
+      <div>
+        <p class="text-zinc-500 text-sm font-medium mb-1">Good to see you back,</p>
+        <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
+          {{ userName }} <span class="text-amber-400">👋</span>
+        </h1>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-6 md:px-10 py-8">
+
+    <!-- Category filter -->
+    <div class="relative mb-8">
+      <button *ngIf="showLeftArrow" (click)="scrollCategories('left')"
+        class="absolute left-0 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-8 h-8 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 shadow-[4px_0_12px_rgba(0,0,0,0.8)]">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <div #categoryStrip
+        class="flex items-center gap-2 overflow-x-auto px-10 pb-2 scrollbar-hide cursor-grab select-none"
+        [class.px-10]="showLeftArrow || showRightArrow">
+        <button (click)="selectCategory(null)"
+          [class.bg-amber-400]="selectedCategory === null"
+          [class.text-zinc-900]="selectedCategory === null"
+          [class.border-amber-400]="selectedCategory === null"
+          [class.text-zinc-400]="selectedCategory !== null"
+          [class.border-zinc-700]="selectedCategory !== null"
+          class="shrink-0 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap hover:border-amber-400/50">
+          All items
+        </button>
+        <button *ngFor="let cat of categories" (click)="selectCategory(cat.name)"
+          [class.bg-amber-400]="selectedCategory === cat.name"
+          [class.text-zinc-900]="selectedCategory === cat.name"
+          [class.border-amber-400]="selectedCategory === cat.name"
+          [class.text-zinc-400]="selectedCategory !== cat.name"
+          [class.border-zinc-700]="selectedCategory !== cat.name"
+          class="shrink-0 cursor-pointer flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap hover:border-amber-400/50">
+          <span>{{ cat.icon }}</span>{{ cat.name }}
+        </button>
+      </div>
+
+      <button *ngIf="showRightArrow" (click)="scrollCategories('right')"
+        class="absolute right-0 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-8 h-8 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 shadow-[-4px_0_12px_rgba(0,0,0,0.8)]">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
     </div>
 
-    <div class="px-6 md:px-10 py-8">
-
-        <!-- ── CATEGORY FILTER ── -->
-        <div class="relative mb-8">
-
-            <!-- Left arrow -->
-            <button *ngIf="showLeftArrow" (click)="scrollCategories('left')"
-                class="absolute left-0 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-8 h-8 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 shadow-[4px_0_12px_rgba(0,0,0,0.8)]">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-                </svg>
-            </button>
-
-            <!-- Scrollable strip -->
-            <div #categoryStrip
-                class="flex items-center gap-2 overflow-x-auto px-10 pb-2 scrollbar-hide cursor-grab select-none"
-                [class.px-10]="showLeftArrow || showRightArrow">
-                <button (click)="selectCategory(null)" [class.bg-amber-400]="selectedCategory === null"
-                    [class.text-zinc-900]="selectedCategory === null"
-                    [class.border-amber-400]="selectedCategory === null"
-                    [class.text-zinc-400]="selectedCategory !== null"
-                    [class.border-zinc-700]="selectedCategory !== null"
-                    class="shrink-0 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap hover:border-amber-400/50">
-                    All items
-                </button>
-                <button *ngFor="let cat of categories" (click)="selectCategory(cat.name)"
-                    [class.bg-amber-400]="selectedCategory === cat.name"
-                    [class.text-zinc-900]="selectedCategory === cat.name"
-                    [class.border-amber-400]="selectedCategory === cat.name"
-                    [class.text-zinc-400]="selectedCategory !== cat.name"
-                    [class.border-zinc-700]="selectedCategory !== cat.name"
-                    class="shrink-0 cursor-pointer flex items-center gap-1.5 px-4 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap hover:border-amber-400/50">
-                    <span>{{ cat.icon }}</span>{{ cat.name }}
-                </button>
-            </div>
-
-            <!-- Right arrow -->
-            <button *ngIf="showRightArrow" (click)="scrollCategories('right')"
-                class="absolute right-0 top-[calc(50%-4px)] -translate-y-1/2 z-10 w-8 h-8 bg-zinc-950 border border-zinc-800 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 shadow-[-4px_0_12px_rgba(0,0,0,0.8)]">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-                </svg>
-            </button>
-
-        </div>
-
-        <!-- ── TOOLBAR ── -->
-        <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
-            <p class="text-zinc-400 text-sm">
-                <span class="text-white font-semibold">{{ filteredItems.length }}</span> items available
-            </p>
-            <div class="flex items-center gap-2">
-                <!-- Sort -->
-                <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()"
-                    class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-amber-400/50 transition-all duration-200 cursor-pointer">
-                    <option  value="newest">Newest first</option>
-                    <option  value="rating">Top rated</option>
-                    <option value="az">A → Z</option>
-                </select>
-                <!-- Available only toggle -->
-                <button (click)="availableOnly = !availableOnly; applyFilters()" [class.bg-amber-400]="availableOnly"
-                    [class.text-zinc-900]="availableOnly" [class.border-amber-400]="availableOnly"
-                    [class.text-zinc-400]="!availableOnly" [class.border-zinc-700]="!availableOnly"
-                    class="px-3 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap cursor-pointer hover:border-amber-400/50">
-                    Available only
-                </button>
-            </div>
-        </div>
-
-        <!-- ── LOADING ── -->
-        <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div *ngFor="let _ of [1,2,3,4,5,6,7,8]"
-                class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden animate-pulse">
-                <div class="aspect-[4/3] bg-zinc-800"></div>
-                <div class="p-4 space-y-2">
-                    <div class="h-3 bg-zinc-800 rounded w-1/3"></div>
-                    <div class="h-4 bg-zinc-800 rounded w-3/4"></div>
-                    <div class="h-3 bg-zinc-800 rounded w-1/2"></div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ── EMPTY STATE ── -->
-        <div *ngIf="!isLoading && filteredItems.length === 0"
-            class="flex flex-col items-center justify-center py-24 text-center">
-            <div
-                class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-3xl mb-4">
-                📦</div>
-            <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">No items found</h3>
-            <p class="text-zinc-500 text-sm max-w-xs">Try a different category or search term, or be the first to list
-                something!</p>
-            <a routerLink="/items/new"
-                class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 no-underline">
-                List an item
-            </a>
-        </div>
-
-        <!-- ── ITEMS GRID ── -->
-        <div *ngIf="!isLoading && filteredItems.length > 0"
-            class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            <div *ngFor="let item of filteredItems" (click)="goToItem(item.id)"
-                class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 cursor-pointer group">
-
-                <!-- Image -->
-                <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden">
-                    <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl" [alt]="item.title"
-                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
-                    <div *ngIf="!item.primaryPhotoUrl" class="w-full h-full flex items-center justify-center text-5xl">
-                        {{ getCategoryEmoji(item.categoryName) }}
-                    </div>
-                    <!-- Badges -->
-                    <div class="absolute top-3 left-3 flex gap-1.5">
-                        <span *ngIf="!item.isCurrentlyOnLoan"
-                            class="bg-emerald-400 text-zinc-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
-                            Available
-                        </span>
-                        <span *ngIf="item.isCurrentlyOnLoan"
-                            class="bg-zinc-700 text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
-                            On loan
-                        </span>
-                    </div>
-                    <!-- Favorite button -->
-                    <button (click)="$event.stopPropagation()"
-                        class="absolute top-3 right-3 w-7 h-7 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg flex items-center justify-center text-zinc-400 hover:text-red-400 transition-all duration-200 opacity-0 group-hover:opacity-100">
-                        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                        </svg>
-                    </button>
-                </div>
-
-                <!-- Body -->
-                <div class="p-4">
-                    <div class="flex items-center justify-between mb-1">
-                        <span class="text-amber-400 text-[15px] font-semibold uppercase tracking-widest">{{
-                            item.categoryName }}</span>
-                        <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border"
-                            [ngClass]="getConditionClass(item.condition)">
-                            {{ item.condition }}
-                        </span>
-                    </div>
-                    <h3 class="font-bold text-white text-lg mb-1 truncate" style="font-family:'Syne',sans-serif">{{
-                        item.title }}</h3>
-                    <p class="text-zinc-500 text-md mb-3 truncate">📍 {{ item.pickupAddress }}</p>
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-1.5 text-lg text-zinc-400">
-                            <div
-                                class="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[9px] font-bold text-white">
-                                {{ getInitials(item.ownerName) }}
-                            </div>
-                            {{ item.ownerName }}
-                        </div>
-                        <div class="text-xs flex items-center gap-1" [class.text-zinc-300]="item.averageRating === 0"
-                            [class.text-zinc-200]="item.averageRating > 0">
-                            <span class="text-amber-400">★</span>
-                            {{ item.averageRating > 0 ? item.averageRating.toFixed(1) : 'New' }}
-                            <span *ngIf="item.reviewCount > 0" class="text-zinc-400">({{ item.reviewCount }})</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
+    <!-- Toolbar -->
+    <div class="flex items-center justify-between mb-6 gap-4 flex-wrap">
+      <p class="text-zinc-400 text-sm">
+        <span class="text-white font-semibold">{{ filteredItems.length }}</span> items available
+        <span *ngIf="totalPages > 1" class="text-zinc-600 ml-2">· Page {{ currentPage }} of {{ totalPages }}</span>
+      </p>
+      <div class="flex items-center gap-2">
+        <select [(ngModel)]="sortBy" (ngModelChange)="applyFilters()"
+          class="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-xl px-3 py-2 outline-none focus:border-amber-400/50 transition-all duration-200 cursor-pointer">
+          <option value="newest">Newest first</option>
+          <option value="rating">Top rated</option>
+          <option value="az">A → Z</option>
+        </select>
+        <button (click)="availableOnly = !availableOnly; applyFilters()"
+          [class.bg-amber-400]="availableOnly" [class.text-zinc-900]="availableOnly"
+          [class.border-amber-400]="availableOnly" [class.text-zinc-400]="!availableOnly"
+          [class.border-zinc-700]="!availableOnly"
+          class="px-3 py-2 text-xs font-semibold rounded-xl border transition-all duration-200 whitespace-nowrap cursor-pointer hover:border-amber-400/50">
+          Available only
+        </button>
+      </div>
     </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div *ngFor="let _ of [1,2,3,4,5,6,7,8]"
+        class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden animate-pulse">
+        <div class="aspect-[4/3] bg-zinc-800"></div>
+        <div class="p-4 space-y-2">
+          <div class="h-3 bg-zinc-800 rounded w-1/3"></div>
+          <div class="h-4 bg-zinc-800 rounded w-3/4"></div>
+          <div class="h-3 bg-zinc-800 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && filteredItems.length === 0"
+      class="flex flex-col items-center justify-center py-24 text-center">
+      <div class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-3xl mb-4">📦</div>
+      <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">No items found</h3>
+      <p class="text-zinc-500 text-sm max-w-xs">Try a different category or search term, or be the first to list something!</p>
+      <a routerLink="/items/new"
+        class="mt-6 inline-flex items-center gap-2 px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 no-underline">
+        List an item
+      </a>
+    </div>
+
+    <!-- Items grid -->
+    <div *ngIf="!isLoading && filteredItems.length > 0"
+      class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <div *ngFor="let item of paginatedItems" (click)="goToItem(item.id)"
+        class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl overflow-hidden transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-black/50 cursor-pointer group">
+
+        <!-- Image -->
+        <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden">
+          <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl" [alt]="item.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          <div *ngIf="!item.primaryPhotoUrl" class="w-full h-full flex items-center justify-center text-5xl">
+            {{ getCategoryEmoji(item.categoryName) }}
+          </div>
+          <div class="absolute top-3 left-3 flex gap-1.5">
+            <span *ngIf="!item.isCurrentlyOnLoan"
+              class="bg-emerald-400 text-zinc-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
+              Available
+            </span>
+            <span *ngIf="item.isCurrentlyOnLoan"
+              class="bg-zinc-700 text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide">
+              On loan
+            </span>
+          </div>
+          <!-- Favorite button -->
+          <button *ngIf="item.ownerId !== currentUserId"
+            (click)="toggleFavorite(item.id, $event)" [disabled]="togglingIds.has(item.id)"
+            class="absolute top-3 right-3 w-7 h-7 bg-black/40 backdrop-blur-sm hover:bg-black/60 rounded-lg flex items-center justify-center transition-all duration-200 opacity-0 group-hover:opacity-100 cursor-pointer disabled:opacity-50"
+            [class.text-red-400]="favoriteIds.has(item.id)"
+            [class.text-zinc-400]="!favoriteIds.has(item.id)">
+            <svg *ngIf="favoriteIds.has(item.id)" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+            </svg>
+            <svg *ngIf="!favoriteIds.has(item.id)" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+            </svg>
+          </button>
+        </div>
+
+        <!-- Body -->
+        <div class="p-4">
+          <div class="flex items-center justify-between mb-1">
+            <span class="text-amber-400 text-[15px] font-semibold uppercase tracking-widest">{{ item.categoryName }}</span>
+            <span class="text-[11px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-md border"
+              [ngClass]="getConditionClass(item.condition)">
+              {{ item.condition }}
+            </span>
+          </div>
+          <h3 class="font-bold text-white text-lg mb-1 truncate" style="font-family:'Syne',sans-serif">{{ item.title }}</h3>
+          <p class="text-zinc-500 text-md mb-3 truncate">📍 {{ item.pickupAddress }}</p>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-1.5 text-lg text-zinc-400">
+              <div class="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[9px] font-bold text-white">
+                {{ getInitials(item.ownerName) }}
+              </div>
+              {{ item.ownerName }}
+            </div>
+            <div class="text-xs flex items-center gap-1"
+              [class.text-zinc-300]="item.averageRating === 0"
+              [class.text-zinc-200]="item.averageRating > 0">
+              <span class="text-amber-400">★</span>
+              {{ item.averageRating > 0 ? item.averageRating.toFixed(1) : 'New' }}
+              <span *ngIf="item.reviewCount > 0" class="text-zinc-400">({{ item.reviewCount }})</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pagination -->
+    <div *ngIf="totalPages > 1" class="flex items-center justify-center gap-1.5 mt-10">
+
+      <!-- Prev -->
+      <button (click)="goToPage(currentPage - 1)" [disabled]="currentPage === 1"
+        class="w-9 h-9 flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      </button>
+
+      <!-- Page numbers -->
+      <ng-container *ngFor="let page of pageNumbers">
+        <span *ngIf="page === -1" class="w-9 h-9 flex items-center justify-center text-zinc-600 text-sm">…</span>
+        <button *ngIf="page !== -1" (click)="goToPage(page)"
+          class="w-9 h-9 flex items-center justify-center rounded-xl border text-xs font-bold transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="page === currentPage"
+          [class.text-zinc-900]="page === currentPage"
+          [class.border-amber-400]="page === currentPage"
+          [class.bg-zinc-900]="page !== currentPage"
+          [class.text-zinc-400]="page !== currentPage"
+          [class.border-zinc-800]="page !== currentPage"
+          [class.hover:border-zinc-600]="page !== currentPage">
+          {{ page }}
+        </button>
+      </ng-container>
+
+      <!-- Next -->
+      <button (click)="goToPage(currentPage + 1)" [disabled]="currentPage === totalPages"
+        class="w-9 h-9 flex items-center justify-center rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:border-zinc-600 transition-all duration-200 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+        </svg>
+      </button>
+    </div>
+
+  </div>
+
+  <!-- Toast -->
+  <div class="fixed bottom-6 left-1/2 -translate-x-1/2 z-[200] transition-all duration-300 pointer-events-none"
+    [class.opacity-100]="toastVisible"
+    [class.translate-y-0]="toastVisible"
+    [class.opacity-0]="!toastVisible"
+    [class.translate-y-4]="!toastVisible">
+    <div class="flex items-center gap-2.5 bg-zinc-800 border border-zinc-700 text-white text-sm font-medium px-4 py-3 rounded-2xl shadow-2xl shadow-black/60">
+      <span class="text-amber-400">⚠️</span>
+      {{ toastMessage }}
+    </div>
+  </div>
+
 </main>
