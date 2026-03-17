@@ -267,6 +267,7 @@ namespace backend.Services
                 ItemTitle = r.Loan?.Item?.Title ?? string.Empty,
                 Rating = r.Rating,
                 Comment = r.Comment,
+                ReviewerId = r.ReviewerId,
                 ReviewerName = r.Reviewer?.FullName ?? string.Empty,
                 ReviewerAvatarUrl = r.Reviewer?.AvatarUrl,
                 IsAdminReview = r.IsAdminReview,

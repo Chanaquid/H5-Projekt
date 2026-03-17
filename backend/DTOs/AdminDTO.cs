@@ -27,7 +27,26 @@
             public int ItemId { get; set; }
             public string ItemTitle { get; set; } = string.Empty;
             public string OwnerName { get; set; } = string.Empty;
+            public double AverageRating { get; set; }
+            public int ReviewCount { get; set; }
+
+            public List<ItemReviewEntryDTO> Reviews { get; set; } = new();
+
             public List<LoanHistoryEntryDTO> Loans { get; set; } = new();
+        }
+
+        public class ItemReviewEntryDTO
+        {
+            public int Id { get; set; }
+            public string ReviewerId { get; set; } = string.Empty;
+            public string? ReviewerAvatarUrl { get; set; }
+
+            public string ReviewerName { get; set; } = string.Empty;
+            public int Rating { get; set; }
+            public string? Comment { get; set; }
+            public bool IsAdminReview { get; set; }
+
+            public DateTime CreatedAt { get; set; }
         }
 
         public class LoanHistoryEntryDTO

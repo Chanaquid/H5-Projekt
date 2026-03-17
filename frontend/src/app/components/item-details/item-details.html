@@ -1,18 +1,465 @@
+<!-- Background -->
 <div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div
+  class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
 
-<nav class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-12 h-16 bg-zinc-950/80 backdrop-blur-xl border-b border-zinc-800">
-  <a routerLink="/" class="flex items-center gap-2.5 no-underline">
-    <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-zinc-900 font-black text-sm">L</div>
-    <span class="font-black text-lg text-white tracking-tight" style="font-family:'Syne',sans-serif">LoanIt</span>
-  </a>
-</nav>
+<app-navbar></app-navbar>
 
-<div class="min-h-screen flex flex-col items-center justify-center pt-20">
-    <div class="bg-zinc-900 border border-zinc-800 p-12 rounded-3xl text-center shadow-2xl">
-        <h1 class="text-white text-4xl font-black mb-4" style="font-family:'Syne',sans-serif">Item Details</h1>
-        <div class="text-amber-400 text-6xl font-mono mb-6">
-            ID: {{ itemId }}
-        </div>
-        <a routerLink="/" class="text-zinc-500 hover:text-white transition-colors">← Back to Gallery</a>
+<main class="pt-16 min-h-screen">
+
+  <!-- Loading -->
+  <div *ngIf="isLoading" class="flex items-center justify-center py-32">
+    <div class="flex flex-col items-center gap-3">
+      <div class="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+      <p class="text-zinc-500 text-sm">Loading item...</p>
     </div>
+  </div>
+
+  <div *ngIf="!isLoading && item">
+
+    <!-- Header -->
+    <div class="px-6 md:px-10 pt-8 pb-6 border-b border-zinc-800/60">
+      <div class="flex items-start justify-between gap-4 flex-wrap">
+        <div>
+          <div class="flex items-center gap-2 mb-2">
+            <button (click)="goBack()"
+              class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors cursor-pointer">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+              </svg>
+              Back
+            </button>
+            <span class="text-zinc-700">/</span>
+            <span class="text-zinc-500 text-xs truncate max-w-[200px]">{{ item.title }}</span>
+          </div>
+          <h1 class="font-black text-2xl md:text-3xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
+            {{ item.title }}
+          </h1>
+          <div class="flex items-center gap-2 mt-2 flex-wrap">
+            <span class="text-amber-400 text-xs font-semibold uppercase tracking-widest">{{ item.category?.name
+              }}</span>
+            <span class="text-zinc-700">·</span>
+            <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md border"
+              [ngClass]="getConditionClass(item.condition)">
+              {{ item.condition }}
+            </span>
+            <span *ngIf="item.isCurrentlyOnLoan"
+              class="bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase px-2 py-0.5 rounded-md">
+              On Loan
+            </span>
+            <span *ngIf="item.status !== 'Approved'" class="text-xs font-bold uppercase px-2 py-0.5 rounded-md"
+              [class.bg-amber-400/10]="item.status === 'Pending'" [class.text-amber-400]="item.status === 'Pending'"
+              [class.bg-red-400/10]="item.status === 'Rejected'" [class.text-red-400]="item.status === 'Rejected'">
+              {{ item.status }}
+            </span>
+          </div>
+        </div>
+
+        <!-- Actions -->
+        <div class="flex items-center gap-2">
+          <button *ngIf="isOwner || isAdmin" (click)="router.navigate(['/items', item.id, 'edit'])"
+            class="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+            Edit
+          </button>
+          <button *ngIf="canRequestLoan" (click)="showLoanModal = true"
+            class="flex items-center gap-2 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-sm font-semibold rounded-xl transition-all duration-200 cursor-pointer">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            Request Loan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="px-6 md:px-10 py-8">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+
+        <!-- LEFT: Photos + Details -->
+        <div class="lg:col-span-2 space-y-6">
+
+          <!-- Photos -->
+          <div *ngIf="item.photos && item.photos.length > 0" class="space-y-3">
+            <!-- Primary photo -->
+            <div class="aspect-[16/9] bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden cursor-pointer"
+              (click)="selectedPhoto = (item.photos[0]?.photoUrl ?? null)">
+              <img [src]="item.photos[0]?.photoUrl" [alt]="item.title" class="w-full h-full object-cover" />
+            </div>
+            <!-- Thumbnail strip -->
+            <div *ngIf="item.photos.length > 1" class="flex gap-2 overflow-x-auto pb-1">
+              <div *ngFor="let photo of item.photos" (click)="selectedPhoto = photo.photoUrl"
+                class="shrink-0 w-20 h-20 rounded-xl overflow-hidden bg-zinc-800 cursor-pointer hover:opacity-80 transition-opacity border-2"
+                [class.border-amber-400]="photo.isPrimary" [class.border-transparent]="!photo.isPrimary">
+                <img [src]="photo.photoUrl" class="w-full h-full object-cover" />
+              </div>
+            </div>
+          </div>
+
+          <!-- No photo placeholder -->
+          <div *ngIf="!item.photos || item.photos.length === 0"
+            class="aspect-[16/9] bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-7xl">
+            {{ getCategoryEmoji(item.category?.name || '') }}
+          </div>
+
+          <!-- Description -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="font-bold text-white text-sm mb-3" style="font-family:'Syne',sans-serif">Description</h3>
+            <p class="text-zinc-300 text-sm leading-relaxed">{{ item.description }}</p>
+          </div>
+
+          <!-- Details grid -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <h3 class="font-bold text-white text-sm mb-4" style="font-family:'Syne',sans-serif">Item Details</h3>
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Current Value</p>
+                <p class="text-white text-sm font-semibold">kr {{ item.currentValue }}</p>
+              </div>
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Min Loan Days</p>
+                <p class="text-white text-sm font-semibold">{{ item.minLoanDays ?? '—' }}</p>
+              </div>
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Available From</p>
+                <p class="text-white text-sm font-semibold">{{ item.availableFrom | date:'MMM d, yyyy' }}</p>
+              </div>
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Available Until</p>
+                <p class="text-white text-sm font-semibold">{{ item.availableUntil | date:'MMM d, yyyy' }}</p>
+              </div>
+              <div class="col-span-2">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Pickup Address</p>
+                <p class="text-white text-sm font-semibold">📍 {{ item.pickupAddress }}</p>
+              </div>
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Requires Verification
+                </p>
+                <p class="text-sm font-semibold" [class.text-amber-400]="item.requiresVerification"
+                  [class.text-zinc-500]="!item.requiresVerification">
+                  {{ item.requiresVerification ? 'Yes' : 'No' }}
+                </p>
+              </div>
+              <div>
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Listed</p>
+                <p class="text-white text-sm font-semibold">{{ item.createdAt | date:'MMM d, yyyy' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Admin note -->
+          <!-- <div *ngIf="item.adminNote" class="bg-amber-400/5 border border-amber-400/20 rounded-2xl p-5">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Admin Note</p>
+            <p class="text-amber-400 text-sm leading-relaxed">{{ item.adminNote }}</p>
+          </div> -->
+
+          <!-- Reviews -->
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">
+                Reviews
+                <span class="ml-2 text-zinc-500 font-normal text-xs">({{ reviews.length }})</span>
+              </h3>
+              <div *ngIf="reviews.length > 0" class="flex items-center gap-2">
+                <div class="flex gap-0.5">
+                  <span *ngFor="let s of [1,2,3,4,5]" class="text-sm" [class.text-amber-400]="s <= averageRating"
+                    [class.text-zinc-600]="s > averageRating">★</span>
+                </div>
+                <span class="text-white font-black text-sm" style="font-family:'Syne',sans-serif">{{
+                  averageRating.toFixed(1) }}</span>
+              </div>
+            </div>
+
+            <!-- Loading -->
+            <div *ngIf="isLoadingReviews" class="space-y-3">
+              <div *ngFor="let _ of [1,2]" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse">
+                <div class="flex items-center gap-3 mb-2">
+                  <div class="w-8 h-8 rounded-full bg-zinc-800"></div>
+                  <div class="h-3 bg-zinc-800 rounded w-28"></div>
+                </div>
+                <div class="h-3 bg-zinc-800 rounded w-full mb-1"></div>
+                <div class="h-3 bg-zinc-800 rounded w-2/3"></div>
+              </div>
+            </div>
+
+            <!-- No reviews -->
+            <div *ngIf="!isLoadingReviews && reviews.length === 0"
+              class="flex flex-col items-center justify-center py-12 bg-zinc-900 border border-zinc-800 rounded-2xl text-center">
+              <span class="text-3xl mb-2">⭐</span>
+              <p class="text-zinc-500 text-sm">No reviews for this item yet.</p>
+            </div>
+
+            <!-- Review list -->
+            <div *ngIf="!isLoadingReviews && reviews.length > 0" class="space-y-3">
+              <div *ngFor="let review of displayedReviews"
+                class="bg-zinc-900 border rounded-2xl p-4 space-y-2 transition-all duration-200"
+                [class.border-amber-400/20]="review.isAdminReview" [class.bg-amber-400/5]="review.isAdminReview"
+                [class.border-zinc-800]="!review.isAdminReview">
+
+                <div class="flex items-center justify-between flex-wrap gap-2">
+                  <div class="flex items-center gap-2">
+                    <div
+                      class="w-7 h-7 rounded-full overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-[10px] font-bold text-amber-400">
+                      <img *ngIf="review.reviewerAvatarUrl" [src]="review.reviewerAvatarUrl"
+                        class="w-full h-full object-cover" />
+                      <span *ngIf="!review.reviewerAvatarUrl">{{ review.reviewerName.charAt(0).toUpperCase() }}</span>
+                    </div>
+                    <p class="text-white text-xs font-semibold">{{ review.reviewerName }}</p>
+                    <span *ngIf="review.isAdminReview"
+                      class="text-[9px] font-black uppercase bg-amber-400/10 text-amber-400 border border-amber-400/20 px-1.5 py-0.5 rounded-md">
+                      Admin
+                    </span>
+                    <span *ngIf="review.isEdited" class="text-zinc-600 text-[10px]">(edited)</span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <div class="flex gap-0.5">
+                      <span *ngFor="let s of [1,2,3,4,5]" class="text-xs" [class.text-amber-400]="s <= review.rating"
+                        [class.text-zinc-600]="s > review.rating">★</span>
+                    </div>
+                    <span class="text-zinc-500 text-[10px]">{{ review.createdAt | date:'MMM d, yyyy' }}</span>
+                  </div>
+                </div>
+
+                <p *ngIf="review.comment" class="text-zinc-300 text-sm leading-relaxed">{{ review.comment }}</p>
+                <p *ngIf="!review.comment" class="text-zinc-600 text-xs italic">No comment left.</p>
+              </div>
+
+              <button *ngIf="visibleReviews < reviews.length" (click)="loadMoreReviews()"
+                class="w-full py-2.5 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-2xl transition-all duration-200 cursor-pointer">
+                Load more ({{ reviews.length - visibleReviews }} remaining)
+              </button>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- RIGHT: Sidebar -->
+        <div class="space-y-5">
+
+          <!-- Owner card -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-4">Owner</p>
+            <div class="flex items-center gap-3">
+              <div
+                class="w-12 h-12 rounded-2xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-sm font-bold text-amber-400"
+                (click)="router.navigate(['/users', item.owner?.id])">
+                <img *ngIf="item.owner?.avatarUrl" [src]="item.owner.avatarUrl"
+                  class="w-full h-full object-cover  cursor-pointer" />
+                <span *ngIf="!item.owner?.avatarUrl " class=" cursor-pointer">{{ getInitials(item.owner?.fullName || '')
+                  }}</span>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-white text-sm font-semibold hover:text-amber-400 transition-colors truncate   cursor-pointer"
+                  (click)="router.navigate(['/users', item.owner?.id])">{{ item.owner?.fullName }}</p>
+                <div class="flex items-center gap-1.5 mt-0.5">
+                  <p class="text-zinc-500 text-xs   cursor-pointer"
+                    (click)="router.navigate(['/users', item.owner?.id])">@{{ item.owner?.username }}</p>
+                  <span *ngIf="item.owner?.isVerified"
+                    class="text-[9px] font-bold uppercase bg-blue-400/10 text-blue-400 border border-blue-400/20 px-1 rounded">✓</span>
+                </div>
+              </div>
+              <div class="text-right shrink-0">
+                <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Score</p>
+                <p class="font-black text-lg leading-none" [class.text-emerald-400]="(item.owner?.score ?? 0) >= 70"
+                  [class.text-amber-400]="(item.owner?.score ?? 0) >= 40 && (item.owner?.score ?? 0) < 70"
+                  [class.text-red-400]="(item.owner?.score ?? 0) < 40" style="font-family:'Syne',sans-serif">
+                  {{ item.owner?.score }}
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Availability -->
+          <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Availability</p>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400 text-xs">Status</span>
+              <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md"
+                [class.bg-emerald-400/10]="!item.isCurrentlyOnLoan && item.isActive && item.status === 'Approved'"
+                [class.text-emerald-400]="!item.isCurrentlyOnLoan && item.isActive && item.status === 'Approved'"
+                [class.bg-blue-400/10]="item.isCurrentlyOnLoan" [class.text-blue-400]="item.isCurrentlyOnLoan"
+                [class.bg-zinc-700]="!item.isActive || item.status !== 'Approved'"
+                [class.text-zinc-400]="!item.isActive || item.status !== 'Approved'">
+                {{ item.isCurrentlyOnLoan ? 'On Loan' : (item.isActive && item.status === 'Approved') ? 'Available' :
+                'Unavailable' }}
+              </span>
+            </div>
+<!-- 
+            <ng-container *ngIf="item.isActive && item.status === 'Approved'">
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 text-xs">From</span>
+                <span class="text-white text-xs font-medium">{{ item.availableFrom | date:'MMM d, yyyy' }}</span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-zinc-400 text-xs">Until</span>
+                <span class="text-white text-xs font-medium">{{ item.availableUntil | date:'MMM d, yyyy' }}</span>
+              </div>
+              <div *ngIf="item.minLoanDays" class="flex items-center justify-between">
+                <span class="text-zinc-400 text-xs">Min loan</span>
+                <span class="text-white text-xs font-medium">{{ item.minLoanDays }} days</span>
+              </div>
+              <div *ngIf="item.requiresVerification"
+                class="flex items-center gap-2 bg-amber-400/5 border border-amber-400/20 rounded-xl px-3 py-2">
+                <span class="text-amber-400 text-xs">⚠️ Requires verified account</span>
+              </div>
+            </ng-container> -->
+          </div>
+          <!-- Rating summary -->
+          <div *ngIf="reviews.length > 0" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">Rating</p>
+            <div class="flex items-center gap-3">
+              <span class="font-black text-3xl text-white" style="font-family:'Syne',sans-serif">{{
+                averageRating.toFixed(1) }}</span>
+              <div>
+                <div class="flex gap-0.5 mb-1">
+                  <span *ngFor="let s of [1,2,3,4,5]" class="text-base" [class.text-amber-400]="s <= averageRating"
+                    [class.text-zinc-600]="s > averageRating">★</span>
+                </div>
+                <p class="text-zinc-500 text-xs">{{ reviews.length }} review{{ reviews.length !== 1 ? 's' : '' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Existing loan request -->
+          <div *ngIf="hasActiveLoanRequest && existingLoan"
+            class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 space-y-3">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Your Loan Request</p>
+
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400 text-xs">Status</span>
+              <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md border"
+                [ngClass]="getLoanStatusClass(existingLoan.status)">
+                {{ existingLoan.status }}
+              </span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400 text-xs">Start</span>
+              <span class="text-white text-xs font-medium">{{ existingLoan.startDate | date:'MMM d, yyyy' }}</span>
+            </div>
+            <div class="flex items-center justify-between">
+              <span class="text-zinc-400 text-xs">End</span>
+              <span class="text-white text-xs font-medium">{{ existingLoan.endDate | date:'MMM d, yyyy' }}</span>
+            </div>
+
+            <p *ngIf="cancelError"
+              class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">
+              {{ cancelError }}
+            </p>
+
+            <div class="flex gap-2 pt-1">
+              <button (click)="router.navigate(['/loans', existingLoan.id])"
+                class="flex-1 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer">
+                View Loan
+              </button>
+              <button
+                *ngIf="existingLoan.status === 'Pending' || existingLoan.status === 'AdminPending' || existingLoan.status === 'Approved'"
+                (click)="cancelLoan()" [disabled]="isCancellingLoan"
+                class="flex-1 py-2 bg-red-500/10 hover:bg-red-500/20 border border-red-500/20 text-red-400 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-50">
+                {{ isCancellingLoan ? 'Cancelling...' : 'Cancel Request' }}
+              </button>
+            </div>
+          </div>
+
+          <!-- Request loan CTA -->
+          <div *ngIf="canRequestLoan" class="bg-amber-400/5 border border-amber-400/20 rounded-2xl p-5">
+            <p class="text-white text-sm font-semibold mb-1" style="font-family:'Syne',sans-serif">Interested?</p>
+            <p class="text-zinc-500 text-xs mb-4">Send a loan request to the owner.</p>
+            <button (click)="showLoanModal = true"
+              class="w-full py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+              Request Loan
+            </button>
+          </div>
+
+          <!-- On loan by someone else -->
+          <div *ngIf="item.isCurrentlyOnLoan && !isOwner && !hasActiveLoanRequest"
+            class="bg-blue-500/5 border border-blue-500/20 rounded-2xl p-5 text-center">
+            <p class="text-blue-400 text-sm font-semibold mb-1">Currently On Loan</p>
+            <p class="text-zinc-500 text-xs">This item is currently borrowed by someone else.</p>
+          </div>
+
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Not found -->
+  <div *ngIf="!isLoading && !item" class="flex flex-col items-center justify-center py-32 text-center">
+    <p class="text-4xl mb-4">📦</p>
+    <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">Item not found</h3>
+    <p class="text-zinc-500 text-sm mb-6">This item doesn't exist or you don't have access to it.</p>
+    <a routerLink="/home"
+      class="px-5 py-2.5 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 no-underline">
+      Browse items
+    </a>
+  </div>
+
+</main>
+
+<!-- Loan request modal -->
+<div *ngIf="showLoanModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showLoanModal = false"></div>
+  <div class="relative z-10 w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-5">
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">Request Loan</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">{{ item?.title }}</p>
+      </div>
+      <button (click)="showLoanModal = false"
+        class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div class="space-y-1.5">
+        <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Start Date <span
+            class="text-red-400">*</span></label>
+        <input type="date" [(ngModel)]="loanForm.startDate"
+          class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200" />
+      </div>
+      <div class="space-y-1.5">
+        <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">End Date <span
+            class="text-red-400">*</span></label>
+        <input type="date" [(ngModel)]="loanForm.endDate"
+          class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200" />
+      </div>
+    </div>
+
+    <div *ngIf="item?.minLoanDays" class="flex items-center gap-2 bg-zinc-800 rounded-xl px-3 py-2">
+      <span class="text-zinc-500 text-xs">Minimum loan period:</span>
+      <span class="text-white text-xs font-semibold">{{ item?.minLoanDays }} days</span>
+    </div>
+
+    <p *ngIf="loanError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{{
+      loanError }}</p>
+    <p *ngIf="loanSuccess"
+      class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{
+      loanSuccess }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="showLoanModal = false"
+        class="flex-1 py-2.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+        Cancel
+      </button>
+      <button (click)="requestLoan()" [disabled]="isRequesting"
+        class="flex-1 py-2.5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+        {{ isRequesting ? 'Requesting...' : 'Send Request' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Photo lightbox -->
+<div *ngIf="selectedPhoto" class="fixed inset-0 z-[110] flex items-center justify-center p-4"
+  (click)="selectedPhoto = null">
+  <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
+  <img [src]="selectedPhoto" class="relative z-10 max-w-[90vw] max-h-[85vh] rounded-2xl object-contain shadow-2xl" />
 </div>

@@ -5,7 +5,8 @@
         {
             Excellent = 0,  //Like new, no visible wear
             Good = 1,  //Minor signs of use, fully functional
-            Fair = 2   //Visible wear or cosmetic damage, still functional
+            Fair = 2,   //Visible wear or cosmetic damage 
+            Poor = 3 //a lot of damage but still functional
         }
 
         //Item status

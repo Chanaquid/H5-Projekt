@@ -87,6 +87,26 @@ namespace backend.Controllers
             return Ok(new ApiDTO.ApiResponse { Message = "Logged out successfully." });
         }
 
+        [Authorize]
+        [HttpPost("change-password")]
+        public async Task<IActionResult> ChangePassword([FromBody] AuthDTO.ChangePasswordDTO dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (userId == null) return Unauthorized();
+
+            try
+            {
+                await _authService.ChangePasswordAsync(userId, dto);
+                return Ok(new ApiDTO.ApiResponse { Message = "Password changed successfully." });
+            }
+            catch (ArgumentException ex)
+            {
+                return BadRequest(new ApiDTO.ApiResponse { Message = ex.Message });
+            }
+        }
+
+
+
         [HttpPost("forgot-password")]
         public async Task<IActionResult> ForgotPassword([FromBody] AuthDTO.ForgotPasswordDTO dto)
         {

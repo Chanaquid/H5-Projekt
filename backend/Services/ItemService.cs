@@ -84,7 +84,6 @@ namespace backend.Services
 
         private static double ToRad(double deg) => deg * Math.PI / 180;
 
-
         //Create item
         public async Task<ItemDTO.ItemDetailDTO> CreateAsync(string ownerId, ItemDTO.CreateItemDTO dto, bool isAdmin = false)
         {
@@ -93,9 +92,17 @@ namespace backend.Services
             if (category == null)
                 throw new ArgumentException($"Category with ID {dto.CategoryId} does not exist.");
 
+            if (dto.CurrentValue < 0)
+                throw new ArgumentException("Current value cant be negative");
+
+
+            if (dto.AvailableFrom.Date < DateTime.UtcNow.Date)
+                throw new ArgumentException("The availability start date cannot be in the past.");
+
             if (dto.AvailableFrom >= dto.AvailableUntil)
                 throw new ArgumentException("AvailableFrom must be before AvailableUntil.");
 
+        
             //minimum loan days must be smaller than the whole loan window
             if (dto.MinLoanDays.HasValue && dto.MinLoanDays > 0)
             {
@@ -232,6 +239,32 @@ namespace backend.Services
             return MapToDetailDTO(updated!);
         }
 
+        //Toggle item status
+        public async Task<ItemDTO.ItemDetailDTO> ToggleActiveAsync(int itemId, string ownerId, bool isActive, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdWithDetailsAsync(itemId);
+            if (item == null)
+                throw new KeyNotFoundException($"Item {itemId} not found.");
+
+            if (!isAdmin && item.OwnerId != ownerId)
+                throw new UnauthorizedAccessException("You can only update your own items.");
+
+            var isOnLoan = item.Loans?.Any(l =>
+                  l.Status == LoanStatus.Active ||
+                  l.Status == LoanStatus.Late) ?? false;
+
+            if (!isActive && isOnLoan)
+                throw new InvalidOperationException("Cannot deactivate an item that is currently on loan.");
+
+            item.IsActive = isActive;
+            item.UpdatedAt = DateTime.UtcNow;
+
+            _itemRepository.Update(item);
+            await _itemRepository.SaveChangesAsync();
+
+            var updated = await _itemRepository.GetByIdWithDetailsAsync(item.Id);
+            return MapToDetailDTO(updated!);
+        }
 
         //Delete item
         public async Task DeleteAsync(int itemId, string ownerId, bool isAdmin = false)
@@ -464,6 +497,7 @@ namespace backend.Services
             throw new InvalidOperationException("Failed to generate a unique QR code. Please try again.");
         }
 
+        //DAILY BG JOB
         public async Task DeactivateExpiredItemsAsync()
         {
             var expiredItems = await _itemRepository.GetActiveItemsExpiredBeforeAsync(DateTime.UtcNow.Date);
@@ -477,6 +511,91 @@ namespace backend.Services
 
             await _itemRepository.SaveChangesAsync();
         }
+
+
+        //PICS
+        public async Task<ItemDTO.ItemPhotoDTO> AddPhotoAsync(int itemId, string ownerId, ItemDTO.AddItemPhotoDTO dto, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdWithDetailsAsync(itemId);
+            if (item == null)
+                throw new KeyNotFoundException($"Item {itemId} not found.");
+
+            if (!isAdmin && item.OwnerId != ownerId)
+                throw new UnauthorizedAccessException("You can only add photos to your own items.");
+
+            //If this is set as primary, unset all existing primary photos
+            if (dto.IsPrimary)
+            {
+                foreach (var existingPhoto in item.Photos)
+                    existingPhoto.IsPrimary = false;
+            }
+
+            //If no photos exist yet, force this one to be primary
+            var isPrimary = dto.IsPrimary || !item.Photos.Any();
+
+            var photo = new ItemPhoto
+            {
+                ItemId = itemId,
+                PhotoUrl = dto.PhotoUrl.Trim(),
+                IsPrimary = isPrimary,
+                DisplayOrder = dto.DisplayOrder
+            };
+
+            item.Photos.Add(photo);
+            _itemRepository.Update(item);
+            await _itemRepository.SaveChangesAsync();
+
+            return MapToPhotoDTO(photo);
+        }
+
+        public async Task DeletePhotoAsync(int itemId, int photoId, string ownerId, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdWithDetailsAsync(itemId);
+            if (item == null)
+                throw new KeyNotFoundException($"Item {itemId} not found.");
+
+            if (!isAdmin && item.OwnerId != ownerId)
+                throw new UnauthorizedAccessException("You can only delete photos from your own items.");
+
+            var photo = item.Photos?.FirstOrDefault(p => p.Id == photoId);
+            if (photo == null)
+                throw new KeyNotFoundException($"Photo {photoId} not found.");
+
+            var wasPrimary = photo.IsPrimary;
+            item.Photos.Remove(photo);
+
+            //If deleted photo was primary, promote the first remaining photo
+            if (wasPrimary && item.Photos.Any())
+                item.Photos.OrderBy(p => p.DisplayOrder).First().IsPrimary = true;
+
+            _itemRepository.Update(item);
+            await _itemRepository.SaveChangesAsync();
+        }
+
+        public async Task<ItemDTO.ItemPhotoDTO> SetPrimaryPhotoAsync(int itemId, int photoId, string ownerId, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdWithDetailsAsync(itemId);
+            if (item == null)
+                throw new KeyNotFoundException($"Item {itemId} not found.");
+
+            if (!isAdmin && item.OwnerId != ownerId)
+                throw new UnauthorizedAccessException("You can only update photos on your own items.");
+
+            var photo = item.Photos?.FirstOrDefault(p => p.Id == photoId);
+            if (photo == null)
+                throw new KeyNotFoundException($"Photo {photoId} not found.");
+
+            foreach (var p in item.Photos)
+                p.IsPrimary = false;
+
+            photo.IsPrimary = true;
+
+            _itemRepository.Update(item);
+            await _itemRepository.SaveChangesAsync();
+
+            return MapToPhotoDTO(photo);
+        }
+
 
 
 
@@ -551,6 +670,7 @@ namespace backend.Services
                 OwnerName = i.Owner?.FullName ?? string.Empty,
                 AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
                 ReviewCount = reviews.Count,
+                IsActive = i.IsActive,
                 IsCurrentlyOnLoan = activeLoans.Any()
             };
         }

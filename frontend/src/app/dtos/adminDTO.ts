@@ -18,11 +18,25 @@ export namespace AdminDTO {
     totalUnpaidFinesAmount: number;
   }
  
-  export interface ItemHistoryDTO {
+   export interface ItemHistoryDTO {
     itemId: number;
     itemTitle: string;
     ownerName: string;
+    averageRating: number;
+    reviewCount: number;
+    reviews: ItemReviewEntryDTO[];
     loans: LoanHistoryEntryDTO[];
+  }
+
+  export interface ItemReviewEntryDTO {
+    id: number;
+    reviewerId: string;
+    reviewerName: string;
+      reviewerAvatarUrl?: string;
+    rating: number;
+    comment?: string;
+    isAdminReview: boolean;
+    createdAt: string;
   }
  
   export interface LoanHistoryEntryDTO {

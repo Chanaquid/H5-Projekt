@@ -79,6 +79,7 @@
             public string OtherPartyName { get; set; } = string.Empty; //Owner name if viewing as borrower, borrower name if viewing as owner
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
+            public DateTime? ActualReturnDate { get; set; }
             public string Status { get; set; } = string.Empty;
             public bool HasUnreadMessages { get; set; }
             public int? DaysOverdue { get; set; }

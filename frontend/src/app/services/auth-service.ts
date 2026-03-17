@@ -75,6 +75,18 @@ export class AuthService {
     );
   }
 
+  isAdmin(): boolean {
+    const token = this.getToken();
+    if (!token) return false;
+    try {
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      const roles = payload['http://schemas.microsoft.com/ws/2008/06/identity/claims/role'];
+      return Array.isArray(roles) ? roles.includes('Admin') : roles === 'Admin';
+    } catch {
+      return false;
+    }
+  }
+
   //Token helpers
 
   saveTokens(token: string, refreshToken: string): void {

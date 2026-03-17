@@ -41,9 +41,11 @@ namespace backend.Controllers
         public async Task<IActionResult> GetById(int id)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+
             try
             {
-                var result = await _loanService.GetByIdAsync(id, userId);
+                var result = await _loanService.GetByIdAsync(id, userId, isAdmin);
                 return Ok(result);
             }
             catch (KeyNotFoundException ex)

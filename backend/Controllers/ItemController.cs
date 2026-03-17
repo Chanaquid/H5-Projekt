@@ -91,8 +91,6 @@ namespace backend.Controllers
         }
 
 
-
-
         //POST Create item
         [HttpPost]
         [Authorize]
@@ -123,6 +121,34 @@ namespace backend.Controllers
             var item = await _itemService.UpdateStatusAsync(id, dto);
             return Ok(item);
         }
+
+        //Toggle active status
+        [HttpPatch("{id}/toggle-active")]
+        [Authorize]
+        public async Task<IActionResult> ToggleActive(int id, [FromBody] ItemDTO.ToggleActiveStatusDTO dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+
+            try
+            {
+                var result = await _itemService.ToggleActiveAsync(id, userId, dto.IsActive, isAdmin);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return Forbid();
+            }
+            catch (InvalidOperationException ex)
+            {
+                return BadRequest(new { message = ex.Message });
+            }
+        }
+
 
         //DELETE item (owner only) and admin
         [HttpDelete("{id}")]
@@ -178,6 +204,38 @@ namespace backend.Controllers
         }
 
 
+        // POST - add pocs
+        [HttpPost("{id}/photos")]
+        [Authorize]
+        public async Task<IActionResult> AddPhoto(int id, [FromBody] ItemDTO.AddItemPhotoDTO dto)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+            var photo = await _itemService.AddPhotoAsync(id, userId, dto, isAdmin);
+            return Ok(photo);
+        }
+
+        // DELETE a pic
+        [HttpDelete("{id}/photos/{photoId}")]
+        [Authorize]
+        public async Task<IActionResult> DeletePhoto(int id, int photoId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+            await _itemService.DeletePhotoAsync(id, photoId, userId, isAdmin);
+            return NoContent();
+        }
+
+        // PATCH 
+        [HttpPatch("{id}/photos/{photoId}/primary")]
+        [Authorize]
+        public async Task<IActionResult> SetPrimaryPhoto(int id, int photoId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+            var photo = await _itemService.SetPrimaryPhotoAsync(id, photoId, userId, isAdmin);
+            return Ok(photo);
+        }
 
 
 

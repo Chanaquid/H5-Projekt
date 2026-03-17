@@ -17,7 +17,7 @@ namespace backend.Interfaces
         Task<List<LoanDTO.LoanSummaryDTO>> GetOwnedLoansAsync(string ownerId);
 
         //Shared
-        Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId);
+        Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId, bool isAdmin = false);
         Task HandleLoanReturnAsync(Loan loan); // handles loan return
 
         //Admin actions

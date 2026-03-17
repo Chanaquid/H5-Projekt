@@ -68,6 +68,10 @@ namespace backend.Services
             if (user == null)
                 throw new KeyNotFoundException("User not found.");
 
+            var loans = await _loanRepository.GetByBorrowerIdAsync(userId);
+            var completedLoans = loans.Count(l =>
+                l.Status == LoanStatus.Returned);
+
             return new UserDTO.UserSummaryDTO
             {
                 Id = user.Id,
@@ -75,7 +79,9 @@ namespace backend.Services
                 FullName = user.FullName,
                 AvatarUrl = user.AvatarUrl,
                 Score = user.Score,
-                IsVerified = user.IsVerified
+                IsVerified = user.IsVerified,
+                CompletedLoansCount = completedLoans
+
             };
         }
 
@@ -295,6 +301,7 @@ namespace backend.Services
                 OtherPartyName = l.Item?.Owner?.FullName ?? string.Empty,
                 StartDate = l.StartDate,
                 EndDate = l.EndDate,
+                ActualReturnDate = l.ActualReturnDate,
                 Status = l.Status.ToString(),
                 HasUnreadMessages = false,
                 DaysOverdue = l.Status == LoanStatus.Active && l.EndDate < DateTime.UtcNow
@@ -317,6 +324,7 @@ namespace backend.Services
                 CategoryIcon = i.Category?.Icon,
                 OwnerName = user.FullName,
                 AverageRating = i.Reviews?.Any() == true ? i.Reviews.Average(r => r.Rating) : 0,
+                IsActive = i.IsActive,
                 ReviewCount = i.Reviews?.Count ?? 0,
                 IsCurrentlyOnLoan = i.Loans?.Any(l => l.Status == LoanStatus.Active || l.Status == LoanStatus.Late) ?? false
             }).ToList();

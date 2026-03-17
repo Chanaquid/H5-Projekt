@@ -34,49 +34,32 @@ namespace backend.Services
         //Dashboard
         public async Task<AdminDTO.AdminDashboardDTO> GetDashboardAsync()
         {
-            //Run all queries in parallel — none depend on each other
-            var pendingItemsTask = _itemRepository.GetPendingApprovalsAsync();
-            var pendingLoansTask = _loanRepository.GetPendingAdminApprovalsAsync();
-            var openDisputesTask = _disputeRepository.GetAllOpenAsync();
-            var pendingAppealsTask = _appealRepository.GetAllPendingAsync();
-            var pendingVerificationsTask = _verificationRepository.GetAllPendingAsync();
-            var allUsersTask = _userRepository.GetAllAsync();
-            var allUnpaidFinesTask = _fineRepository.GetAllUnpaidAsync();
-
-            await Task.WhenAll(
-                pendingItemsTask,
-                pendingLoansTask,
-                openDisputesTask,
-                pendingAppealsTask,
-                pendingVerificationsTask,
-                allUsersTask,
-                allUnpaidFinesTask
-            );
-
+            var pendingItems = await _itemRepository.GetPendingApprovalsAsync();
+            var pendingLoans = await _loanRepository.GetPendingAdminApprovalsAsync();
+            var openDisputes = await _disputeRepository.GetAllOpenAsync();
+            var pendingAppeals = await _appealRepository.GetAllPendingAsync();
+            var pendingVerifications = await _verificationRepository.GetAllPendingAsync();
+            var allUsers = await _userRepository.GetAllAsync();
+            var unpaidFines = await _fineRepository.GetAllUnpaidAsync();
             var allItems = await _itemRepository.GetAllApprovedAsync();
             var allLoans = await _loanRepository.GetAllAsync();
-            var unpaidFines = allUnpaidFinesTask.Result;
 
             var activeStatuses = new[] { Models.LoanStatus.Approved, Models.LoanStatus.Active };
 
             return new AdminDTO.AdminDashboardDTO
             {
-                //Action queues — the red badge counts in the sidebar
-                PendingItemApprovals = pendingItemsTask.Result.Count,
-                PendingLoanApprovals = pendingLoansTask.Result.Count,
-                OpenDisputes = openDisputesTask.Result.Count,
-                PendingAppeals = pendingAppealsTask.Result.Count,
-                PendingVerifications = pendingVerificationsTask.Result.Count,
-
-                //Platform stats
-                TotalUsers = allUsersTask.Result.Count,
+                PendingItemApprovals = pendingItems.Count,
+                PendingLoanApprovals = pendingLoans.Count,
+                OpenDisputes = openDisputes.Count,
+                PendingAppeals = pendingAppeals.Count,
+                PendingVerifications = pendingVerifications.Count,
+                TotalUsers = allUsers.Count,
                 TotalActiveItems = allItems.Count,
                 TotalActiveLoans = allLoans.Count(l => l.Status == Models.LoanStatus.Active),
                 TotalUnpaidFines = unpaidFines.Count,
                 TotalUnpaidFinesAmount = unpaidFines.Sum(f => f.Amount)
             };
         }
-
         //Item history
         public async Task<AdminDTO.ItemHistoryDTO> GetItemHistoryAsync(int itemId)
         {
@@ -143,11 +126,31 @@ namespace backend.Services
                 });
             }
 
+            var reviews = item.Reviews?.ToList() ?? new();
+
+            var sortedReviews = reviews
+                .OrderByDescending(r => r.IsAdminReview)
+                .ThenByDescending(r => r.CreatedAt)
+                .ToList();
+
             return new AdminDTO.ItemHistoryDTO
             {
                 ItemId = item.Id,
                 ItemTitle = item.Title,
                 OwnerName = item.Owner?.FullName ?? string.Empty,
+                AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
+                ReviewCount = reviews.Count,
+                Reviews = sortedReviews.Select(r => new AdminDTO.ItemReviewEntryDTO
+                {
+                    Id = r.Id,
+                    ReviewerId = r.ReviewerId,
+                    ReviewerName = r.IsAdminReview ? "Admin" : (r.Reviewer?.FullName ?? string.Empty),
+                    ReviewerAvatarUrl = r.Reviewer?.AvatarUrl,
+                    Rating = r.Rating,
+                    Comment = r.Comment,
+                    IsAdminReview = r.IsAdminReview,
+                    CreatedAt = r.CreatedAt
+                }).ToList(),
                 Loans = loanHistory
             };
         }

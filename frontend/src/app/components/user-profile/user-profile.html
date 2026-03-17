@@ -1,0 +1,305 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div
+    class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
+
+<app-navbar></app-navbar>
+
+<main class="pt-16 min-h-screen">
+
+    <!-- Profile Header -->
+    <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+
+        <!-- Loading skeleton -->
+        <div *ngIf="isLoadingProfile" class="flex items-center gap-6">
+            <div class="w-20 h-20 rounded-2xl bg-zinc-800 animate-pulse shrink-0"></div>
+            <div class="space-y-2 flex-1">
+                <div class="h-5 bg-zinc-800 rounded w-48 animate-pulse"></div>
+                <div class="h-3 bg-zinc-800 rounded w-32 animate-pulse"></div>
+                <div class="h-3 bg-zinc-800 rounded w-24 animate-pulse"></div>
+            </div>
+        </div>
+
+        <!-- Profile info -->
+        <div *ngIf="!isLoadingProfile && profile" class="flex items-start gap-6 flex-wrap">
+
+            <!-- Avatar -->
+            <div
+                class="w-20 h-20 rounded-2xl overflow-hidden bg-zinc-800 shrink-0 flex items-center justify-center text-2xl font-black text-amber-400 border border-zinc-700">
+                <img *ngIf="profile.avatarUrl" [src]="profile.avatarUrl" class="w-full h-full object-cover" />
+                <span *ngIf="!profile.avatarUrl">{{ getInitials(profile.fullName) }}</span>
+            </div>
+
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+                <div class="flex items-center gap-3 flex-wrap mb-1">
+                    <h1 class="font-black text-2xl md:text-3xl text-white tracking-tight"
+                        style="font-family:'Syne',sans-serif">
+                        {{ profile.fullName }}
+                    </h1>
+                    <span *ngIf="profile.isVerified"
+                        class="flex items-center gap-1 text-[10px] font-bold uppercase bg-blue-400/10 text-blue-400 border border-blue-400/20 px-2 py-0.5 rounded-lg">
+                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                            <path fill-rule="evenodd"
+                                d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                                clip-rule="evenodd" />
+                        </svg>
+                        Verified
+                    </span>
+                </div>
+                <p class="text-zinc-500 text-sm mb-3">@{{ profile.username }}</p>
+
+                <!-- Stats row -->
+                <div class="flex items-center gap-4 flex-wrap">
+                    <!-- Score -->
+                    <div class="flex items-center gap-2 px-3 py-1.5 rounded-xl border" [ngClass]="scoreBg">
+                        <span class="text-xs font-medium text-zinc-400">Score</span>
+                        <span class="font-black text-lg leading-none" [ngClass]="scoreColor"
+                            style="font-family:'Syne',sans-serif">
+                            {{ profile.score }}
+                        </span>
+                    </div>
+
+                    <!-- Rating -->
+                    <div *ngIf="reviews.length > 0"
+                        class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl">
+                        <div class="flex gap-0.5">
+                            <span *ngFor="let s of [1,2,3,4,5]" class="text-sm"
+                                [class.text-amber-400]="s <= averageRating"
+                                [class.text-zinc-600]="s > averageRating">★</span>
+                        </div>
+                        <span class="text-white text-sm font-bold" style="font-family:'Syne',sans-serif">{{
+                            averageRating.toFixed(1) }}</span>
+                        <span class="text-zinc-500 text-xs">({{ reviews.length }} review{{ reviews.length !== 1 ? 's' :
+                            '' }})</span>
+                    </div>
+
+                    <!-- Items count -->
+                    <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl">
+                        <span class="text-zinc-400 text-xs">Items</span>
+                        <span class="text-white font-bold text-sm" style="font-family:'Syne',sans-serif">{{ items.length
+                            }}</span>
+                    </div>
+
+                    <!-- Completed loans -->
+                    <div class="flex items-center gap-2 bg-zinc-900 border border-zinc-800 px-3 py-1.5 rounded-xl">
+                        <span class="text-zinc-400 text-xs">Completed Loans</span>
+                        <span class="text-white font-bold text-sm" style="font-family:'Syne',sans-serif">
+                            {{ profile.completedLoansCount }}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Not found -->
+        <div *ngIf="!isLoadingProfile && !profile" class="text-center py-12">
+            <p class="text-zinc-500 text-sm">User not found.</p>
+        </div>
+    </div>
+
+    <div class="px-6 md:px-10 py-8 space-y-10">
+
+        <!-- Items Section -->
+        <div>
+            <div class="flex items-center justify-between gap-4 flex-wrap mb-5">
+                <h2 class="font-black text-xl text-white" style="font-family:'Syne',sans-serif">
+                    Listed Items
+                    <span class="ml-2 text-sm font-normal text-zinc-500">({{ filteredItems.length }})</span>
+                </h2>
+
+                <!-- Filters -->
+                <div class="flex items-center gap-2 flex-wrap">
+                    <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1">
+                        <button (click)="activeFilter = 'all'; applyFilters()"
+                            class="px-3 py-1 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+                            [class.bg-amber-400]="activeFilter === 'all'" [class.text-zinc-900]="activeFilter === 'all'"
+                            [class.text-zinc-400]="activeFilter !== 'all'">All</button>
+                        <button (click)="activeFilter = 'available'; applyFilters()"
+                            class="px-3 py-1 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+                            [class.bg-amber-400]="activeFilter === 'available'"
+                            [class.text-zinc-900]="activeFilter === 'available'"
+                            [class.text-zinc-400]="activeFilter !== 'available'">Available</button>
+                        <button (click)="activeFilter = 'onloan'; applyFilters()"
+                            class="px-3 py-1 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+                            [class.bg-amber-400]="activeFilter === 'onloan'"
+                            [class.text-zinc-900]="activeFilter === 'onloan'"
+                            [class.text-zinc-400]="activeFilter !== 'onloan'">On Loan</button>
+                    </div>
+
+                    <div class="relative">
+                        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-zinc-500" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                        </svg>
+                        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
+                            placeholder="Search items..."
+                            class="bg-zinc-900 border border-zinc-800 text-white text-xs rounded-xl pl-8 pr-3 py-2 outline-none placeholder-zinc-600 focus:border-amber-400/50 transition-all duration-200 w-44" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading items -->
+            <div *ngIf="isLoadingItems" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div *ngFor="let _ of [1,2,3,4]"
+                    class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden animate-pulse">
+                    <div class="aspect-[4/3] bg-zinc-800"></div>
+                    <div class="p-4 space-y-2">
+                        <div class="h-3 bg-zinc-800 rounded w-1/3"></div>
+                        <div class="h-4 bg-zinc-800 rounded w-3/4"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Empty -->
+            <div *ngIf="!isLoadingItems && filteredItems.length === 0"
+                class="flex flex-col items-center justify-center py-16 bg-zinc-900 border border-zinc-800 rounded-2xl text-center">
+                <span class="text-4xl mb-3">📦</span>
+                <p class="text-white font-semibold text-sm mb-1" style="font-family:'Syne',sans-serif">No items found
+                </p>
+                <p class="text-zinc-500 text-xs">{{ activeFilter === 'all' ? 'This user has no listed items.' : 'No
+                    items match this filter.' }}</p>
+            </div>
+
+            <!-- Items grid -->
+            <div *ngIf="!isLoadingItems && filteredItems.length > 0"
+                class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                <div *ngFor="let item of filteredItems" [routerLink]="['/items', item.id]"
+                    class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl overflow-hidden transition-all duration-200 cursor-pointer group">
+
+                    <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden">
+                        <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl" [alt]="item.title"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" />
+                        <div *ngIf="!item.primaryPhotoUrl"
+                            class="w-full h-full flex items-center justify-center text-5xl">
+                            {{ getCategoryEmoji(item.categoryName) }}
+                        </div>
+                        <div class="absolute top-3 left-3 flex gap-1.5">
+                            <span *ngIf="item.isCurrentlyOnLoan"
+                                class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">On
+                                Loan</span>
+                            <span *ngIf="!item.isCurrentlyOnLoan && item.isActive"
+                                class="bg-emerald-400 text-zinc-900 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Available</span>
+                            <span *ngIf="!item.isActive"
+                                class="bg-zinc-600 text-zinc-300 text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">Inactive</span>
+                        </div>
+                    </div>
+
+                    <div class="p-4">
+                        <p class="text-amber-400 text-[11px] font-semibold uppercase tracking-widest mb-0.5">{{
+                            item.categoryName }}</p>
+                        <h3 class="font-bold text-white text-sm truncate mb-1" style="font-family:'Syne',sans-serif">{{
+                            item.title }}</h3>
+                        <p class="text-zinc-500 text-xs truncate mb-2">📍 {{ item.pickupAddress }}</p>
+                        <div class="flex items-center justify-between">
+                            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border"
+                                [ngClass]="getConditionClass(item.condition)">
+                                {{ item.condition }}
+                            </span>
+                            <span *ngIf="item.reviewCount > 0" class="flex items-center gap-1 text-xs text-zinc-500">
+                                <span class="text-amber-400">★</span>{{ item.averageRating.toFixed(1) }} ({{
+                                item.reviewCount }})
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reviews Section -->
+        <div>
+            <div class="flex items-center justify-between mb-5">
+                <h2 class="font-black text-xl text-white" style="font-family:'Syne',sans-serif">
+                    Reviews
+                    <span class="ml-2 text-sm font-normal text-zinc-500">({{ reviews.length }})</span>
+                </h2>
+                <div *ngIf="reviews.length > 0" class="flex items-center gap-2">
+                    <div class="flex gap-0.5">
+                        <span *ngFor="let s of [1,2,3,4,5]" class="text-base"
+                            [class.text-amber-400]="s <= averageRating"
+                            [class.text-zinc-600]="s > averageRating">★</span>
+                    </div>
+                    <span class="text-white font-black text-lg" style="font-family:'Syne',sans-serif">{{
+                        averageRating.toFixed(1) }}</span>
+                </div>
+            </div>
+
+            <!-- Loading reviews -->
+            <div *ngIf="isLoadingReviews" class="space-y-3">
+                <div *ngFor="let _ of [1,2,3]" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 animate-pulse">
+                    <div class="flex items-center gap-3 mb-2">
+                        <div class="w-8 h-8 rounded-full bg-zinc-800"></div>
+                        <div class="h-3 bg-zinc-800 rounded w-32"></div>
+                    </div>
+                    <div class="h-3 bg-zinc-800 rounded w-full mb-1"></div>
+                    <div class="h-3 bg-zinc-800 rounded w-2/3"></div>
+                </div>
+            </div>
+
+            <!-- No reviews -->
+            <div *ngIf="!isLoadingReviews && reviews.length === 0"
+                class="flex flex-col items-center justify-center py-16 bg-zinc-900 border border-zinc-800 rounded-2xl text-center">
+                <span class="text-4xl mb-3">⭐</span>
+                <p class="text-white font-semibold text-sm mb-1" style="font-family:'Syne',sans-serif">No reviews yet
+                </p>
+                <p class="text-zinc-500 text-xs">This user hasn't received any reviews yet.</p>
+            </div>
+
+            <!-- Reviews list -->
+            <div *ngIf="!isLoadingReviews && reviews.length > 0" class="space-y-3">
+                <div *ngFor="let review of displayedReviews"
+                    class="bg-zinc-900 border rounded-2xl p-4 space-y-2 transition-all duration-200"
+                    [class.border-amber-400/20]="review.isAdminReview" [class.bg-amber-400/5]="review.isAdminReview"
+                    [class.border-zinc-800]="!review.isAdminReview">
+
+                    <!-- Reviewer header -->
+                    <div class="flex items-center justify-between flex-wrap gap-2">
+                        <div class="flex items-center gap-2">
+                            <div
+                                class="w-7 h-7 rounded-full overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-[10px] font-bold text-amber-400">
+                                <img *ngIf="review.reviewerAvatarUrl" [src]="review.reviewerAvatarUrl"
+                                    class="w-full h-full object-cover" />
+                                <span *ngIf="!review.reviewerAvatarUrl">{{ review.reviewerName.charAt(0).toUpperCase()
+                                    }}</span>
+                            </div>
+                            <p class="text-white text-xs font-semibold cursor-pointer hover:text-amber-400 transition-colors"
+                                (click)="router.navigate(['/users', review.reviewerId])">
+                                {{ review.reviewerName }}
+                            </p> <span *ngIf="review.isAdminReview"
+                                class="text-[9px] font-black uppercase bg-amber-400/10 text-amber-400 border border-amber-400/20 px-1.5 py-0.5 rounded-md">
+                                Admin
+                            </span>
+                            <span *ngIf="review.isEdited" class="text-zinc-600 text-[10px]">(edited)</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex gap-0.5">
+                                <span *ngFor="let s of [1,2,3,4,5]" class="text-xs"
+                                    [class.text-amber-400]="s <= review.rating"
+                                    [class.text-zinc-600]="s > review.rating">★</span>
+                            </div>
+                            <span class="text-zinc-500 text-[10px]">{{ review.createdAt | date:'MMM d, yyyy' }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Item context -->
+                    <p *ngIf="review.itemTitle" class="text-zinc-300 text-[11px]">
+                        Loan: <span class="text-zinc-300">{{ review.itemTitle }}</span>
+                    </p>
+
+                    <!-- Comment -->
+                    <p *ngIf="review.comment" class="text-zinc-300 text-sm leading-relaxed">{{ review.comment }}</p>
+                    <p *ngIf="!review.comment" class="text-zinc-400 text-xs italic">No comment left.</p>
+                </div>
+
+                <!-- Load more -->
+                <button *ngIf="visibleReviews < reviews.length" (click)="loadMoreReviews()"
+                    class="w-full py-2.5 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 rounded-2xl transition-all duration-200 cursor-pointer">
+                    Load more ({{ reviews.length - visibleReviews }} remaining)
+                </button>
+            </div>
+        </div>
+
+    </div>
+</main>

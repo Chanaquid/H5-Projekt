@@ -101,6 +101,7 @@ namespace backend.DTOs
             public string OwnerName { get; set; } = string.Empty;
             public double AverageRating { get; set; }
             public int ReviewCount { get; set; }
+            public bool IsActive { get; set; }
             public bool IsCurrentlyOnLoan { get; set; }
         }
 
@@ -112,6 +113,21 @@ namespace backend.DTOs
             public string PhotoUrl { get; set; } = string.Empty;
             public bool IsPrimary { get; set; }
             public int DisplayOrder { get; set; }
+        }
+
+        //Add/upload an item photo
+        public class AddItemPhotoDTO
+        {
+            public string PhotoUrl { get; set; } = string.Empty;
+            public bool IsPrimary { get; set; } = false;
+            public int DisplayOrder { get; set; } = 0;
+        }
+
+
+
+        public class ToggleActiveStatusDTO
+        {
+            public bool IsActive { get; set; }
         }
 
         //QRcode response - returned only to admin and owner

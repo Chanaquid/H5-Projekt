@@ -18,6 +18,7 @@ export class UserService {
     return this.http.get<UserDTO.UserProfileDTO>(`${this.baseUrl}/me`);
   }
 
+
   // GET: Get a public profile (accessible by any auth user)
   getPublicProfile(id: string): Observable<UserDTO.UserSummaryDTO> {
     return this.http.get<UserDTO.UserSummaryDTO>(`${this.baseUrl}/${id}/profile`);

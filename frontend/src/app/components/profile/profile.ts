@@ -27,9 +27,10 @@ export class Profile implements OnInit {
   myLoans: LoanDTO.LoanSummaryDTO[] = [];
   scoreHistory: UserDTO.ScoreHistoryDTO[] = [];
   myFines: FineDTO.FineResponseDTO[] = [];
+  showAvatarModal = false;
 
   // Stats
-  stats: { icon: string; value: string | number; label: string; currency?: string}[] = [];
+  stats: { icon: string; value: string | number; label: string; currency?: string }[] = [];
 
   // Tabs
   activeTab: 'items' | 'loans' | 'score' = 'items';
@@ -42,6 +43,10 @@ export class Profile implements OnInit {
   addressSuggestions: any[] = [];
   showAddressSuggestions = false;
   private addressSearchTimeout: any;
+
+  //tracking
+  private loadedFlags = { profile: false, items: false, loans: false, fines: false };
+
 
   // Edit profile
   editMode = false;
@@ -70,6 +75,12 @@ export class Profile implements OnInit {
   deletePassword = '';
   isDeletingAccount = false;
   deleteError = '';
+
+
+  ownedLoans: LoanDTO.LoanSummaryDTO[] = [];
+  loanView: 'borrowed' | 'lent' = 'borrowed';
+
+
 
   resetPasswordForm() {
     this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
@@ -105,6 +116,12 @@ export class Profile implements OnInit {
     this.loadLoans();
     this.loadScoreHistory();
     this.loadFines();
+    this.loadOwnedLoans();
+
+  }
+
+  openAvatarModal(): void {
+    this.showAvatarModal = true;
   }
 
   private loadProfile() {
@@ -120,7 +137,8 @@ export class Profile implements OnInit {
           latitude: p.latitude,
           longitude: p.longitude,
         };
-        this.buildStats();
+        this.loadedFlags.profile = true;
+        this.checkAndBuildStats();
         this.cdr.detectChanges();
       },
     });
@@ -130,7 +148,8 @@ export class Profile implements OnInit {
     this.itemService.getMyItems().subscribe({
       next: (items) => {
         this.myItems = items;
-        this.buildStats();
+        this.loadedFlags.items = true;
+        this.checkAndBuildStats();
         this.cdr.detectChanges();
       },
     });
@@ -140,30 +159,58 @@ export class Profile implements OnInit {
     this.loanService.getBorrowedLoans().subscribe({
       next: (loans) => {
         this.myLoans = loans;
-        this.buildStats();
+        this.loadedFlags.loans = true;
+        this.checkAndBuildStats();
         this.cdr.detectChanges();
       },
-      error: () => { },
+      error: () => {
+        this.loadedFlags.loans = true; //still mark done so stats aren't blocked
+        this.checkAndBuildStats();
+      },
     });
   }
 
   private loadScoreHistory() {
     this.userService.getScoreHistory().subscribe({
       next: (history) => {
-        this.scoreHistory = history; //newest first
+        this.scoreHistory = history;
         this.cdr.detectChanges();
       },
     });
   }
 
   private loadFines() {
-  this.fineService.getMyFines().subscribe({
-    next: (fines) => {
-      this.myFines = fines;
+    this.fineService.getMyFines().subscribe({
+      next: (fines) => {
+        this.myFines = fines;
+        this.loadedFlags.fines = true;
+        this.checkAndBuildStats();
+        this.cdr.detectChanges();
+        console.log(fines)
+      },
+      error: () => {
+        this.loadedFlags.fines = true;
+        this.checkAndBuildStats();
+      },
+    });
+  }
+
+  private loadOwnedLoans() {
+  this.loanService.getOwnedLoans().subscribe({
+    next: (loans) => {
+      this.ownedLoans = loans;
       this.cdr.detectChanges();
     },
-    error: () => {},
-    });
+    error: () => {}
+  });
+}
+
+  private checkAndBuildStats() {
+    const { profile, items, loans, fines } = this.loadedFlags;
+    if (profile && items && loans && fines) {
+      this.buildStats();
+      this.cdr.detectChanges();
+    }
   }
 
   private buildStats() {
@@ -178,8 +225,12 @@ export class Profile implements OnInit {
       { icon: '📦', value: activeItems, label: 'Active items' },
       { icon: '🤝', value: activeLoans, label: 'Active loans' },
       { icon: '✅', value: completedLoans, label: 'Completed loans' },
-      { icon: '💸', value: '11342.00', currency: 'kr', label: 'Total fines paid' }
+      { icon: '💸', value: totalFinesPaid, currency: 'kr', label: 'Total fines paid' }
     ];
+  }
+
+  goToLoan(id: number): void {
+    this.router.navigate(['/loans', id]);
   }
 
   saveProfile() {
@@ -297,6 +348,7 @@ export class Profile implements OnInit {
     this.showAddressSuggestions = false;
     this.cdr.detectChanges();
   }
+
   goToItem(id: number) {
     this.router.navigate(['/items', id]);
   }
@@ -313,7 +365,7 @@ export class Profile implements OnInit {
     switch (status.toLowerCase()) {
       case 'active': return 'bg-emerald-400/10 text-emerald-400';
       case 'approved': return 'bg-blue-400/10 text-blue-400';
-      case 'returned': return 'bg-zinc-700 text-zinc-400';
+      case 'returned': return 'bg-zinc-300/10 text-zinc-200';
       case 'overdue': return 'bg-red-400/10 text-red-400';
       case 'pending': return 'bg-amber-400/10 text-amber-400';
       default: return 'bg-zinc-700 text-zinc-400';

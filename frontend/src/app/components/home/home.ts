@@ -1,15 +1,16 @@
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { Router, RouterLink } from '@angular/router';
+import { Router, RouterLink, ActivatedRoute } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { AuthService } from '../../services/auth-service';
 import { ItemDTO } from '../../dtos/itemDTO';
 import { UserService } from '../../services/user-service';
+import { Navbar } from '../navbar/navbar';
 
 @Component({
   selector: 'app-home',
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, Navbar],
   templateUrl: './home.html',
   styleUrl: './home.css',
 })
@@ -19,84 +20,12 @@ export class Home implements OnInit, AfterViewInit {
 
   @ViewChild('categoryStrip') categoryStrip!: ElementRef;
 
- 
-  ngAfterViewInit() {
-  const el = this.categoryStrip.nativeElement;
-
-  const updateArrows = () => {
-    this.showLeftArrow = el.scrollLeft > 0;
-    this.showRightArrow = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
-    this.cdr.detectChanges();
-  };
-
-  setTimeout(() => updateArrows(), 100);
-  el.addEventListener('scroll', updateArrows);
-  window.addEventListener('resize', updateArrows);
-
-  // Drag to scroll
-  let isDown = false;
-  let startX = 0;
-  let scrollLeft = 0;
-  let hasDragged = false;
-
-  el.addEventListener('mousedown', (e: MouseEvent) => {
-    isDown = true;
-    hasDragged = false;
-    startX = e.pageX;
-    scrollLeft = el.scrollLeft;
-    el.style.userSelect = 'none';
-  });
-
-  window.addEventListener('mouseup', () => {
-    isDown = false;
-    el.style.cursor = 'grab';
-    el.style.userSelect = '';
-  });
-
-  window.addEventListener('mousemove', (e: MouseEvent) => {
-    if (!isDown) return;
-    const diff = e.pageX - startX;
-
-    // Only start dragging after moving 5px — prevents killing button clicks
-    if (Math.abs(diff) > 5) {
-      hasDragged = true;
-      el.style.cursor = 'grabbing';
-      el.scrollLeft = scrollLeft - diff;
-    }
-  });
-
-  // Block click on child buttons if we dragged
-  el.addEventListener('click', (e: MouseEvent) => {
-    if (hasDragged) {
-      e.stopPropagation();
-      hasDragged = false;
-    }
-  }, true);
-}
-
-
-
-scrollCategories(dir: 'left' | 'right') {
-  this.categoryStrip.nativeElement.scrollBy({ left: dir === 'right' ? 220 : -220, behavior: 'smooth' });
-}
-
-  // User info
   userName = '';
-  userEmail = '';
-  userInitials = '';
-  userScore = 0;
-  unreadCount = 0;
-  userAvatarUrl: string | null = null;
-
-  // UI state
-  showUserMenu = false;
   isLoading = true;
 
-  // Items
   allItems: ItemDTO.ItemSummaryDTO[] = [];
   filteredItems: ItemDTO.ItemSummaryDTO[] = [];
 
-  // Filters
   searchQuery = '';
   selectedCategory: string | null = null;
   sortBy = 'newest';
@@ -127,33 +56,12 @@ scrollCategories(dir: 'left' | 'right') {
   ];
 
   private emojiMap: Record<string, string> = {
-
-    electronics: '📱',
-    tools: '🔧',
-    sports: '⚽',
-    music: '🎸',
-    books: '📚',
-    camping: '⛺',
-    photography: '📷',
-    cameras: '📷',
-    gaming: '🎮',
-    gardening: '🌱',
-    garden: '🪴',
-    biking: '🚲',
-    bikes: '🚲',
-    kitchen: '🍳',
-    cleaning: '🧹',
-    fashion: '👗',
-    art: '🎨',
-    baby: '👶',
-    events: '🎉',
-    auto: '🚗',
-    other: '📦',
-    others: '📦',
-    // outdoors: '🏕️',
-    // travel: '🧳',
-    // fitness: '🏋️',
-    // tech: '💻'
+    electronics: '📱', tools: '🔧', sports: '⚽', music: '🎸',
+    books: '📚', camping: '⛺', photography: '📷', cameras: '📷',
+    gaming: '🎮', gardening: '🌱', garden: '🪴', biking: '🚲',
+    bikes: '🚲', kitchen: '🍳', cleaning: '🧹', fashion: '👗',
+    art: '🎨', baby: '👶', events: '🎉', auto: '🚗',
+    other: '📦', others: '📦',
   };
 
   constructor(
@@ -161,46 +69,84 @@ scrollCategories(dir: 'left' | 'right') {
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
-    private userService: UserService
-  ) { }
+    private userService: UserService,
+    private route: ActivatedRoute
+  ) {}
 
-  ngOnInit() {
+  ngOnInit(): void {
     if (!this.authService.isLoggedIn()) {
       this.router.navigate(['/']);
       return;
     }
-
     this.loadUserInfo();
     this.loadItems();
+    
+    this.route.queryParams.subscribe(params => {
+    this.searchQuery = params['q'] || '';
+    this.applyFilters();
+  });
   }
 
-  private loadUserInfo() {
+  ngAfterViewInit(): void {
+    const el = this.categoryStrip.nativeElement;
 
+    const updateArrows = () => {
+      this.showLeftArrow = el.scrollLeft > 0;
+      this.showRightArrow = el.scrollLeft + el.clientWidth < el.scrollWidth - 1;
+      this.cdr.detectChanges();
+    };
 
+    setTimeout(() => updateArrows(), 100);
+    el.addEventListener('scroll', updateArrows);
+    window.addEventListener('resize', updateArrows);
+
+    let isDown = false, startX = 0, scrollLeft = 0, hasDragged = false;
+
+    el.addEventListener('mousedown', (e: MouseEvent) => {
+      isDown = true; hasDragged = false;
+      startX = e.pageX; scrollLeft = el.scrollLeft;
+      el.style.userSelect = 'none';
+    });
+
+    window.addEventListener('mouseup', () => {
+      isDown = false;
+      el.style.cursor = 'grab';
+      el.style.userSelect = '';
+    });
+
+    window.addEventListener('mousemove', (e: MouseEvent) => {
+      if (!isDown) return;
+      const diff = e.pageX - startX;
+      if (Math.abs(diff) > 5) {
+        hasDragged = true;
+        el.style.cursor = 'grabbing';
+        el.scrollLeft = scrollLeft - diff;
+      }
+    });
+
+    el.addEventListener('click', (e: MouseEvent) => {
+      if (hasDragged) { e.stopPropagation(); hasDragged = false; }
+    }, true);
+  }
+
+  private loadUserInfo(): void {
     this.userService.getMe().subscribe({
       next: (user) => {
         this.userName = user.fullName || user.username;
-        this.userEmail = user.email;
-        this.userInitials = this.getInitials(this.userName);
-        this.userScore = user.score;
-        this.userAvatarUrl = user.avatarUrl ?? null;
         this.cdr.detectChanges();
       },
-      error: (err) => {
-        console.error('Failed to load user info:', err);
-      }
+      error: (err) => console.error('Failed to load user info:', err)
     });
   }
 
-  private loadItems() {
+  private loadItems(): void {
     this.isLoading = true;
     this.http.get<ItemDTO.ItemSummaryDTO[]>(`${this.base}/api/items`).subscribe({
       next: (items) => {
         this.allItems = items;
-        this.applyFilters();  //populate filteredItems first
+        this.applyFilters();
         this.isLoading = false;
         this.cdr.detectChanges();
-
       },
       error: (err) => {
         console.error('Failed to load items:', err);
@@ -210,16 +156,14 @@ scrollCategories(dir: 'left' | 'right') {
     });
   }
 
-  onSearch() {
-    this.applyFilters();
-  }
+  onSearch(): void { this.applyFilters(); }
 
-  selectCategory(name: string | null) {
+  selectCategory(name: string | null): void {
     this.selectedCategory = name;
     this.applyFilters();
   }
 
-  applyFilters() {
+  applyFilters(): void {
     let result = [...this.allItems];
 
     if (this.searchQuery.trim()) {
@@ -247,27 +191,20 @@ scrollCategories(dir: 'left' | 'right') {
     } else if (this.sortBy === 'az') {
       result.sort((a, b) => a.title.localeCompare(b.title));
     } else {
-      // newest — sort by id descending instead of reverse()
-      result.sort((a, b) => b.id - a.id);  // ← fix: was result.reverse()
+      result.sort((a, b) => b.id - a.id);
     }
 
-    this.filteredItems = [...result]; // ← new array reference forces Angular to re-render
+    this.filteredItems = [...result];
   }
 
-  goToItem(id: number) {
-    this.router.navigate(['/items', id]);
-  }
-
-  logout() {
-    this.authService.logout().subscribe({
-      next: () => this.router.navigate(['/']),
-      error: () => {
-        //Clear tokens and redirect even if API call fails
-        this.authService.clearTokens();
-        this.router.navigate(['/']);
-      },
+  scrollCategories(dir: 'left' | 'right'): void {
+    this.categoryStrip.nativeElement.scrollBy({
+      left: dir === 'right' ? 220 : -220,
+      behavior: 'smooth'
     });
   }
+
+  goToItem(id: number): void { this.router.navigate(['/items', id]); }
 
   getInitials(name: string): string {
     return name.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2);
@@ -280,15 +217,11 @@ scrollCategories(dir: 'left' | 'right') {
   getConditionClass(condition: string): string {
     const c = condition?.toLowerCase();
     switch (c) {
-      case 'excellent':
-        return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
-      case 'good':
-        return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
-      case 'fair':
-        return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
-      default:
-        return 'bg-zinc-800 text-zinc-400 border-zinc-700';
+      case 'excellent': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'good':      return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'fair':      return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'poor':      return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      default:          return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
   }
-
 }

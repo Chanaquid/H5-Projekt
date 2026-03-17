@@ -16,6 +16,13 @@ namespace backend.Interfaces
         Task<ItemDTO.ItemDetailDTO> UpdateAsync(int itemId, string ownerId, ItemDTO.UpdateItemDTO dto, bool isAdmin = false);
         Task DeleteAsync(int itemId, string ownerId, bool isAdmin = false);
         Task<List<ItemDTO.ItemSummaryDTO>> GetByOwnerAsync(string ownerId);
+        Task<ItemDTO.ItemDetailDTO> ToggleActiveAsync(int itemId, string ownerId, bool isActive, bool isAdmin = false);
+
+
+        //Item pics
+        Task<ItemDTO.ItemPhotoDTO> AddPhotoAsync(int itemId, string ownerId, ItemDTO.AddItemPhotoDTO dto, bool isAdmin = false);
+        Task DeletePhotoAsync(int itemId, int photoId, string ownerId, bool isAdmin = false);
+        Task<ItemDTO.ItemPhotoDTO> SetPrimaryPhotoAsync(int itemId, int photoId, string ownerId, bool isAdmin = false);
 
         //QR code
         //Only for owner or admin — enforced in controller

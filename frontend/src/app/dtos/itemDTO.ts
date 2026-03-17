@@ -18,6 +18,7 @@ export namespace ItemDTO {
     availableFrom: string;
     availableUntil: string;
   }
+
  
   export interface UpdateItemDTO {
     categoryId?: number;
@@ -88,6 +89,7 @@ export namespace ItemDTO {
     ownerName: string;
     averageRating: number;
     reviewCount: number;
+    isActive: boolean;
     isCurrentlyOnLoan: boolean;
   }
  

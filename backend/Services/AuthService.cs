@@ -170,6 +170,18 @@ namespace backend.Services
             await _userManager.UpdateAsync(user);
         }
 
+        //change password
+        public async Task ChangePasswordAsync(string userId, AuthDTO.ChangePasswordDTO dto)
+        {
+            var user = await _userManager.FindByIdAsync(userId)
+                ?? throw new ArgumentException("User not found.");
+
+            var result = await _userManager.ChangePasswordAsync(user, dto.CurrentPassword, dto.NewPassword);
+
+            if (!result.Succeeded)
+                throw new ArgumentException(result.Errors.First().Description);
+        }
+
         //Forgot password
         public async Task<bool> ForgotPasswordAsync(string email)
         {

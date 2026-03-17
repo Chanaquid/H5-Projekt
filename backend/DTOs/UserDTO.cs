@@ -94,6 +94,8 @@ namespace backend.DTOs
             public string? AvatarUrl { get; set; }
             public int Score { get; set; }
             public bool IsVerified { get; set; }
+            public int CompletedLoansCount { get; set; }
+
         }
 
         //Admin view of a user - can see everything

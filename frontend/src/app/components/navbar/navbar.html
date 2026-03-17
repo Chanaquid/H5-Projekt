@@ -1,0 +1,198 @@
+<nav
+    class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16 bg-zinc-950 border-b border-zinc-800/80">
+
+    <!-- Left: Logo -->
+    <a routerLink="/home" class="flex items-center gap-2.5 no-underline shrink-0">
+        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-zinc-900 font-black text-sm">L
+        </div>
+        <span class="font-black text-lg text-white tracking-tight hidden sm:block"
+            style="font-family:'Syne',sans-serif">LoanIt</span>
+    </a>
+
+    <!-- Center: Search -->
+    <div *ngIf="isHomePage" class="flex-1 max-w-md mx-4 md:mx-8">
+        <div class="relative">
+            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                    d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+            </svg>
+            <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="onSearch()" placeholder="Search items..."
+                class="w-full bg-zinc-900 border border-zinc-800 text-white text-sm rounded-xl pl-9 pr-4 py-2.5 outline-none placeholder-zinc-600 focus:border-amber-400/50 focus:ring-1 focus:ring-amber-400/20 transition-all duration-200" />
+        </div>
+    </div>
+
+    <!-- Right: Actions -->
+    <div class="flex items-center gap-2 shrink-0">
+
+        <!-- List item button -->
+        <a *ngIf="isHomePage" routerLink="/my-items"
+            class="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-amber-400/20 no-underline">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            List item
+        </a>
+
+
+        <!-- Notifications -->
+        <div class="relative" (clickOutside)="showNotifications = false">
+            <button (click)="showNotifications = !showNotifications; showUserMenu = false"
+                class="relative w-9 h-9 flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 rounded-xl transition-all duration-200 cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6 6 0 10-12 0v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                </svg>
+                <span *ngIf="unreadCount > 0"
+                    class="absolute top-1.5 right-1.5 w-2 h-2 bg-amber-400 rounded-full"></span>
+            </button>
+
+            <!-- Notification dropdown -->
+            <div *ngIf="showNotifications"
+                class="absolute right-0 top-12 w-80 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/60 overflow-hidden z-50">
+
+                <!-- Header -->
+                <div class="px-4 py-3 border-b border-zinc-800 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-sm font-bold text-white" style="font-family:'Syne',sans-serif">Notifications
+                        </h3>
+                        <span *ngIf="unreadCount > 0"
+                            class="text-[10px] font-bold bg-amber-400 text-zinc-900 rounded-full px-1.5 py-0.5 leading-none">
+                            {{ unreadCount }}
+                        </span>
+                    </div>
+                    <button *ngIf="unreadCount > 0" (click)="markAllAsRead()"
+                        class="text-[10px] text-amber-400 hover:text-amber-300 font-medium uppercase tracking-widest transition-colors cursor-pointer">
+                        Mark all read
+                    </button>
+                </div>
+
+                <!-- List -->
+                <div class="max-h-[400px] overflow-y-auto">
+
+                    <!-- Empty state -->
+                    <div *ngIf="notifications.length === 0" class="py-12 text-center">
+                        <p class="text-3xl mb-2">🔔</p>
+                        <p class="text-zinc-500 text-sm">No notifications yet</p>
+                    </div>
+
+                    <!-- Notification items -->
+                    <div *ngFor="let n of notifications" (click)="onNotificationClick(n)"
+                        class="flex items-start gap-3 px-4 py-3 border-b border-zinc-800/60 last:border-0 cursor-pointer transition-colors duration-150 hover:bg-zinc-800/60"
+                        [class.bg-amber-400/5]="!n.isRead">
+
+                        <!-- Icon -->
+                        <div class="w-9 h-9 rounded-xl shrink-0 flex items-center justify-center text-base mt-0.5"
+                            [ngClass]="getNotificationIconBg(n.type)">
+                            {{ getNotificationIcon(n.type) }}
+                        </div>
+
+                        <!-- Content -->
+                        <div class="flex-1 min-w-0">
+                            <!-- <p class="text-sm text-white font-medium leading-snug">{{ n.type }}</p> -->
+                            <p class="text-xs text-zinc-500 mt-0.5 leading-snug">{{ n.message }}</p>
+                            <p class="text-[10px] text-zinc-600 mt-1">{{ n.createdAt | date:'MMM d, h:mm a' }}</p>
+                        </div>
+
+                        <!-- Unread dot -->
+                        <div *ngIf="!n.isRead" class="w-2 h-2 bg-amber-400 rounded-full shrink-0 mt-2"></div>
+                    </div>
+                </div>
+
+                <!-- Footer -->
+                <div *ngIf="notifications.length > 0" class="px-4 py-3 border-t border-zinc-800">
+                    <a routerLink="/notifications" (click)="showNotifications = false"
+                        class="block text-center text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors no-underline">
+                        View all notifications
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Avatar dropdown -->
+        <div class="relative" (clickOutside)="showUserMenu = false">
+            <button (click)="showUserMenu = !showUserMenu"
+                class="flex items-center gap-2 pl-1 pr-3 py-1 rounded-xl hover:bg-zinc-800 transition-all duration-200 cursor-pointer">
+                <div
+                    class="w-8 h-8 rounded-lg bg-amber-400/20 border border-amber-400/30 flex items-center justify-center text-amber-400 font-bold text-sm">
+                    <img *ngIf="userAvatarUrl" [src]="userAvatarUrl" [alt]="userName"
+                        class="w-full h-full object-cover" />
+
+                    <div *ngIf="!userAvatarUrl"
+                        class="w-full h-full bg-amber-400/20 flex items-center justify-center text-amber-400 font-bold text-sm">
+                        {{ userInitials }}
+                    </div>
+                </div>
+                <span class="text-sm text-zinc-300 hidden md:block font-medium">{{ userName }}</span>
+                <svg class="w-3.5 h-3.5 text-zinc-500 hidden md:block" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            <!-- Dropdown -->
+            <div *ngIf="showUserMenu"
+                class="absolute right-0 top-12 w-52 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl shadow-black/60 py-2 overflow-hidden">
+                <div class="px-4 py-2.5 border-b border-zinc-800 mb-1">
+                    <p class="text-sm font-semibold text-white">{{ userName }}</p>
+                    <p class="text-xs text-zinc-500">{{ userEmail }}</p>
+                </div>
+                <a routerLink="/my-profile" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                    My Profile
+                </a>
+                <a routerLink="/my-items" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10" />
+                    </svg>
+                    My Items
+                </a>
+                <a routerLink="/my-loans" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                    </svg>
+                    My Loans
+                </a>
+                <a routerLink="/favorites" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                    </svg>
+                    Favorites
+                </a>
+
+                <!-- Admin section — only shown to admins -->
+                <div *ngIf="isAdmin" class="border-t border-zinc-800 mt-1 pt-1">
+                    <a routerLink="/admin-dashboard" (click)="showUserMenu=false"
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-amber-400 hover:text-amber-300 hover:bg-zinc-800 transition-colors no-underline">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                        </svg>
+                        Admin Dashboard
+                    </a>
+                </div>
+
+                <div class="border-t border-zinc-800 mt-1 pt-1">
+                    <button (click)="logout()"
+                        class="w-full flex items-center gap-3 px-4 py-2.5 text-sm text-red-400 hover:text-red-300 hover:bg-zinc-800 transition-colors text-left">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                        </svg>
+                        Sign out
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</nav>

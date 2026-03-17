@@ -1,0 +1,283 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div
+    class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
+
+<app-navbar></app-navbar>
+
+<main class="pt-16 min-h-screen">
+
+    <!-- Header -->
+    <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+        <div class="flex items-center justify-between gap-4 flex-wrap">
+            <div>
+                <p class="text-zinc-500 text-sm font-medium mb-1">Welcome back,</p>
+                <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight"
+                    style="font-family:'Syne',sans-serif">
+                    Admin Dashboard
+                    <span
+                        class="ml-3 text-xs font-bold uppercase tracking-widest bg-amber-400/10 text-amber-400 border border-amber-400/20 px-2 py-1 rounded-lg align-middle">Admin</span>
+                </h1>
+            </div>
+            <button (click)="loadDashboard()"
+                class="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium rounded-xl transition-all duration-200 cursor-pointer">
+                <svg class="w-4 h-4" [class.animate-spin]="isLoading" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+                </svg>
+                Refresh
+            </button>
+        </div>
+    </div>
+
+    <div *ngIf="isLoading" class="flex items-center justify-center py-32">
+        <div class="flex flex-col items-center gap-3">
+            <div class="w-8 h-8 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+            <p class="text-zinc-500 text-sm">Loading dashboard...</p>
+        </div>
+    </div>
+
+    <div *ngIf="!isLoading && dashboard" class="px-6 md:px-10 py-8 space-y-8">
+
+        <!-- Action queues — things requiring attention -->
+        <div>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Action Required</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+
+                <!-- Pending item approvals -->
+                <div
+                    class="bg-zinc-900 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-amber-400/40 hover:-translate-y-0.5"
+                    [class.border-amber-400/30]="dashboard.pendingItemApprovals > 0"
+                    [class.bg-amber-400/5]="dashboard.pendingItemApprovals > 0"
+                    [class.border-zinc-800]="dashboard.pendingItemApprovals === 0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl">📦</span>
+                        <span *ngIf="dashboard.pendingItemApprovals > 0"
+                            class="text-[10px] font-black bg-amber-400 text-zinc-900 px-1.5 py-0.5 rounded-full">
+                            {{ dashboard.pendingItemApprovals }}
+                        </span>
+                    </div>
+                    <p class="text-white font-bold text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.pendingItemApprovals }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Item Approvals</p>
+                </div>
+
+                <!-- Pending loan approvals -->
+                <div
+                    class="bg-zinc-900 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-amber-400/40 hover:-translate-y-0.5"
+                    [class.border-amber-400/30]="dashboard.pendingLoanApprovals > 0"
+                    [class.bg-amber-400/5]="dashboard.pendingLoanApprovals > 0"
+                    [class.border-zinc-800]="dashboard.pendingLoanApprovals === 0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl">📋</span>
+                        <span *ngIf="dashboard.pendingLoanApprovals > 0"
+                            class="text-[10px] font-black bg-amber-400 text-zinc-900 px-1.5 py-0.5 rounded-full">
+                            {{ dashboard.pendingLoanApprovals }}
+                        </span>
+                    </div>
+                    <p class="text-white font-bold text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.pendingLoanApprovals }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Loan Approvals</p>
+                </div>
+
+                <!-- Open disputes -->
+                <div
+                    class="bg-zinc-900 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-red-400/40 hover:-translate-y-0.5"
+                    [class.border-red-400/30]="dashboard.openDisputes > 0"
+                    [class.bg-red-400/5]="dashboard.openDisputes > 0"
+                    [class.border-zinc-800]="dashboard.openDisputes === 0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl">⚖️</span>
+                        <span *ngIf="dashboard.openDisputes > 0"
+                            class="text-[10px] font-black bg-red-500 text-white px-1.5 py-0.5 rounded-full">
+                            {{ dashboard.openDisputes }}
+                        </span>
+                    </div>
+                    <p class="text-white font-bold text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.openDisputes }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Open Disputes</p>
+                </div>
+
+                <!-- Pending appeals -->
+                <div
+                    class="bg-zinc-900 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-orange-400/40 hover:-translate-y-0.5"
+                    [class.border-orange-400/30]="dashboard.pendingAppeals > 0"
+                    [class.bg-orange-400/5]="dashboard.pendingAppeals > 0"
+                    [class.border-zinc-800]="dashboard.pendingAppeals === 0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl">📤</span>
+                        <span *ngIf="dashboard.pendingAppeals > 0"
+                            class="text-[10px] font-black bg-orange-400 text-zinc-900 px-1.5 py-0.5 rounded-full">
+                            {{ dashboard.pendingAppeals }}
+                        </span>
+                    </div>
+                    <p class="text-white font-bold text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.pendingAppeals }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Pending Appeals</p>
+                </div>
+
+                <!-- Pending verifications -->
+                <div
+                    class="bg-zinc-900 border rounded-2xl p-5 cursor-pointer transition-all duration-200 hover:border-blue-400/40 hover:-translate-y-0.5"
+                    [class.border-blue-400/30]="dashboard.pendingVerifications > 0"
+                    [class.bg-blue-400/5]="dashboard.pendingVerifications > 0"
+                    [class.border-zinc-800]="dashboard.pendingVerifications === 0">
+                    <div class="flex items-center justify-between mb-3">
+                        <span class="text-2xl">🏅</span>
+                        <span *ngIf="dashboard.pendingVerifications > 0"
+                            class="text-[10px] font-black bg-blue-400 text-zinc-900 px-1.5 py-0.5 rounded-full">
+                            {{ dashboard.pendingVerifications }}
+                        </span>
+                    </div>
+                    <p class="text-white font-bold text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.pendingVerifications }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Verifications</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Platform stats -->
+        <div>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Platform Overview</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                    <span class="text-2xl block mb-3">👥</span>
+                    <p class="text-white font-black text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.totalUsers }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Total Users</p>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                    <span class="text-2xl block mb-3">📦</span>
+                    <p class="text-white font-black text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.totalActiveItems }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Active Items</p>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5">
+                    <span class="text-2xl block mb-3">🤝</span>
+                    <p class="text-white font-black text-2xl" style="font-family:'Syne',sans-serif">{{
+                        dashboard.totalActiveLoans }}</p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Active Loans</p>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5"
+                    [class.border-red-500/20]="dashboard.totalUnpaidFines > 0">
+                    <span class="text-2xl block mb-3">⚠️</span>
+                    <p class="font-black text-2xl" style="font-family:'Syne',sans-serif"
+                        [class.text-red-400]="dashboard.totalUnpaidFines > 0"
+                        [class.text-white]="dashboard.totalUnpaidFines === 0">
+                        {{ dashboard.totalUnpaidFines }}
+                    </p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Unpaid Fines</p>
+                </div>
+
+                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5"
+                    [class.border-red-500/20]="dashboard.totalUnpaidFinesAmount > 0">
+                    <span class="text-2xl block mb-3">💸</span>
+                    <p class="font-black text-2xl" style="font-family:'Syne',sans-serif"
+                        [class.text-red-400]="dashboard.totalUnpaidFinesAmount > 0"
+                        [class.text-white]="dashboard.totalUnpaidFinesAmount === 0">
+                        kr {{ dashboard.totalUnpaidFinesAmount }}
+                    </p>
+                    <p class="text-zinc-500 text-xs mt-0.5">Unpaid Fines Amount</p>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- Quick actions -->
+        <div>
+            <h2 class="text-xs font-bold uppercase tracking-widest text-zinc-500 mb-4">Quick Actions</h2>
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <button (click)="navigate('/admin-items')"
+                    class="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-amber-400/30 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 cursor-pointer group">
+                    <div
+                        class="w-9 h-9 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Review Items</p>
+                        <p class="text-zinc-500 text-xs">Approve or reject</p>
+                    </div>
+                </button>
+
+                <button (click)="navigate('/admin/loans/pending')"
+                    class="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-amber-400/30 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 cursor-pointer group">
+                    <div
+                        class="w-9 h-9 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Review Loans</p>
+                        <p class="text-zinc-500 text-xs">Low-score users</p>
+                    </div>
+                </button>
+
+                <button (click)="navigate('/admin/users')"
+                    class="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-amber-400/30 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 cursor-pointer group">
+                    <div
+                        class="w-9 h-9 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Manage Users</p>
+                        <p class="text-zinc-500 text-xs">View all users</p>
+                    </div>
+                </button>
+
+                <button (click)="navigate('/admin/verifications')"
+                    class="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-amber-400/30 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 cursor-pointer group">
+                    <div
+                        class="w-9 h-9 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Review Verifications</p>
+                        <p class="text-zinc-500 text-xs">Verify users</p>
+                    </div>
+                </button>
+
+                <button (click)="navigate('/admin/disputes')"
+                    class="flex items-center gap-3 bg-zinc-900 border border-zinc-800 hover:border-amber-400/30 rounded-2xl px-4 py-3.5 text-left transition-all duration-200 cursor-pointer group">
+                    <div
+                        class="w-9 h-9 bg-amber-400/10 rounded-xl flex items-center justify-center shrink-0 group-hover:bg-amber-400/20 transition-colors">
+                        <svg class="w-4 h-4 text-amber-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
+                        </svg>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold">Disputes</p>
+                        <p class="text-zinc-500 text-xs">Resolve open cases</p>
+                    </div>
+                </button>
+            </div>
+        </div>
+
+        <!-- All clear state -->
+        <div *ngIf="allClear"
+            class="flex flex-col items-center justify-center py-12 bg-zinc-900 border border-emerald-500/20 rounded-2xl text-center">
+            <p class="text-4xl mb-3">✅</p>
+            <h3 class="font-bold text-white text-lg mb-1" style="font-family:'Syne',sans-serif">All clear!</h3>
+            <p class="text-zinc-500 text-sm">No pending actions require your attention.</p>
+        </div>
+
+    </div>
+</main>

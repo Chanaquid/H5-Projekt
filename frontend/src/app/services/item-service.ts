@@ -92,4 +92,26 @@ export class ItemService {
   adminDecide(id: number, dto: ItemDTO.AdminItemDecisionDTO): Observable<ItemDTO.ItemDetailDTO> {
     return this.http.post<ItemDTO.ItemDetailDTO>(`${this.baseUrl}/admin/${id}/decide`, dto);
   }
+
+  // POST /api/items/{id}/photos
+  addPhoto(itemId: number, dto: { photoUrl: string; isPrimary: boolean; displayOrder: number }): Observable<ItemDTO.ItemPhotoDTO> {
+    return this.http.post<ItemDTO.ItemPhotoDTO>(`${this.baseUrl}/${itemId}/photos`, dto);
+  }
+
+  // DELETE /api/items/{id}/photos/{photoId}
+  deletePhoto(itemId: number, photoId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${itemId}/photos/${photoId}`);
+  }
+
+  // PATCH /api/items/{id}/photos/{photoId}/primary
+  setPrimaryPhoto(itemId: number, photoId: number): Observable<ItemDTO.ItemPhotoDTO> {
+    return this.http.patch<ItemDTO.ItemPhotoDTO>(`${this.baseUrl}/${itemId}/photos/${photoId}/primary`, {});
+  }
+
+  // PATCH: api/items/{id}/toggle-active
+  toggleActive(id: number, isActive: boolean): Observable<ItemDTO.ItemDetailDTO> {
+    return this.http.patch<ItemDTO.ItemDetailDTO>(`${this.baseUrl}/${id}/toggle-active`, { isActive });
+  }
+
+
 }

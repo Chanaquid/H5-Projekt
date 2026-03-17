@@ -70,6 +70,7 @@ namespace backend.Repositories
                 .Include(i => i.Photos)
                 .Include(i => i.Loans)
                 .Include(i => i.Reviews)
+                    .ThenInclude(r => r.Reviewer)
                 .IgnoreQueryFilters()
                 .FirstOrDefaultAsync(i => i.Id == itemId);
         }

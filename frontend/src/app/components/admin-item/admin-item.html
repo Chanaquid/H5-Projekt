@@ -1,0 +1,571 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10"></div>
+
+<app-navbar></app-navbar>
+
+<main class="pt-16 min-h-screen">
+
+  <!-- Header -->
+  <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+    <div class="flex items-center gap-3 mb-1">
+      <a routerLink="/admin-dashboard" class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors no-underline">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Dashboard
+      </a>
+      <span class="text-zinc-700">/</span>
+      <span class="text-zinc-500 text-xs">Items</span>
+    </div>
+    <div class="flex items-center justify-between gap-4 flex-wrap mt-2">
+      <div>
+        <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
+          All Items
+        </h1>
+        <p class="text-zinc-500 text-sm mt-1">{{ allItems.length }} total items on the platform</p>
+      </div>
+    </div>
+    <div class="flex items-center gap-6 mt-6 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
+        <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ approvedCount }}</span> Approved</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
+        <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ pendingCount }}</span> Pending</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-red-400 rounded-full"></span>
+        <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ rejectedCount }}</span> Rejected</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-6 md:px-10 py-8">
+
+    <!-- Tabs + Search -->
+    <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+      <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1">
+        <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; applyFilters()"
+          class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
+          [class.text-zinc-400]="activeTab !== tab.key">
+          {{ tab.label }}
+          <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+            [class.bg-zinc-900]="activeTab === tab.key" [class.text-amber-400]="activeTab === tab.key"
+            [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-500]="activeTab !== tab.key">
+            {{ getTabCount(tab.key) }}
+          </span>
+        </button>
+      </div>
+      <div class="relative">
+        <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>
+        </svg>
+        <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()" placeholder="Search items or owner..."
+          class="bg-zinc-900 border border-zinc-800 text-white text-sm rounded-xl pl-9 pr-4 py-2 outline-none placeholder-zinc-600 focus:border-amber-400/50 transition-all duration-200 w-64"/>
+      </div>
+    </div>
+
+    <!-- Loading -->
+    <div *ngIf="isLoading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div *ngFor="let _ of [1,2,3,4,5,6,7,8]" class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden animate-pulse">
+        <div class="aspect-[4/3] bg-zinc-800"></div>
+        <div class="p-4 space-y-2">
+          <div class="h-3 bg-zinc-800 rounded w-1/3"></div>
+          <div class="h-4 bg-zinc-800 rounded w-3/4"></div>
+          <div class="h-3 bg-zinc-800 rounded w-1/2"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div *ngIf="!isLoading && filteredItems.length === 0" class="flex flex-col items-center justify-center py-24 text-center">
+      <div class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-3xl mb-4">📦</div>
+      <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">No items found</h3>
+      <p class="text-zinc-500 text-sm">Try a different tab or search term.</p>
+    </div>
+
+    <!-- Items grid -->
+    <div *ngIf="!isLoading && filteredItems.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <div *ngFor="let item of filteredItems" (click)="openItemModal(item)"
+        class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl overflow-hidden transition-all duration-200 cursor-pointer group">
+        <div class="aspect-[4/3] bg-zinc-800 relative overflow-hidden">
+          <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl" [alt]="item.title"
+            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"/>
+          <div *ngIf="!item.primaryPhotoUrl" class="w-full h-full flex items-center justify-center text-5xl">
+            {{ getCategoryEmoji(item.categoryName) }}
+          </div>
+          <div class="absolute top-3 left-3 flex gap-1.5">
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-md uppercase tracking-wide"
+              [class.bg-emerald-400]="item.status === 'Approved' && item.isActive"
+              [class.text-zinc-900]="item.status === 'Approved' && item.isActive"
+              [class.bg-amber-400]="item.status === 'Pending'"
+              [class.text-zinc-900]="item.status === 'Pending'"
+              [class.bg-red-500]="item.status === 'Rejected'"
+              [class.text-white]="item.status === 'Rejected'"
+              [class.bg-zinc-600]="item.status === 'Approved' && !item.isActive"
+              [class.text-zinc-300]="item.status === 'Approved' && !item.isActive">
+              {{ item.status === 'Approved' && !item.isActive ? 'Inactive' : item.status }}
+            </span>
+            <span *ngIf="item.isCurrentlyOnLoan" class="bg-blue-500 text-white text-[10px] font-bold px-2 py-0.5 rounded-md uppercase">On Loan</span>
+          </div>
+        </div>
+        <div class="p-4">
+          <p class="text-amber-400 text-[11px] font-semibold uppercase tracking-widest mb-0.5">{{ item.categoryName }}</p>
+          <h3 class="font-bold text-white text-sm truncate mb-1" style="font-family:'Syne',sans-serif">{{ item.title }}</h3>
+          <p class="text-zinc-500 text-xs truncate mb-1">👤 {{ item.ownerName }}</p>
+          <p class="text-zinc-500 text-xs truncate">📍 {{ item.pickupAddress }}</p>
+          <div class="flex items-center justify-between mt-3">
+            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border" [ngClass]="getConditionClass(item.condition)">
+              {{ item.condition }}
+            </span>
+            <span class="text-zinc-500 text-xs">
+              {{ item.availableFrom | date:'MMM d' }} → {{ item.availableUntil | date:'MMM d, yy' }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Item Modal -->
+<div *ngIf="showItemModal && selectedItem" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showItemModal = false"></div>
+  <div class="relative z-10 w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+
+    <!-- Header -->
+    <div class="px-6 py-5 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">{{ selectedItem.title }}</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">Item #{{ selectedItem.id }} · Owner: {{ selectedItem.ownerName }}</p>
+      </div>
+      <div class="flex items-center gap-2">
+        <button *ngIf="itemDetail" (click)="showEditForm ? showEditForm = false : openEditForm()"
+          class="flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="showEditForm" [class.text-zinc-900]="showEditForm"
+          [class.bg-zinc-800]="!showEditForm" [class.text-zinc-300]="!showEditForm">
+          <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
+          </svg>
+          {{ showEditForm ? 'Cancel Edit' : 'Edit' }}
+        </button>
+        <button (click)="showItemModal = false" class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800">
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- Body -->
+    <div *ngIf="itemDetail" class="p-6 space-y-5">
+
+      <!-- Photos -->
+      <div *ngIf="itemDetail.photos && itemDetail.photos.length > 0" class="flex gap-2 overflow-x-auto pb-1">
+        <div *ngFor="let photo of itemDetail.photos"
+          class="relative shrink-0 w-28 h-28 rounded-xl overflow-hidden bg-zinc-800 cursor-pointer hover:opacity-90 transition-opacity"
+          (click)="selectedPhoto = photo.photoUrl">
+          <img [src]="photo.photoUrl" class="w-full h-full object-cover"/>
+          <span *ngIf="photo.isPrimary" class="absolute top-1 left-1 text-[9px] bg-amber-400 text-zinc-900 font-bold px-1 rounded">Primary</span>
+        </div>
+      </div>
+
+      <!-- Status change -->
+      <div class="bg-zinc-800 rounded-xl p-4 space-y-3">
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Status</p>
+        <div class="flex gap-2">
+          <button (click)="changeStatus('Approved')" [disabled]="isActioning"
+            class="flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-40"
+            [class.bg-emerald-500]="itemDetail.status === 'Approved'" [class.text-white]="itemDetail.status === 'Approved'"
+            [class.bg-zinc-700]="itemDetail.status !== 'Approved'" [class.text-zinc-300]="itemDetail.status !== 'Approved'">
+            ✓ Approve
+          </button>
+          <button (click)="changeStatus('Pending')" [disabled]="isActioning"
+            class="flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-40"
+            [class.bg-amber-400]="itemDetail.status === 'Pending'" [class.text-zinc-900]="itemDetail.status === 'Pending'"
+            [class.bg-zinc-700]="itemDetail.status !== 'Pending'" [class.text-zinc-300]="itemDetail.status !== 'Pending'">
+            ⏳ Pending
+          </button>
+          <button (click)="changeStatus('Rejected')" [disabled]="isActioning"
+            class="flex-1 py-2 text-xs font-bold uppercase rounded-xl transition-all duration-200 cursor-pointer disabled:opacity-40"
+            [class.bg-red-500]="itemDetail.status === 'Rejected'" [class.text-white]="itemDetail.status === 'Rejected'"
+            [class.bg-zinc-700]="itemDetail.status !== 'Rejected'" [class.text-zinc-300]="itemDetail.status !== 'Rejected'">
+            ✗ Reject
+          </button>
+        </div>
+        <div class="space-y-1.5">
+          <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Admin Note</label>
+          <textarea [(ngModel)]="adminNote" rows="2" placeholder="Add a note (required when rejecting)..."
+            class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2 outline-none placeholder-zinc-500 resize-none transition-all duration-200"></textarea>
+        </div>
+        <p *ngIf="actionError" class="text-red-400 text-xs">{{ actionError }}</p>
+        <p *ngIf="actionSuccess" class="text-emerald-400 text-xs">{{ actionSuccess }}</p>
+      </div>
+
+      <!-- Edit form -->
+      <div *ngIf="showEditForm && editForm" class="bg-zinc-800 rounded-xl p-4 space-y-4">
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Edit Item</p>
+
+        <div class="space-y-1.5">
+          <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Title</label>
+          <input type="text" [(ngModel)]="editForm.title"
+            class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"/>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Category</label>
+            <select [(ngModel)]="editForm.categoryId"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200">
+              <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.icon }} {{ cat.name }}</option>
+            </select>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Condition</label>
+            <select [(ngModel)]="editForm.condition"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200">
+              <option value="Excellent">Excellent</option>
+              <option value="Good">Good</option>
+              <option value="Fair">Fair</option>
+              <option value="Poor">Poor</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Description</label>
+          <textarea [(ngModel)]="editForm.description" rows="3"
+            class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none resize-none transition-all duration-200"></textarea>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Value (kr)</label>
+            <input type="number" [(ngModel)]="editForm.currentValue"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"/>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Min Loan Days</label>
+            <input type="number" [(ngModel)]="editForm.minLoanDays" placeholder="None"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-500 transition-all duration-200"/>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Available From</label>
+            <input type="date" [(ngModel)]="editForm.availableFrom"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"/>
+          </div>
+          <div class="space-y-1.5">
+            <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Available Until</label>
+            <input type="date" [(ngModel)]="editForm.availableUntil"
+              class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"/>
+          </div>
+        </div>
+
+        <div class="space-y-1.5">
+          <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Pickup Address</label>
+          <input type="text" [(ngModel)]="editForm.pickupAddress"
+            class="w-full bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none transition-all duration-200"/>
+        </div>
+
+        <div class="flex gap-3">
+          <div class="flex-1 flex items-center justify-between bg-zinc-700 rounded-xl px-3 py-2.5">
+            <p class="text-white text-xs font-medium">Requires Verification</p>
+            <button (click)="editForm.requiresVerification = !editForm.requiresVerification"
+              class="w-9 h-5 rounded-full transition-all duration-200 relative shrink-0"
+              [class.bg-amber-400]="editForm.requiresVerification"
+              [class.bg-zinc-500]="!editForm.requiresVerification">
+              <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                [class.left-0.5]="!editForm.requiresVerification"
+                [class.left-4]="editForm.requiresVerification"></span>
+            </button>
+          </div>
+          <div class="flex-1 flex items-center justify-between bg-zinc-700 rounded-xl px-3 py-2.5">
+            <p class="text-white text-xs font-medium">Is Active</p>
+            <button (click)="editForm.isActive = !editForm.isActive"
+              class="w-9 h-5 rounded-full transition-all duration-200 relative shrink-0"
+              [class.bg-amber-400]="editForm.isActive"
+              [class.bg-zinc-500]="!editForm.isActive">
+              <span class="absolute top-0.5 w-4 h-4 bg-white rounded-full shadow transition-all duration-200"
+                [class.left-0.5]="!editForm.isActive"
+                [class.left-4]="editForm.isActive"></span>
+            </button>
+          </div>
+        </div>
+
+        <p *ngIf="updateError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{{ updateError }}</p>
+        <p *ngIf="updateSuccess" class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">{{ updateSuccess }}</p>
+
+        <button (click)="updateItem()" [disabled]="isUpdating"
+          class="w-full py-2.5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+          {{ isUpdating ? 'Saving...' : 'Save changes' }}
+        </button>
+      </div>
+
+      <!-- Item details -->
+      <div class="grid grid-cols-2 gap-4">
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Category</p>
+          <p class="text-white text-sm">{{ itemDetail.category?.name }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Condition</p>
+          <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-md border" [ngClass]="getConditionClass(itemDetail.condition)">
+            {{ itemDetail.condition }}
+          </span>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Current Value</p>
+          <p class="text-white text-sm">kr {{ itemDetail.currentValue }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Min Loan Days</p>
+          <p class="text-white text-sm">{{ itemDetail.minLoanDays ?? '—' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Available From</p>
+          <p class="text-white text-sm">{{ itemDetail.availableFrom | date:'MMM d, yyyy' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Available Until</p>
+          <p class="text-white text-sm">{{ itemDetail.availableUntil | date:'MMM d, yyyy' }}</p>
+        </div>
+        <div class="space-y-1 col-span-2">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Pickup Address</p>
+          <p class="text-white text-sm">{{ itemDetail.pickupAddress }}</p>
+        </div>
+        <div class="space-y-1 col-span-2">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Description</p>
+          <p class="text-zinc-300 text-sm leading-relaxed">{{ itemDetail.description }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Requires Verification</p>
+          <p class="text-white text-sm">{{ itemDetail.requiresVerification ? 'Yes' : 'No' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Visible to users</p>
+          <p class="text-sm"
+            [class.text-emerald-400]="itemDetail.status === 'Approved' && itemDetail.isActive"
+            [class.text-zinc-500]="itemDetail.status !== 'Approved' || !itemDetail.isActive">
+            {{ itemDetail.status === 'Approved' && itemDetail.isActive ? 'Yes' : 'No' }}
+          </p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Created</p>
+          <p class="text-white text-sm">{{ itemDetail.createdAt | date:'MMM d, yyyy' }}</p>
+        </div>
+        <div class="space-y-1">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Currently On Loan</p>
+          <p class="text-sm" [class.text-blue-400]="itemDetail.isCurrentlyOnLoan" [class.text-zinc-500]="!itemDetail.isCurrentlyOnLoan">
+            {{ itemDetail.isCurrentlyOnLoan ? 'Yes' : 'No' }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Owner info -->
+      <div class="bg-zinc-800 rounded-xl p-4 flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-sm font-bold text-amber-400">
+          <img *ngIf="itemDetail.owner?.avatarUrl" [src]="itemDetail.owner.avatarUrl" class="w-full h-full object-cover"/>
+          <span *ngIf="!itemDetail.owner?.avatarUrl">{{ getInitials(itemDetail.owner?.fullName || '') }}</span>
+        </div>
+        <div class="flex-1">
+          <p class="text-white text-sm font-semibold cursor-pointer hover:text-amber-400 transition-colors"
+            (click)="router.navigate(['/users', itemDetail.owner?.id])">
+            {{ itemDetail.owner?.fullName }}
+          </p>
+          <p class="text-zinc-500 text-xs">@{{ itemDetail.owner?.username }}</p>
+        </div>
+        <div class="text-right">
+          <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Score</p>
+          <p class="font-black text-lg leading-none"
+            [class.text-emerald-400]="(itemDetail.owner?.score ?? 0) >= 70"
+            [class.text-amber-400]="(itemDetail.owner?.score ?? 0) >= 40 && (itemDetail.owner?.score ?? 0) < 70"
+            [class.text-red-400]="(itemDetail.owner?.score ?? 0) < 40"
+            style="font-family:'Syne',sans-serif">
+            {{ itemDetail.owner?.score }}
+          </p>
+        </div>
+      </div>
+
+      <!-- Existing admin note -->
+      <div *ngIf="itemDetail.adminNote" class="bg-amber-400/5 border border-amber-400/20 rounded-xl p-4">
+        <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Previous Admin Note</p>
+        <p class="text-amber-400 text-sm">{{ itemDetail.adminNote }}</p>
+      </div>
+
+      <!-- Reviews -->
+      <div *ngIf="itemHistory">
+        <div *ngIf="itemHistory.reviewCount > 0" class="bg-zinc-800 rounded-xl p-4 space-y-3">
+          <div class="flex items-center justify-between">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Reviews</p>
+            <div class="flex items-center gap-2">
+              <span class="text-amber-400 font-black text-sm" style="font-family:'Syne',sans-serif">
+                {{ itemHistory.averageRating.toFixed(1) }}
+              </span>
+              <div class="flex gap-0.5">
+                <span *ngFor="let s of [1,2,3,4,5]" class="text-xs"
+                  [class.text-amber-400]="s <= itemHistory.averageRating"
+                  [class.text-zinc-600]="s > itemHistory.averageRating">★</span>
+              </div>
+              <span class="text-zinc-500 text-xs">({{ itemHistory.reviewCount }})</span>
+            </div>
+          </div>
+          <div *ngFor="let review of displayedReviews" class="bg-zinc-700 rounded-xl px-3 py-2.5 space-y-1">
+            <div class="flex items-center justify-between">
+              <div class="flex items-center gap-2">
+                <div class="w-6 h-6 rounded-full overflow-hidden bg-zinc-600 shrink-0 flex items-center justify-center text-[10px] font-bold text-amber-400">
+                  <img *ngIf="review.reviewerAvatarUrl" [src]="review.reviewerAvatarUrl" class="w-full h-full object-cover"/>
+                  <span *ngIf="!review.reviewerAvatarUrl">{{ review.reviewerName.charAt(0).toUpperCase() }}</span>
+                </div>
+                <p class="text-white text-xs font-semibold cursor-pointer hover:text-amber-400 transition-colors"
+                  (click)="router.navigate(['/users', review.reviewerId])">
+                  {{ review.reviewerName }}
+                </p>
+                <span *ngIf="review.isAdminReview"
+                  class="text-[9px] font-black uppercase bg-amber-400/10 text-amber-400 border border-amber-400/20 px-1.5 py-0.5 rounded-md">
+                  Admin
+                </span>
+              </div>
+              <div class="flex gap-0.5">
+                <span *ngFor="let s of [1,2,3,4,5]" class="text-[10px]"
+                  [class.text-amber-400]="s <= review.rating"
+                  [class.text-zinc-600]="s > review.rating">★</span>
+              </div>
+            </div>
+            <p *ngIf="review.comment" class="text-zinc-400 text-xs leading-relaxed">{{ review.comment }}</p>
+            <p class="text-zinc-600 text-[10px]">{{ review.createdAt | date:'MMM d, yyyy' }}</p>
+          </div>
+          <button *ngIf="visibleReviews < itemHistory.reviewCount" (click)="loadMoreReviews()"
+            class="w-full py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-700 hover:bg-zinc-600 rounded-xl transition-all duration-200 cursor-pointer">
+            Load more ({{ itemHistory.reviewCount - visibleReviews }} remaining)
+          </button>
+        </div>
+        <div *ngIf="itemHistory.reviewCount === 0" class="bg-zinc-800 rounded-xl p-4 text-center">
+          <p class="text-zinc-500 text-sm">No reviews yet.</p>
+        </div>
+      </div>
+
+      <!-- Loan history -->
+      <div *ngIf="itemHistory">
+        <div *ngIf="itemHistory.loans.length > 0">
+          <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">
+            Loan History ({{ itemHistory.loans.length }})
+          </p>
+          <div class="space-y-3">
+            <div *ngFor="let loan of displayedLoans" class="bg-zinc-800 rounded-xl p-4 space-y-3">
+
+              <!-- Loan header — clickable -->
+              <div class="flex items-center justify-between flex-wrap gap-2 cursor-pointer"
+                (click)="router.navigate(['/loans', loan.loanId])">
+                <div>
+                  <p class="text-white text-sm font-semibold hover:text-amber-400 transition-colors">
+                    Loan #{{ loan.loanId }}
+                  </p>
+                  <p class="text-zinc-500 text-xs">Borrowed by <span class="text-zinc-300">{{ loan.borrowerName }}</span></p>
+                </div>
+                <div class="flex items-center gap-2">
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border" [ngClass]="getConditionClass(loan.snapshotCondition)">
+                    {{ loan.snapshotCondition }}
+                  </span>
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg border" [ngClass]="getLoanStatusClass(loan.status)">
+                    {{ loan.status }}
+                  </span>
+                  <svg class="w-3.5 h-3.5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                  </svg>
+                </div>
+              </div>
+
+              <!-- Dates -->
+              <div class="flex items-center gap-4 text-xs text-zinc-500">
+                <span>{{ loan.startDate | date:'MMM d' }} → {{ loan.endDate | date:'MMM d, yyyy' }}</span>
+                <span *ngIf="loan.actualReturnDate" class="text-emerald-400">
+                  Returned {{ loan.actualReturnDate | date:'MMM d, yyyy' }}
+                </span>
+              </div>
+
+              <!-- Snapshot photos -->
+              <div *ngIf="loan.snapshotPhotos && loan.snapshotPhotos.length > 0" class="flex gap-2 overflow-x-auto pb-1">
+                <div *ngFor="let photo of loan.snapshotPhotos"
+                  class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-zinc-700 cursor-pointer hover:opacity-80 transition-opacity"
+                  (click)="selectedPhoto = photo.photoUrl">
+                  <img [src]="photo.photoUrl" class="w-full h-full object-cover"/>
+                </div>
+              </div>
+
+              <!-- Fines -->
+              <div *ngIf="loan.fines && loan.fines.length > 0" class="space-y-1.5">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Fines</p>
+                <div *ngFor="let fine of loan.fines" class="flex items-center justify-between bg-zinc-700 rounded-lg px-3 py-2">
+                  <div>
+                    <p class="text-white text-xs font-medium">{{ fine.type }}</p>
+                    <p class="text-zinc-500 text-[10px]">{{ fine.createdAt | date:'MMM d, yyyy' }}</p>
+                  </div>
+                  <div class="text-right">
+                    <p class="text-white text-xs font-bold">kr {{ fine.amount }}</p>
+                    <span class="text-[10px] font-bold uppercase"
+                      [class.text-red-400]="fine.status === 'Unpaid'"
+                      [class.text-amber-400]="fine.status === 'PendingVerification'"
+                      [class.text-emerald-400]="fine.status === 'Paid'">
+                      {{ fine.status }}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Disputes -->
+              <div *ngIf="loan.disputes && loan.disputes.length > 0" class="space-y-1.5">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Disputes</p>
+                <div *ngFor="let dispute of loan.disputes" class="flex items-center justify-between bg-zinc-700 rounded-lg px-3 py-2">
+                  <div>
+                    <p class="text-white text-xs font-medium">{{ dispute.filedAs }}</p>
+                    <p class="text-zinc-500 text-[10px]">Filed by {{ dispute.filedByName }} · {{ dispute.createdAt | date:'MMM d, yyyy' }}</p>
+                  </div>
+                  <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md"
+                    [class.bg-amber-400/10]="dispute.status === 'Open' || dispute.status === 'UnderReview'"
+                    [class.text-amber-400]="dispute.status === 'Open' || dispute.status === 'UnderReview'"
+                    [class.bg-emerald-400/10]="dispute.status === 'Resolved'"
+                    [class.text-emerald-400]="dispute.status === 'Resolved'">
+                    {{ dispute.status }}
+                  </span>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+          <button *ngIf="visibleLoans < itemHistory.loans.length" (click)="loadMoreLoans()"
+            class="w-full mt-3 py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 rounded-xl transition-all duration-200 cursor-pointer">
+            Load more ({{ itemHistory.loans.length - visibleLoans }} remaining)
+          </button>
+        </div>
+
+        <div *ngIf="itemHistory.loans.length === 0" class="bg-zinc-800 rounded-xl p-4 text-center">
+          <p class="text-zinc-500 text-sm">No loan history for this item.</p>
+        </div>
+      </div>
+
+      <!-- History loading -->
+      <div *ngIf="!itemHistory" class="flex items-center justify-center py-6">
+        <div class="w-5 h-5 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+
+    </div>
+
+    <!-- Loading detail -->
+    <div *ngIf="!itemDetail" class="flex items-center justify-center py-16">
+      <div class="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Photo lightbox -->
+<div *ngIf="selectedPhoto" class="fixed inset-0 z-[110] flex items-center justify-center p-4" (click)="selectedPhoto = null">
+  <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
+  <img [src]="selectedPhoto" class="relative z-10 max-w-[90vw] max-h-[85vh] rounded-2xl object-contain shadow-2xl"/>
+</div>

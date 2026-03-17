@@ -39,6 +39,7 @@ export namespace ReviewDTO {
     itemTitle: string;
     rating: number;
     comment?: string;
+    reviewerId: string;
     reviewerName: string;
     reviewerAvatarUrl?: string;
     createdAt: string;

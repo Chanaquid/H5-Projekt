@@ -292,14 +292,14 @@ namespace backend.Services
         }
 
         //Get loan by id
-        public async Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId)
+        public async Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId, bool isAdmin = false)
         {
             var loan = await _loanRepository.GetByIdWithDetailsAsync(loanId);
             if (loan == null)
                 throw new KeyNotFoundException($"Loan {loanId} not found.");
 
             //Only the owner or borrower can view a loan
-            if (loan.BorrowerId != requestingUserId && loan.Item.OwnerId != requestingUserId)
+            if (!isAdmin && loan.BorrowerId != requestingUserId && loan.Item.OwnerId != requestingUserId)
                 throw new UnauthorizedAccessException("You do not have access to this loan.");
 
             return MapToDetailDTO(loan, requestingUserId);
@@ -378,42 +378,56 @@ namespace backend.Services
 
         public async Task HandleLoanReturnAsync(Loan loan)
         {
-            var borrower = loan.Borrower; 
-            var item = loan.Item;         
+            var borrower = loan.Borrower;
+            var item = loan.Item;
 
             loan.Status = LoanStatus.Returned;
             loan.ActualReturnDate = DateTime.UtcNow;
             loan.UpdatedAt = DateTime.UtcNow;
-
             _loanRepository.Update(loan);
 
             var returnedOnTime = DateTime.UtcNow.Date <= loan.EndDate.Date;
 
             if (returnedOnTime && borrower != null)
             {
-                var newScore = borrower.Score + OnTimeReturnScore;
+                var newScore = Math.Min(borrower.Score + OnTimeReturnScore, 100);
+                var actualPointsAdded = newScore - borrower.Score;
 
-                await _userRepository.AddScoreHistoryAsync(new ScoreHistory
+                if (actualPointsAdded > 0)
                 {
-                    UserId = borrower.Id,
-                    PointsChanged = OnTimeReturnScore,
-                    ScoreAfterChange = newScore,
-                    Reason = ScoreChangeReason.OnTimeReturn,
-                    LoanId = loan.Id,
-                    Note = $"On-time return of '{item.Title}'.",
-                    CreatedAt = DateTime.UtcNow
-                });
+                    await _userRepository.AddScoreHistoryAsync(new ScoreHistory
+                    {
+                        UserId = borrower.Id,
+                        PointsChanged = actualPointsAdded,
+                        ScoreAfterChange = newScore,
+                        Reason = ScoreChangeReason.OnTimeReturn,
+                        LoanId = loan.Id,
+                        Note = $"On-time return of '{item.Title}'.",
+                        CreatedAt = DateTime.UtcNow
+                    });
 
-                borrower.Score = newScore;
-                await _userRepository.UpdateAsync(borrower);
+                    borrower.Score = newScore;
+                    await _userRepository.UpdateAsync(borrower);
 
-                await _notificationService.SendAsync(
-                    borrower.Id,
-                    NotificationType.LoanReturned,
-                    $"Your return of '{item.Title}' has been confirmed. +{OnTimeReturnScore} points for returning on time!",
-                    loan.Id,
-                    NotificationReferenceType.Loan
-                );
+                    await _notificationService.SendAsync(
+                        borrower.Id,
+                        NotificationType.LoanReturned,
+                        $"Your return of '{item.Title}' has been confirmed. +{actualPointsAdded} points for returning on time!",
+                        loan.Id,
+                        NotificationReferenceType.Loan
+                    );
+                }
+                else
+                {
+                    //Score already at 100 — just notify, no scorehistory
+                    await _notificationService.SendAsync(
+                        borrower.Id,
+                        NotificationType.LoanReturned,
+                        $"Your return of '{item.Title}' has been confirmed. Your score is already at its maximum!",
+                        loan.Id,
+                        NotificationReferenceType.Loan
+                    );
+                }
             }
             else if (borrower != null)
             {
@@ -450,7 +464,6 @@ namespace backend.Services
                     NotificationReferenceType.Item
                 );
             }
-
 
             await _loanRepository.SaveChangesAsync();
         }
@@ -635,6 +648,7 @@ namespace backend.Services
                                         : l.Borrower?.FullName ?? string.Empty,
                 StartDate = l.StartDate,
                 EndDate = l.EndDate,
+                ActualReturnDate = l.ActualReturnDate,
                 Status = l.Status.ToString(),
                 HasUnreadMessages = false,  //Wired up when MessageService is built
                 DaysOverdue = daysOverdue

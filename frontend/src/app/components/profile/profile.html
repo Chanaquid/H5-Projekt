@@ -31,7 +31,8 @@
 
             <!-- Avatar -->
             <div class="relative">
-                <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-zinc-700 bg-zinc-800">
+                <div class="w-24 h-24 rounded-2xl overflow-hidden border-2 border-zinc-700 bg-zinc-800 cursor-pointer"
+                    (click)="profile?.avatarUrl && openAvatarModal()">
                     <img *ngIf="profile?.avatarUrl" [src]="profile!.avatarUrl!" [alt]="profile?.fullName"
                         class="w-full h-full object-cover" />
                     <div *ngIf="!profile?.avatarUrl"
@@ -64,9 +65,9 @@
                         Verified
                     </span>
                 </div>
-                <p class="text-zinc-500 text-sm mb-1">@{{ profile?.username }}</p>
-                <p class="text-zinc-500 text-sm">📍 {{ profile?.address || 'No address set' }}</p>
-                <p class="text-zinc-600 text-xs mt-1">Member since {{ profile?.membershipDate | date:'MMMM yyyy' }}</p>
+                <p class="text-zinc-400 text-sm mb-1">@{{ profile?.username }}</p>
+                <p class="text-zinc-400 text-sm">📍 {{ profile?.address || 'No address set' }}</p>
+                <p class="text-zinc-400 text-xs mt-1">Member since {{ profile?.membershipDate | date:'MMMM yyyy' }}</p>
             </div>
 
             <!-- Cards row -->
@@ -76,7 +77,7 @@
                 <div
                     class="flex flex-col items-center bg-zinc-900 border border-zinc-800 rounded-2xl px-6 py-4 min-w-[120px]">
                     <span class="text-2xl mb-1">🏅</span>
-                    <span class="text-xs text-zinc-500 uppercase tracking-widest font-medium mb-1">Trust Score</span>
+                    <span class="text-xs text-zinc-500 uppercase tracking-widest font-medium mb-1">User Score</span>
                     <span class="font-black text-4xl leading-none"
                         [class.text-emerald-400]="(profile?.score ?? 0) >= 70"
                         [class.text-amber-400]="(profile?.score ?? 0) >= 40 && (profile?.score ?? 0) < 70"
@@ -93,7 +94,7 @@
                 </div>
 
                 <!-- Unpaid Fines -->
-                <div class="flex flex-col items-center rounded-2xl px-6 py-4 min-w-[120px] border transition-all duration-200"
+                <div class="flex flex-col items-center rounded-2xl px-4 py-4 min-w-[110px] max-w-[140px] w-full border transition-all duration-200 overflow-hidden"
                     [class.bg-red-500/10]="(profile?.unpaidFinesTotal ?? 0) > 0"
                     [class.border-red-500/30]="(profile?.unpaidFinesTotal ?? 0) > 0"
                     [class.bg-zinc-900]="(profile?.unpaidFinesTotal ?? 0) === 0"
@@ -111,7 +112,7 @@
                         {{ (profile?.unpaidFinesTotal ?? 0) > 0 ? ('kr ' + profile?.unpaidFinesTotal) : 'None' }}
                     </span>
                     <p class="text-[12px] mt-1.5" [class.text-red-400]="(profile?.unpaidFinesTotal ?? 0) > 0"
-                        [class.text-zinc-600]="(profile?.unpaidFinesTotal ?? 0) === 0">
+                        [class.text-zinc-400]="(profile?.unpaidFinesTotal ?? 0) === 0">
                         {{ (profile?.unpaidFinesTotal ?? 0) > 0 ? 'Payment required' : 'All clear' }}
                     </p>
                 </div>
@@ -192,31 +193,109 @@
 
                     <!-- Tab: Loan History -->
                     <div *ngIf="activeTab === 'loans'" class="p-4">
-                        <div *ngIf="myLoans.length === 0" class="py-12 text-center">
-                            <p class="text-4xl mb-3">📋</p>
-                            <p class="text-zinc-500 text-sm">No loan history yet.</p>
-                        </div>
-                        <div class="space-y-3">
-                            <div *ngFor="let loan of myLoans"
-                                class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3">
-                                <div
-                                    class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
-                                    <img *ngIf="loan.itemPrimaryPhoto" [src]="loan.itemPrimaryPhoto"
-                                        class="w-full h-full object-cover" />
-                                    <span *ngIf="!loan.itemPrimaryPhoto">📦</span>
-                                </div>
-                                <div class="flex-1 min-w-0">
-                                    <p class="text-white text-sm font-semibold truncate">{{ loan.itemTitle }}</p>
-                                    <p class="text-zinc-500 text-xs">{{ loan.startDate | date:'MMM d' }} → {{
-                                        loan.actualReturnDate | date:'MMM d, yyyy' }}</p>
-                                </div>
-                                <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shrink-0"
-                                    [ngClass]="getLoanStatusClass(loan.status)">
-                                    {{ loan.status }}
+
+                        <!-- Borrowed / Lent toggle -->
+                        <div class="flex items-center gap-1 bg-zinc-800 rounded-xl p-1 mb-4 w-fit">
+                            <button (click)="loanView = 'borrowed'"
+                                class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+                                [class.bg-zinc-900]="loanView === 'borrowed'"
+                                [class.text-white]="loanView === 'borrowed'"
+                                [class.text-zinc-500]="loanView !== 'borrowed'">
+                                📦 Borrowed
+                                <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full"
+                                    [class.bg-amber-400/10]="loanView === 'borrowed'"
+                                    [class.text-amber-400]="loanView === 'borrowed'"
+                                    [class.bg-zinc-700]="loanView !== 'borrowed'"
+                                    [class.text-zinc-500]="loanView !== 'borrowed'">
+                                    {{ myLoans.length }}
                                 </span>
+                            </button>
+                            <button (click)="loanView = 'lent'"
+                                class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+                                [class.bg-zinc-900]="loanView === 'lent'" [class.text-white]="loanView === 'lent'"
+                                [class.text-zinc-500]="loanView !== 'lent'">
+                                🤝 Lent out
+                                <span class="ml-1 text-[10px] px-1.5 py-0.5 rounded-full"
+                                    [class.bg-amber-400/10]="loanView === 'lent'"
+                                    [class.text-amber-400]="loanView === 'lent'"
+                                    [class.bg-zinc-700]="loanView !== 'lent'"
+                                    [class.text-zinc-500]="loanView !== 'lent'">
+                                    {{ ownedLoans.length }}
+                                </span>
+                            </button>
+                        </div>
+
+                        <!-- Borrowed loans -->
+                        <div *ngIf="loanView === 'borrowed'">
+                            <div *ngIf="myLoans.length === 0" class="py-12 text-center">
+                                <p class="text-4xl mb-3">📋</p>
+                                <p class="text-zinc-500 text-sm">No loan history yet.</p>
+                            </div>
+                            <div class="space-y-3">
+                                <div *ngFor="let loan of myLoans"
+                                    (click)="goToLoan(loan.id)"
+                                    class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3 cursor-pointer">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
+                                        <img *ngIf="loan.itemPrimaryPhoto" [src]="loan.itemPrimaryPhoto"
+                                            class="w-full h-full object-cover" />
+                                        <span *ngIf="!loan.itemPrimaryPhoto">📦</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-white text-sm font-semibold truncate">{{ loan.itemTitle }}</p>
+                                        <p class="text-zinc-300 text-xs">{{ loan.startDate | date:'MMM d' }} → {{
+                                            loan.endDate | date:'MMM d, yyyy' }}</p>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shrink-0"
+                                        [ngClass]="getLoanStatusClass(loan.status)">
+                                        {{ loan.status }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
+
+                        <!-- Lent out loans -->
+                        <div *ngIf="loanView === 'lent'">
+                            <div *ngIf="ownedLoans.length === 0" class="py-12 text-center">
+                                <p class="text-4xl mb-3">🤝</p>
+                                <p class="text-zinc-500 text-sm">You haven't lent out any items yet.</p>
+                            </div>
+                            <div class="space-y-3">
+                                <div *ngFor="let loan of ownedLoans"
+                                (click)="goToLoan(loan.id)"
+                                    class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3 cursor-pointer">
+                                    <div
+                                        class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
+                                        <img *ngIf="loan.itemPrimaryPhoto" [src]="loan.itemPrimaryPhoto"
+                                            class="w-full h-full object-cover" />
+                                        <span *ngIf="!loan.itemPrimaryPhoto">📦</span>
+                                    </div>
+                                    <div class="flex-1 min-w-0">
+                                        <p class="text-white text-sm font-semibold truncate">{{ loan.itemTitle }}</p>
+                                        <p class="text-zinc-200 text-xs">To: <span class="text-zinc-200">{{
+                                                loan.otherPartyName }}</span></p>
+                                        <p class="text-zinc-300 text-xs">
+                                            {{ loan.startDate | date:'MMM d' }} →
+                                            <span *ngIf="loan.status === 'Returned'">
+                                                {{ loan.actualReturnDate | date:'MMM d, yyyy' }}
+                                            </span>
+                                            <span *ngIf="loan.status !== 'Returned'">
+                                                {{ loan.endDate | date:'MMM d, yyyy' }}
+                                            </span>
+                                        </p>
+                                    </div>
+                                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md shrink-0"
+                                        [ngClass]="getLoanStatusClass(loan.status)">
+                                        {{ loan.status }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+
                     </div>
+
+
+
 
                     <!-- Tab: Score History -->
                     <div *ngIf="activeTab === 'score'" class="p-4">
@@ -238,7 +317,7 @@
                                         {{ entry.pointsChanged > 0 ? '↑' : entry.pointsChanged < 0 ? '↓' : '–' }} </div>
                                             <div>
                                                 <p class="text-white text-xs font-medium">{{ entry.reason }}</p>
-                                                <p *ngIf="entry.note" class="text-zinc-500 text-xs">{{ entry.note }}</p>
+                                                <p *ngIf="entry.note" class="text-zinc-400 text-xs">{{ entry.note }}</p>
                                             </div>
                                     </div>
                                     <div class="text-right">
@@ -248,7 +327,7 @@
                                             [class.text-zinc-400]="entry.pointsChanged === 0">
                                             {{ entry.pointsChanged > 0 ? '+' : '' }}{{ entry.pointsChanged }}
                                         </span>
-                                        <p class="text-zinc-600 text-[10px]">{{ entry.createdAt | date:'MMM d, yyyy' }}
+                                        <p class="text-zinc-400 text-[10px]">{{ entry.createdAt | date:'MMM d, yyyy' }}
                                         </p>
                                     </div>
                                 </div>
@@ -362,7 +441,7 @@
                             <h3 class="font-bold text-white text-sm" style="font-family:'Syne',sans-serif">Change
                                 Password</h3>
                             <button (click)="passwordMode = !passwordMode; resetPasswordForm()"
-                                class="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors">
+                                class="text-xs text-amber-400 hover:text-amber-300 font-medium transition-colors cursor-pointer">
                                 {{ passwordMode ? 'Cancel' : 'Change' }}
                             </button>
                         </div>
@@ -429,7 +508,7 @@
                         </h3>
                         <div class="flex items-center justify-between">
                             <span class="text-zinc-500 text-xs">Username</span>
-                            <span class="text-white text-xs font-medium truncate ml-4">{{ profile?.email }}</span>
+                            <span class="text-white text-xs font-medium truncate ml-4">{{ profile?.username }}</span>
                         </div>
                         <div class="flex items-center justify-between">
                             <span class="text-zinc-500 text-xs">Email</span>
@@ -455,6 +534,10 @@
                             <span class="text-zinc-500 text-xs">Gender</span>
                             <span class="text-white text-xs font-medium">{{ profile?.gender || '—' }}</span>
                         </div>
+                        <div class="flex items-center justify-between">
+                            <span class="text-zinc-500 text-xs">Address</span>
+                            <span class="text-white text-xs font-medium">{{ profile?.address || '—' }}</span>
+                        </div>
                     </div>
 
                     <!-- Danger Zone -->
@@ -463,7 +546,7 @@
                             Zone</h3>
                         <p class="text-zinc-500 text-xs mb-4">Permanently delete your account.</p>
                         <button (click)="showDeleteConfirm = !showDeleteConfirm"
-                            class="w-full border border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-300 font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
+                            class="w-full border cursor-pointer border-red-500/30 hover:bg-red-500/10 text-red-400 hover:text-red-300 font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
                             Delete my account
                         </button>
                         <div *ngIf="showDeleteConfirm" class="mt-4 space-y-3">
@@ -475,13 +558,45 @@
                                 {{ deleteError }}
                             </p>
                             <button (click)="deleteAccount()" [disabled]="isDeletingAccount"
-                                class="w-full bg-red-500 hover:bg-red-400 disabled:opacity-50 text-white font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
+                                class="w-full cursor-pointer bg-red-500 hover:bg-red-400 disabled:opacity-50 text-white font-semibold text-xs rounded-xl py-2.5 transition-all duration-200">
                                 {{ isDeletingAccount ? 'Deleting...' : 'Confirm — delete my account' }}
                             </button>
                         </div>
                     </div>
 
                 </div>
+            </div>
+        </div>
+
+        <!-- Avatar Lightbox Modal -->
+        <div *ngIf="showAvatarModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            (click)="showAvatarModal = false">
+
+            <!-- Backdrop -->
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+
+            <!-- Modal -->
+            <div class="relative z-10 flex flex-col items-center gap-4" (click)="$event.stopPropagation()">
+
+                <!-- Close button -->
+                <button (click)="showAvatarModal = false"
+                    class="absolute -top-10 right-0 w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors">
+                    <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+
+                <!-- Image -->
+                <div
+                    class="w-72 h-72 md:w-96 md:h-96 rounded-3xl overflow-hidden border-2 border-zinc-700 shadow-2xl shadow-black/80">
+                    <img [src]="profile!.avatarUrl!" [alt]="profile?.fullName" class="w-full h-full object-cover" />
+                </div>
+
+                <!-- Name -->
+                <p class="text-white font-bold text-lg" style="font-family:'Syne',sans-serif">
+                    {{ profile?.fullName }}
+                </p>
             </div>
         </div>
 </main>

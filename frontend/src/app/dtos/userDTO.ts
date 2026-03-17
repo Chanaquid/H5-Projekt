@@ -71,6 +71,8 @@ export namespace UserDTO {
     avatarUrl?: string;
     score: number;
     isVerified: boolean;
+      completedLoansCount: number;
+
   }
  
   export interface AdminUserDTO {
