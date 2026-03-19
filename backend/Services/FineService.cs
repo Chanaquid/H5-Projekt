@@ -86,6 +86,12 @@ namespace backend.Services
             return fines.Select(MapToFineDTO).ToList();
         }
 
+        public async Task<List<FineDTO.FineResponseDTO>> GetByDisputeIdAsync(int disputeId)
+        {
+            var fines = await _fineRepository.GetByDisputeIdAsync(disputeId);
+            return fines.Select(MapToFineDTO).ToList();
+        }
+
         //Get all pending verification fines
         public async Task<List<FineDTO.FineResponseDTO>> GetPendingVerificationAsync()
         {
@@ -308,39 +314,101 @@ namespace backend.Services
         }
 
         //Issue custom fine — for admin via dispute verdict
-        public async Task<FineDTO.FineResponseDTO> IssueCustomFineAsync(int loanId, decimal amount, int disputeId)
+        public async Task<FineDTO.FineResponseDTO?> IssueCustomFineAsync(int loanId, int disputeId, string userId, decimal? amount = null, int? scoreAdjustment = null)
         {
             var loan = await _loanRepository.GetByIdWithDetailsAsync(loanId);
             if (loan == null)
                 throw new KeyNotFoundException($"Loan {loanId} not found.");
 
-            if (amount <= 0)
-                throw new ArgumentException("Fine amount must be greater than zero.");
+            var user = await _userRepository.GetByIdAsync(userId);
+            if (user == null)
+                throw new KeyNotFoundException($"User {userId} not found.");
 
-            var fine = new Fine
+            Fine? fine = null;
+
+            if (amount.HasValue && amount > 0)
             {
-                LoanId = loanId,
-                UserId = loan.BorrowerId,
-                Type = FineType.Custom, //Custom fine
-                Amount = Math.Round(amount, 2),
-                ItemValueAtTimeOfFine = loan.Item.CurrentValue,
-                DisputeId = disputeId,
-                CreatedAt = DateTime.UtcNow
-            };
+                fine = new Fine
+                {
+                    LoanId = loanId,
+                    UserId = userId,
+                    Type = FineType.Custom,
+                    Amount = Math.Round(amount.Value, 2),
+                    ItemValueAtTimeOfFine = loan.Item.CurrentValue,
+                    DisputeId = disputeId,
+                    CreatedAt = DateTime.UtcNow
+                };
 
-            await _fineRepository.AddAsync(fine);
-            await UpdateUnpaidTotalAsync(loan.BorrowerId, amount);
+                await _fineRepository.AddAsync(fine);
+                await UpdateUnpaidTotalAsync(userId, amount.Value);
+            }
+
+            if (scoreAdjustment.HasValue && scoreAdjustment != 0)
+            {               
+                var newScore = Math.Clamp(user.Score + scoreAdjustment.Value, 0, 100);
+                var actualChange = newScore - user.Score;
+
+                user.Score = newScore;
+
+                await _userRepository.AddScoreHistoryAsync(new ScoreHistory
+                {
+                    UserId = userId,
+                    PointsChanged = actualChange,
+                    ScoreAfterChange = newScore,
+                    Reason = ScoreChangeReason.AdminAdjustment,
+                    LoanId = loanId,
+                    Note = $"Dispute #{disputeId} verdict: score adjusted by {scoreAdjustment.Value} points.",
+                    CreatedAt = DateTime.UtcNow
+                });
+
+                await _userRepository.SaveChangesAsync();
+
+
+            }
+
+            // Notifications
+            if (amount.HasValue && amount > 0 && scoreAdjustment.HasValue && scoreAdjustment != 0)
+            {
+                var scoreText = scoreAdjustment.Value < 0
+                    ? $"reduced by {Math.Abs(scoreAdjustment.Value)} points"
+                    : $"increased by {scoreAdjustment.Value} points";
+
+                await _notificationService.SendAsync(
+                    userId,
+                    NotificationType.FineIssued,
+                    $"A fine of {amount.Value} kr has been issued and your score has been {scoreText} for '{loan.Item.Title}' (Dispute #{disputeId}).",
+                    fine!.Id,
+                    NotificationReferenceType.Fine
+                );
+            }
+            else if (amount.HasValue && amount > 0)
+            {
+                await _notificationService.SendAsync(
+                    userId,
+                    NotificationType.FineIssued,
+                    $"A fine of {amount.Value} kr has been issued for '{loan.Item.Title}'.",
+                    fine!.Id,
+                    NotificationReferenceType.Fine
+                );
+            }
+            else if (scoreAdjustment.HasValue && scoreAdjustment != 0)
+            {
+                var scoreText = scoreAdjustment.Value < 0
+                    ? $"reduced by {Math.Abs(scoreAdjustment.Value)} points"
+                    : $"increased by {scoreAdjustment.Value} points";
+
+                await _notificationService.SendAsync(
+                    userId,
+                    NotificationType.FineIssued,
+                    $"Your score has been {scoreText} due to dispute #{disputeId}.",
+                    disputeId,
+                    NotificationReferenceType.Dispute
+                );
+            }
+
             await _fineRepository.SaveChangesAsync();
 
-            await _notificationService.SendAsync(
-                loan.BorrowerId,
-                NotificationType.FineIssued,
-                $"A fine of {amount} kr has been issued for '{loan.Item.Title}'.",
-                fine.Id,
-                NotificationReferenceType.Fine
-            );
-
-            return MapToFineDTO(fine);
+            return fine != null ? MapToFineDTO(fine) : null;
         }
 
         //Admin update fine

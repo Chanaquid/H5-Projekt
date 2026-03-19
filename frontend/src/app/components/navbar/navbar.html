@@ -26,9 +26,9 @@
     <div class="flex items-center gap-2 shrink-0">
 
         <!-- My profile (public view) -->
-        <a (click)="router.navigate(['/users', currentUserId]); showUserMenu = false"
+        <a (click)="router.navigate(['/my-chats']); showUserMenu = false"
             class="hidden md:inline-flex items-center gap-2 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-sm rounded-xl transition-all duration-200 hover:-translate-y-px hover:shadow-lg hover:shadow-amber-400/20 cursor-pointer">
-            My Profile
+            My chats
         </a>
 
 
@@ -134,12 +134,20 @@
                     <p class="text-sm font-semibold text-white">{{ userName }}</p>
                     <p class="text-xs text-zinc-500">{{ userEmail }}</p>
                 </div>
-                <a routerLink="/my-dashboard" (click)="showUserMenu=false"
-                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                <a  (click)="router.navigate(['/users', currentUserId]); showUserMenu = false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline cursor-pointer">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
                             d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
+                    My Profile
+                </a>
+                <a routerLink="/my-dashboard" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z" />
+                        </svg>
                     My Dashboard
                 </a>
                 <a routerLink="/my-items" (click)="showUserMenu=false"
@@ -157,6 +165,14 @@
                             d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                     </svg>
                     My Loans
+                </a>
+                <a routerLink="/my-resolution-center" (click)="showUserMenu=false"
+                    class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">
+                    <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    Resolution Center
                 </a>
                 <a routerLink="/favorites" (click)="showUserMenu=false"
                     class="flex items-center gap-3 px-4 py-2.5 text-sm text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors no-underline">

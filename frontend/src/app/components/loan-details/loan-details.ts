@@ -72,7 +72,7 @@ export class LoanDetails implements OnInit, OnDestroy {
 
   // Dispute
   showDisputeModal = false;
-  disputeForm = { description: '' };
+  disputeForm = { description: '', photoUrl: '', photoCaption: '' };
   isFilingDispute = false;
   disputeError = '';
 
@@ -352,11 +352,19 @@ export class LoanDetails implements OnInit, OnDestroy {
       filedAs,
       description: this.disputeForm.description.trim()
     }).subscribe({
-      next: () => {
-        this.isFilingDispute = false;
-        this.showDisputeModal = false;
-        this.disputeForm.description = '';
-        this.loadLoan(this.loan!.id);
+      next: (created) => {
+        // If a photo was provided, upload it
+        if (this.disputeForm.photoUrl.trim()) {
+          this.disputeService.addPhoto(created.id, {
+            photoUrl: this.disputeForm.photoUrl.trim(),
+            caption: this.disputeForm.photoCaption.trim() || undefined
+          }).subscribe({
+            next: () => this.onDisputeSuccess(),
+            error: () => this.onDisputeSuccess() // photo failed but dispute was created, proceed
+          });
+        } else {
+          this.onDisputeSuccess();
+        }
       },
       error: (err) => {
         this.disputeError = err.error?.message ?? 'Failed to file dispute.';
@@ -364,6 +372,14 @@ export class LoanDetails implements OnInit, OnDestroy {
         this.cdr.detectChanges();
       }
     });
+  }
+
+  private onDisputeSuccess(): void {
+    this.isFilingDispute = false;
+    this.showDisputeModal = false;
+    this.disputeForm = { description: '', photoUrl: '', photoCaption: '' };
+    this.cdr.detectChanges(); // ← add this
+    this.loadLoan(this.loan!.id);
   }
 
 
@@ -439,6 +455,7 @@ export class LoanDetails implements OnInit, OnDestroy {
 
   get otherParty(): UserDTO.UserSummaryDTO | null {
     if (!this.loan) return null;
+    console.log("Other party", this.isOwner ? this.loan.borrower : this.loan.owner);
     return this.isOwner ? this.loan.borrower : this.loan.owner;
   }
 

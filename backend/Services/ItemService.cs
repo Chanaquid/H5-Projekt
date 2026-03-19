@@ -172,6 +172,11 @@ namespace backend.Services
             if (!isAdmin && item.OwnerId != ownerId) //Only owner can edit their own items (also admins ofc)
                 throw new UnauthorizedAccessException("You can only edit your own items.");
 
+            if(dto.CurrentValue < 0)
+            {
+                throw new ArgumentException($"Current value cannot be negative");
+            }
+
 
             var availableFrom = dto.AvailableFrom ?? item.AvailableFrom;
             var availableUntil = dto.AvailableUntil ?? item.AvailableUntil;
@@ -657,6 +662,7 @@ namespace backend.Services
             {
                 Id = i.Id,
                 Title = i.Title,
+                Description = i.Description,
                 Condition = i.Condition.ToString(),
                 Status = i.Status.ToString(),
                 PickupAddress = i.PickupAddress,

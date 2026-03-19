@@ -12,10 +12,12 @@ import { ItemService } from '../../services/item-service';
 import { LoanService } from '../../services/loan-service';
 import { FineDTO } from '../../dtos/fineDTO';
 import { FineService } from '../../services/fine-service';
+import { VerificationService } from '../../services/verification-service';
+import { Navbar } from "../navbar/navbar";
 
 @Component({
   selector: 'app-profile',
-  imports: [CommonModule, RouterLink, FormsModule],
+  imports: [CommonModule, RouterLink, FormsModule, Navbar],
   templateUrl: './profile.html',
   styleUrl: './profile.css',
 })
@@ -81,6 +83,17 @@ export class Profile implements OnInit {
   loanView: 'borrowed' | 'lent' = 'borrowed';
 
 
+  //Verification modal
+  showVerifyModal = false;
+  verificationStatus: string | null = null; // 'Pending' | 'Approved' | 'Rejected' | null
+  isSubmittingVerify = false;
+  verifyError = '';
+  verifyForm = { documentUrl: '', documentType: '' };
+  documentTypes = [
+    { label: '🪪 National ID', value: 'NationalId' },
+    { label: '🛂 Passport',    value: 'Passport' },
+    { label: '🚗 Driving License', value: 'DrivingLicense' },
+  ];
 
   resetPasswordForm() {
     this.passwordForm = { currentPassword: '', newPassword: '', confirmPassword: '' };
@@ -101,6 +114,7 @@ export class Profile implements OnInit {
     private itemService: ItemService,
     private loanService: LoanService,
     private fineService: FineService,
+    private verificationService: VerificationService,
     private router: Router,
     private http: HttpClient,
     private cdr: ChangeDetectorRef,
@@ -112,6 +126,7 @@ export class Profile implements OnInit {
       return;
     }
     this.loadProfile();
+    this.loadVerificationStatus()
     this.loadItems();
     this.loadLoans();
     this.loadScoreHistory();
@@ -203,7 +218,44 @@ export class Profile implements OnInit {
     },
     error: () => {}
   });
-}
+  }
+
+  private loadVerificationStatus(): void {
+    if (this.profile?.isVerified) return;
+    this.verificationService.getMyRequest().subscribe({
+      next: (req) => {
+        this.verificationStatus = req.status;
+        console.log('Verification status:', req);
+        this.cdr.detectChanges();
+      },
+      error: () => {
+        this.verificationStatus = null;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  submitVerification(): void {
+    if (!this.verifyForm.documentUrl || !this.verifyForm.documentType) return;
+    this.isSubmittingVerify = true;
+    this.verifyError = '';
+
+    this.verificationService.submitRequest(this.verifyForm).subscribe({
+      next: () => {
+        this.verificationStatus = 'Pending';
+        this.isSubmittingVerify = false;
+        this.showVerifyModal = false;
+        this.verifyForm = { documentUrl: '', documentType: '' };
+        this.cdr.detectChanges();
+
+      },
+      error: (err) => {
+        this.verifyError = err.error?.message ?? 'Something went wrong.';
+        this.isSubmittingVerify = false;
+      }
+    });
+  }
+
 
   private checkAndBuildStats() {
     const { profile, items, loans, fines } = this.loadedFlags;

@@ -23,7 +23,7 @@
         <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
-        Add new item
+        List a new item
       </button>
     </div>
 
@@ -59,7 +59,7 @@
       <!-- Tabs -->
       <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1">
         <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; applyFilters()"
-          class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200"
+          class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
           [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
           [class.text-zinc-400]="activeTab !== tab.key" [class.hover:text-white]="activeTab !== tab.key">
           {{ tab.label }}
@@ -147,20 +147,22 @@
         <div class="p-4">
           <div class="flex items-start justify-between gap-2 mb-1">
             <div class="flex-1 min-w-0 cursor-pointer" (click)="goToItem(item.id)">
-              <p class="text-amber-400 text-[11px] font-semibold uppercase tracking-widest mb-0.5">{{ item.categoryName
+              <p class="text-amber-400 text-[15px] font-semibold uppercase tracking-widest mb-0.5">{{ item.categoryName
                 }}</p>
               <h3 class="font-bold text-white text-base truncate" style="font-family:'Syne',sans-serif">{{ item.title }}
               </h3>
             </div>
-            <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md border shrink-0 mt-1"
+            <span class="text-[11px] font-bold uppercase px-2 py-0.5 rounded-md border shrink-0 mt-1"
               [ngClass]="getConditionClass(item.condition)">
               {{ item.condition }}
             </span>
           </div>
 
-          <p class="text-zinc-500 text-xs mb-1 truncate">📍 {{ item.pickupAddress }}</p>
+          <p class="text-sky-400/70 text-xs mb-1 truncate">📍 {{ item.pickupAddress }}</p>
+          <p *ngIf="item.description" class="text-zinc-400 text-xs mb-3 line-clamp-2 leading-relaxed">{{
+            item.description }}</p>
 
-          <div class="flex items-center gap-3 text-xs text-zinc-500 mb-4">
+          <div class="flex items-center gap-3 text-xs text-violet-600 mb-4">
             <span>{{ item.availableFrom | date:'MMM d, yyyy' }} → {{ item.availableUntil | date:'MMM d, yyyy' }}</span>
             <span *ngIf="item.reviewCount > 0" class="flex items-center gap-1">
               <span class="text-amber-400">★</span>{{ item.averageRating.toFixed(1) }} ({{ item.reviewCount }})
@@ -169,13 +171,23 @@
 
           <!-- Action buttons -->
           <div class="flex items-center gap-2">
-            <button (click)="editItem(item)"
-              class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 hover:text-white text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer">
-              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <button (click)="copyShareLink(item.id)"
+              class="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 transition-all duration-200 cursor-pointer rounded-xl text-xs font-semibold"
+              [class.bg-zinc-800]="copiedItemId !== item.id" [class.text-zinc-300]="copiedItemId !== item.id"
+              [class.bg-emerald-500/10]="copiedItemId === item.id" [class.text-emerald-400]="copiedItemId === item.id">
+
+              <svg *ngIf="copiedItemId !== item.id" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                  d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 100-5.368 3 3 0 000 5.368zm0 10.736a3 3 0 100-5.368 3 3 0 000 5.368z" />
               </svg>
-              Edit
+
+              <svg *ngIf="copiedItemId === item.id" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24"
+                stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+
+              {{ copiedItemId === item.id ? 'Copied!' : 'Share' }}
             </button>
 
             <button (click)="toggleActive(item)" [disabled]="item.status !== 'Approved' || item.isCurrentlyOnLoan"
@@ -326,14 +338,14 @@
           <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Photo URL</label>
           <input type="text" [(ngModel)]="createForm.photoUrl" placeholder="https://example.com/photo.jpg"
             class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 transition-all duration-200" />
-          <p class="text-zinc-600 text-[11px]">Optional — you can add more photos after listing</p>
+          <p class="text-zinc-500 text-[11px]">Optional — you can add more photos after listing</p>
         </div>
 
         <!-- Requires verification -->
         <div class="flex items-center justify-between bg-zinc-800 rounded-xl px-4 py-3">
           <div>
             <p class="text-white text-sm font-medium">Requires Verification</p>
-            <p class="text-zinc-500 text-xs mt-0.5">Only verified users can borrow this item</p>
+            <p class="text-zinc-400 text-xs mt-0.5">Only verified users can borrow this item</p>
           </div>
           <button (click)="createForm.requiresVerification = !createForm.requiresVerification"
             class="w-11 h-6 rounded-full transition-all duration-200 relative shrink-0"
@@ -351,7 +363,8 @@
         </p>
 
         <!-- Note -->
-        <p *ngIf="!isAdmin" class="text-zinc-600 text-xs">
+        <p *ngIf="!isAdmin"
+          class="text-amber-400 bg-amber-400/10 border border-amber-500/20 rounded-lg px-3 py-2 text-xs">
           ℹ️ Your item will be reviewed by an admin before becoming visible to others.
         </p>
       </div>

@@ -5,22 +5,7 @@
 </div>
 
 <!-- ── NAVBAR ── -->
-<nav
-    class="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 md:px-10 h-16 bg-zinc-950/85 backdrop-blur-xl border-b border-zinc-800/80">
-    <a routerLink="/home" class="flex items-center gap-2.5 no-underline shrink-0">
-        <div class="w-8 h-8 bg-amber-400 rounded-lg flex items-center justify-center text-zinc-900 font-black text-sm">L
-        </div>
-        <span class="font-black text-lg text-white tracking-tight hidden sm:block"
-            style="font-family:'Syne',sans-serif">LoanIt</span>
-    </a>
-    <a routerLink="/home"
-        class="flex items-center gap-2 text-zinc-400 hover:text-white text-sm font-medium transition-colors no-underline">
-        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
-        </svg>
-        Back to home
-    </a>
-</nav>
+<app-navbar></app-navbar>
 
 <!-- ── MAIN ── -->
 <main class="pt-16 min-h-screen">
@@ -51,6 +36,16 @@
                             clip-rule="evenodd" />
                     </svg>
                 </div>
+                <!-- Not verified badge -->
+                <div *ngIf="!profile?.isVerified"
+                    class="absolute -bottom-1.5 -right-1.5 w-6 h-6 bg-zinc-600 rounded-full flex items-center justify-center border-2 border-zinc-950"
+                    title="Not verified">
+                    <svg class="w-3 h-3 text-zinc-300" fill="currentColor" viewBox="0 0 20 20">
+                        <path fill-rule="evenodd"
+                            d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
             </div>
 
             <!-- Info -->
@@ -64,6 +59,30 @@
                         class="text-[10px] font-bold uppercase tracking-widest bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full">
                         Verified
                     </span>
+                    <!-- Not Verified badge + button -->
+                    <ng-container *ngIf="!profile?.isVerified">
+                        <span
+                            class="text-[10px] font-bold uppercase tracking-widest bg-rose-600/10 text-rose-400 border border-rose-400/20 px-2 py-0.5 rounded-full">
+                            Not Verified
+                        </span>
+                        <button *ngIf="!verificationStatus" (click)="showVerifyModal = true"
+                            class="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest bg-amber-400/10 text-amber-400 border border-amber-400/20 hover:bg-amber-400/20 px-2 py-0.5 rounded-full transition-all duration-200 cursor-pointer">
+                            <svg class="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round"
+                                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                            </svg>
+                            Verify Now
+                        </button>
+                        <span *ngIf="verificationStatus === 'Pending'"
+                            class="text-[10px] font-bold uppercase tracking-widest bg-amber-400/10 text-amber-400 border border-amber-400/20 px-2 py-0.5 rounded-full">
+                            ⏳ Verification Pending
+                        </span>
+                        <span *ngIf="verificationStatus === 'Rejected'"
+                            class="text-[10px] font-bold uppercase tracking-widest bg-rose-500/10 text-rose-400 border border-rose-400/20 px-2 py-0.5 rounded-full cursor-pointer hover:bg-rose-500/20 transition-all"
+                            (click)="showVerifyModal = true">
+                            ✕ Rejected — Resubmit
+                        </span>
+                    </ng-container>
                 </div>
                 <p class="text-zinc-400 text-sm mb-1">@{{ profile?.username }}</p>
                 <p class="text-zinc-400 text-sm">📍 {{ profile?.address || 'No address set' }}</p>
@@ -232,8 +251,7 @@
                                 <p class="text-zinc-500 text-sm">No loan history yet.</p>
                             </div>
                             <div class="space-y-3">
-                                <div *ngFor="let loan of myLoans"
-                                    (click)="goToLoan(loan.id)"
+                                <div *ngFor="let loan of myLoans" (click)="goToLoan(loan.id)"
                                     class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3 cursor-pointer">
                                     <div
                                         class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
@@ -261,8 +279,7 @@
                                 <p class="text-zinc-500 text-sm">You haven't lent out any items yet.</p>
                             </div>
                             <div class="space-y-3">
-                                <div *ngFor="let loan of ownedLoans"
-                                (click)="goToLoan(loan.id)"
+                                <div *ngFor="let loan of ownedLoans" (click)="goToLoan(loan.id)"
                                     class="flex items-center gap-3 bg-zinc-800 border border-zinc-700 rounded-xl p-3 cursor-pointer">
                                     <div
                                         class="w-10 h-10 rounded-xl bg-zinc-700 overflow-hidden shrink-0 flex items-center justify-center text-lg">
@@ -293,9 +310,6 @@
                         </div>
 
                     </div>
-
-
-
 
                     <!-- Tab: Score History -->
                     <div *ngIf="activeTab === 'score'" class="p-4">
@@ -597,6 +611,70 @@
                 <p class="text-white font-bold text-lg" style="font-family:'Syne',sans-serif">
                     {{ profile?.fullName }}
                 </p>
+            </div>
+        </div>
+
+
+        <!-- Verify Identity Modal -->
+        <div *ngIf="showVerifyModal" class="fixed inset-0 z-[100] flex items-center justify-center p-4"
+            (click)="showVerifyModal = false">
+            <div class="absolute inset-0 bg-black/80 backdrop-blur-sm"></div>
+            <div class="relative z-10 bg-zinc-900 border border-zinc-700 rounded-2xl p-6 w-full max-w-md shadow-2xl shadow-black/80"
+                (click)="$event.stopPropagation()">
+
+                <!-- Header -->
+                <div class="flex items-center justify-between mb-5">
+                    <div>
+                        <h3 class="font-black text-white text-lg" style="font-family:'Syne',sans-serif">Verify your
+                            identity</h3>
+                        <p class="text-zinc-500 text-xs mt-0.5">Submit a government-issued ID to get verified</p>
+                    </div>
+                    <button *ngIf="verificationStatus === null"  (click)="showVerifyModal = false"
+                        class="text-zinc-500 hover:text-white transition-colors cursor-pointer">
+                        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                    </button>
+                </div>
+
+                <!-- Document Type -->
+                <div class="space-y-1.5 mb-4">
+                    <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Document Type</label>
+                    <div class="grid grid-cols-3 gap-2">
+                        <button *ngFor="let type of documentTypes" (click)="verifyForm.documentType = type.value"
+                            class="py-2.5 text-xs font-semibold rounded-xl border cursor-pointer"
+                            [class.bg-amber-400]="verifyForm.documentType === type.value"
+                            [class.text-zinc-900]="verifyForm.documentType === type.value"
+                            [class.border-amber-400]="verifyForm.documentType === type.value"
+                            [class.text-zinc-400]="verifyForm.documentType !== type.value"
+                            [class.border-zinc-700]="verifyForm.documentType !== type.value"
+                            [class.hover:border-amber-400/50]="verifyForm.documentType !== type.value">
+                            {{ type.label }}
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Document URL -->
+                <div class="space-y-1.5 mb-5">
+                    <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Document URL</label>
+                    <input type="text" [(ngModel)]="verifyForm.documentUrl" placeholder="https://..."
+                        class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 transition-all duration-200" />
+                    <p class="text-zinc-600 text-[10px]">Upload your ID image to a service like Imgur and paste the link
+                        here.</p>
+                </div>
+
+                <!-- Errors / Success -->
+                <p *ngIf="verifyError"
+                    class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2 mb-4">
+                    {{ verifyError }}
+                </p>
+
+                <!-- Submit -->
+                <button (click)="submitVerification()"
+                    [disabled]="isSubmittingVerify || !verifyForm.documentUrl || !verifyForm.documentType"
+                    class="w-full bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 disabled:cursor-not-allowed text-zinc-900 font-semibold text-sm rounded-xl py-2.5 transition-all duration-200">
+                    {{ isSubmittingVerify ? 'Submitting…' : 'Submit for review' }}
+                </button>
             </div>
         </div>
 </main>

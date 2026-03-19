@@ -9,6 +9,8 @@ namespace backend.Interfaces
         Task<ApplicationUser?> GetByIdWithDetailsAsync(string userId); //Includes ScoreHistory
         Task<List<ApplicationUser>> GetAllAsync(); //Admin — includes deleted
         Task<List<ScoreHistory>> GetScoreHistoryAsync(string userId);
+        Task<List<ScoreHistory>> GetScoreHistoryByLoanIdAsync(int loanId);
+
 
         Task AddScoreHistoryAsync(ScoreHistory entry);
         Task UpdateAsync(ApplicationUser user);

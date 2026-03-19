@@ -576,6 +576,7 @@ namespace backend.Services
                 {
                     Id = l.Item.Id,
                     Title = l.Item.Title,
+                    Description = l.Item.Description,
                     Condition = l.Item.Condition.ToString(),
                     PickupAddress = l.Item.PickupAddress,
                     PickupLatitude = l.Item.PickupLatitude,
@@ -592,6 +593,7 @@ namespace backend.Services
                     FullName = l.Item.Owner.FullName,
                     Username = l.Item.Owner.UserName ?? string.Empty,
                     Score = l.Item.Owner.Score,
+                    IsVerified = l.Item.Owner.IsVerified,
                     AvatarUrl = l.Item.Owner.AvatarUrl
                 },
                 Borrower = new UserDTO.UserSummaryDTO
@@ -600,6 +602,7 @@ namespace backend.Services
                     FullName = l.Borrower.FullName,
                     Username = l.Borrower.UserName ?? string.Empty,
                     Score = l.Borrower.Score,
+                    IsVerified = l.Item.Owner.IsVerified,
                     AvatarUrl = l.Borrower.AvatarUrl
                 },
                 SnapshotPhotos = l.SnapshotPhotos?.OrderBy(p => p.DisplayOrder).Select(p => new LoanDTO.LoanSnapshotPhotoDTO

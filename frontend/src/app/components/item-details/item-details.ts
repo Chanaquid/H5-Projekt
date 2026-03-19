@@ -37,6 +37,33 @@ export class ItemDetails implements OnInit {
   isCancellingLoan = false;
   cancelError = '';
 
+  // Edit modal
+  showEditModal = false;
+  editForm = {
+    title: '',
+    description: '',
+    condition: 'Good' as unknown as ItemDTO.UpdateItemDTO['condition'],
+    currentValue: 0,
+    availableFrom: '',
+    availableUntil: '',
+    minLoanDays: undefined as number | undefined,
+    pickupAddress: '',
+    pickupLatitude: 0 as number,
+    pickupLongitude: 0 as number,
+    requiresVerification: false,
+    isActive: true,
+    photoUrl: '',
+  };
+  isSavingEdit = false;
+  editError = '';
+  editSuccess = '';
+  descriptionExpanded = false;
+
+  // Address autocomplete
+  addressSuggestions: any[] = [];
+  showAddressSuggestions = false;
+  private addressSearchTimeout: any;
+
   // Reviews
   visibleReviews = 5;
   get displayedReviews() { return this.reviews.slice(0, this.visibleReviews); }
@@ -122,7 +149,6 @@ export class ItemDetails implements OnInit {
         if (loan) {
           this.loanService.getById(loan.id).subscribe({
             next: (detail) => {
-              // Only set if it's for this specific item
               if (detail.item.id === this.item!.id) {
                 this.existingLoan = detail;
                 this.cdr.detectChanges();
@@ -150,6 +176,149 @@ export class ItemDetails implements OnInit {
     });
   }
 
+  // ── Edit modal ──────────────────────────────────────────────────────────────
+
+  openEditModal(): void {
+    if (!this.item) return;
+    this.editForm = {
+      title: this.item.title ?? '',
+      description: this.item.description ?? '',
+      condition: (this.item.condition ?? 'Good') as unknown as ItemDTO.UpdateItemDTO['condition'],
+      currentValue: this.item.currentValue ?? 0,
+      availableFrom: this.toDateInputValue(this.item.availableFrom),
+      availableUntil: this.toDateInputValue(this.item.availableUntil),
+      minLoanDays: this.item.minLoanDays ?? undefined,
+      pickupAddress: this.item.pickupAddress ?? '',
+      pickupLatitude: this.item.pickupLatitude ?? 0,
+      pickupLongitude: this.item.pickupLongitude ?? 0,
+      requiresVerification: this.item.requiresVerification ?? false,
+      isActive: this.item.isActive ?? true,
+      photoUrl: this.item.photos?.[0]?.photoUrl ?? '',
+    };
+    this.editError = '';
+    this.editSuccess = '';
+    this.descriptionExpanded = false;
+    this.addressSuggestions = [];
+    this.showAddressSuggestions = false;
+    this.showEditModal = true;
+  }
+
+  closeEditModal(): void {
+    if (this.isSavingEdit) return;
+    this.showEditModal = false;
+    this.showAddressSuggestions = false;
+  }
+
+  saveEdit(): void {
+    if (!this.item) return;
+    if (!this.editForm.title?.trim()) {
+      this.editError = 'Title is required.';
+      return;
+    }
+
+    this.isSavingEdit = true;
+    this.editError = '';
+    this.editSuccess = '';
+
+    this.itemService.update(this.item.id, {
+      title: this.editForm.title.trim(),
+      description: this.editForm.description,
+      condition: this.editForm.condition,
+      currentValue: this.editForm.currentValue,
+      availableFrom: this.editForm.availableFrom,
+      availableUntil: this.editForm.availableUntil,
+      minLoanDays: this.editForm.minLoanDays,
+      pickupAddress: this.editForm.pickupAddress,
+      pickupLatitude: this.editForm.pickupLatitude,
+      pickupLongitude: this.editForm.pickupLongitude,
+      requiresVerification: this.editForm.requiresVerification,
+      isActive: this.editForm.isActive,
+    }).subscribe({
+      next: (updated) => {
+        this.item = updated;
+        this.updatePhoto(updated);
+      },
+      error: (err) => {
+        this.editError = err.error?.message ?? 'Failed to save changes.';
+        this.isSavingEdit = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
+  private updatePhoto(updated: ItemDTO.ItemDetailDTO): void {
+    const newUrl = this.editForm.photoUrl?.trim();
+    const existingPhoto = updated.photos?.[0];
+
+    const finish = (item?: ItemDTO.ItemDetailDTO) => {
+      if (item) this.item = item;
+      this.isSavingEdit = false;
+      this.editSuccess = '✓ Changes saved!';
+      this.cdr.detectChanges();
+      setTimeout(() => {
+        this.showEditModal = false;
+        this.editSuccess = '';
+        this.cdr.detectChanges();
+      }, 1200);
+    };
+
+    const addNew = () => {
+      if (!newUrl) { finish(); return; }
+      this.itemService.addPhoto(updated.id, { photoUrl: newUrl, isPrimary: true, displayOrder: 0 }).subscribe({
+        next: () => this.itemService.getById(updated.id).subscribe({ next: finish, error: () => finish() }),
+        error: () => finish(),
+      });
+    };
+
+    if (existingPhoto && newUrl !== existingPhoto.photoUrl) {
+      // Delete old photo first, then add new one (if provided)
+      this.itemService.deletePhoto(updated.id, existingPhoto.id).subscribe({
+        next: addNew,
+        error: addNew, // still try to add even if delete fails
+      });
+    } else if (!existingPhoto && newUrl) {
+      // No existing photo, just add
+      addNew();
+    } else {
+      // No change needed
+      finish();
+    }
+  }
+
+  // ── Address autocomplete ────────────────────────────────────────────────────
+
+  onAddressInput(value: string): void {
+    clearTimeout(this.addressSearchTimeout);
+    this.showAddressSuggestions = false;
+    if (!value || value.length < 3) { this.addressSuggestions = []; return; }
+    this.addressSearchTimeout = setTimeout(() => {
+      fetch(`https://nominatim.openstreetmap.org/search?format=json&addressdetails=1&q=${encodeURIComponent(value)}&limit=5`)
+        .then(res => res.json())
+        .then(data => {
+          this.addressSuggestions = data;
+          this.showAddressSuggestions = true;
+          this.cdr.detectChanges();
+        });
+    }, 400);
+  }
+
+  selectAddress(suggestion: any): void {
+    this.editForm.pickupAddress = suggestion.display_name;
+    this.editForm.pickupLatitude = parseFloat(suggestion.lat);
+    this.editForm.pickupLongitude = parseFloat(suggestion.lon);
+    this.showAddressSuggestions = false;
+    this.addressSuggestions = [];
+    this.cdr.detectChanges();
+  }
+
+  // ── Misc helpers ────────────────────────────────────────────────────────────
+
+  private toDateInputValue(value: string | Date | null | undefined): string {
+    if (!value) return '';
+    const d = new Date(value);
+    if (isNaN(d.getTime())) return '';
+    return d.toISOString().slice(0, 10);
+  }
 
   get hasActiveLoanRequest(): boolean {
     if (!this.existingLoan) return false;
@@ -196,7 +365,6 @@ export class ItemDetails implements OnInit {
       next: () => {
         this.existingLoan = null;
         this.isCancellingLoan = false;
-        //Reload item to refresh isCurrentlyOnLoan
         this.loadItem(this.item!.id);
         this.cdr.detectChanges();
       },

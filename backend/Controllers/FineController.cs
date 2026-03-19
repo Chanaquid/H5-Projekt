@@ -65,6 +65,14 @@ namespace backend.Controllers
             return Ok(fines);
         }
 
+        //Get fine by disputeId
+        [HttpGet("dispute/{disputeId}")]
+        public async Task<IActionResult> GetByDisputeId(int disputeId)
+        {
+            var result = await _fineService.GetByDisputeIdAsync(disputeId);
+            return Ok(result);
+        }
+
         //POST - Admin issues customFine
         [HttpPost("admin/issue")]
         [Authorize(Roles = "Admin")]

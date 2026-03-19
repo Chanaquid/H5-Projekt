@@ -119,6 +119,25 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("score-history/loan/{loanId}")]
+        public async Task<IActionResult> GetScoreHistoryByLoan(int loanId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            try
+            {
+                var result = await _userService.GetScoreHistoryByLoanIdAsync(loanId, userId);
+                return Ok(result);
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+            catch (UnauthorizedAccessException)
+            {
+                return Forbid();
+            }
+        }
+
         //Admin endpoints
 
         // GET - get all users

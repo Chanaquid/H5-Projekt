@@ -23,9 +23,11 @@
         //Admin issues their final verdict
         public class AdminVerdictDTO
         {
-            public string Verdict { get; set; } = string.Empty; //"OwnerFavored", "BorrowerFavored", "PartialDamage", "Inconclusive"
-            public decimal? CustomFineAmount { get; set; }       //Required only when Verdict = "PartialDamage"
-            public string AdminNote { get; set; } = string.Empty;
+            public string Verdict { get; set; } = string.Empty; //"OwnerFavored", "BorrowerFavored" or "Neutral"
+            public decimal? FineAmount { get; set; }  
+            public string? AdminNote { get; set; }
+            public string? FineIssuedToUserId { get; set; }
+            public int? ScoreAdjustment { get; set; }
         }
 
         //Upload a photo as evidence
@@ -44,6 +46,7 @@
             public string ItemTitle { get; set; } = string.Empty;
 
             //Who filed
+            public string FiledById { get; set; } = string.Empty;
             public string FiledByName { get; set; } = string.Empty;
             public string FiledAs { get; set; } = string.Empty;
             public string Description { get; set; } = string.Empty;
@@ -56,7 +59,6 @@
 
             //Admin verdict
             public string? AdminVerdict { get; set; }
-            public decimal? CustomFineAmount { get; set; }
             public string? AdminNote { get; set; }
             public DateTime? ResolvedAt { get; set; }
 
@@ -77,6 +79,8 @@
             public int Id { get; set; }
             public int LoanId { get; set; }
             public string ItemTitle { get; set; } = string.Empty;
+            public string FiledById { get; set; } = string.Empty;
+
             public string FiledByName { get; set; } = string.Empty;
             public string FiledAs { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
@@ -89,6 +93,8 @@
         {
             public int Id { get; set; }
             public string PhotoUrl { get; set; } = string.Empty;
+            public string SubmittedById { get; set; } = string.Empty;
+
             public string SubmittedByName { get; set; } = string.Empty;
             public string? Caption { get; set; }
             public DateTime UploadedAt { get; set; }

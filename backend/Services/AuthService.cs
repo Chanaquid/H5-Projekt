@@ -251,7 +251,8 @@ namespace backend.Services
             var jwt = _configuration.GetSection("Jwt");
             var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwt["Key"]!));
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
-            var expiresAt = DateTime.UtcNow.AddHours(1);
+            //var expiresAt = DateTime.UtcNow.AddHours(1);
+            var expiresAt = DateTime.UtcNow.AddMinutes(double.Parse(jwt["ExpiryMinutes"]!));
 
             var claims = new[]
             {

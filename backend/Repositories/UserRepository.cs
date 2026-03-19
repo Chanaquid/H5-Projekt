@@ -55,6 +55,15 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        //Get score history by loaIn
+        public async Task<List<ScoreHistory>> GetScoreHistoryByLoanIdAsync(int loanId)
+        {
+            return await _context.ScoreHistories
+                .Where(s => s.LoanId == loanId)
+                .OrderBy(s => s.CreatedAt)
+                .ToListAsync();
+        }
+
         public async Task AddScoreHistoryAsync(ScoreHistory entry)
         {
             await _context.ScoreHistories.AddAsync(entry);

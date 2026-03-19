@@ -12,6 +12,7 @@ namespace backend.Interfaces
 
         //Score
         Task<List<UserDTO.ScoreHistoryDTO>> GetScoreHistoryAsync(string userId);
+        Task<List<UserDTO.ScoreHistoryDTO>> GetScoreHistoryByLoanIdAsync(int loanId, string requestingUserId);
         Task AdminAdjustScoreAsync(string targetUserId, UserDTO.AdminScoreAdjustDTO dto);
 
         //Admin

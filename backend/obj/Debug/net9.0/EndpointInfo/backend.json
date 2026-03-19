@@ -995,6 +995,29 @@
         }
       }
     },
+    "/api/fines/dispute/{disputeId}": {
+      "get": {
+        "tags": [
+          "Fine"
+        ],
+        "parameters": [
+          {
+            "name": "disputeId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/fines/admin/issue": {
       "post": {
         "tags": [
@@ -2615,6 +2638,29 @@
         }
       }
     },
+    "/api/users/score-history/loan/{loanId}": {
+      "get": {
+        "tags": [
+          "User"
+        ],
+        "parameters": [
+          {
+            "name": "loanId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/users": {
       "get": {
         "tags": [
@@ -3326,13 +3372,22 @@
             "type": "string",
             "nullable": true
           },
-          "customFineAmount": {
+          "fineAmount": {
             "type": "number",
             "format": "double",
             "nullable": true
           },
           "adminNote": {
             "type": "string",
+            "nullable": true
+          },
+          "fineIssuedToUserId": {
+            "type": "string",
+            "nullable": true
+          },
+          "scoreAdjustment": {
+            "type": "integer",
+            "format": "int32",
             "nullable": true
           }
         },

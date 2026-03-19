@@ -10,13 +10,17 @@ import { ApiResponseDTO } from '../dtos/apiResponseDTO';
 export class AuthService {
   private readonly baseUrl = 'https://localhost:7183/api/auth';
 
+    private _scheduleWarning?: () => void;
+    setScheduler(fn: () => void): void { this._scheduleWarning = fn; }
+ 
+
   constructor(private http: HttpClient) {}
 
   //POST /api/auth/register
   register(dto: AuthDTO.RegisterDTO): Observable<AuthDTO.AuthResponseDTO> {
     return this.http
       .post<AuthDTO.AuthResponseDTO>(`${this.baseUrl}/register`, dto)
-      .pipe(tap((res) => this.saveTokens(res.token, res.refreshToken)));
+      .pipe(tap((res) => { this.saveTokens(res.token, res.refreshToken); this._scheduleWarning?.(); }));
   }
 
   //GET /api/auth/confirm-email?userId=&token=
@@ -30,14 +34,14 @@ export class AuthService {
   login(dto: AuthDTO.LoginDTO): Observable<AuthDTO.AuthResponseDTO> {
     return this.http
       .post<AuthDTO.AuthResponseDTO>(`${this.baseUrl}/login`, dto)
-      .pipe(tap((res) => this.saveTokens(res.token, res.refreshToken)));
+      .pipe(tap((res) => { this.saveTokens(res.token, res.refreshToken); this._scheduleWarning?.(); }));
   }
 
   //POST /api/auth/refresh
   refresh(dto: AuthDTO.RefreshTokenDTO): Observable<AuthDTO.AuthResponseDTO> {
     return this.http
       .post<AuthDTO.AuthResponseDTO>(`${this.baseUrl}/refresh`, dto)
-      .pipe(tap((res) => this.saveTokens(res.token, res.refreshToken)));
+      .pipe(tap((res) => { this.saveTokens(res.token, res.refreshToken); this._scheduleWarning?.(); }));
   }
 
   //POST /api/auth/logout  — requires Bearer token (attach via interceptor)
@@ -48,12 +52,12 @@ export class AuthService {
   }
 
   // POST /api/auth/change-password
-    changePassword(currentPassword: string, newPassword: string): Observable<ApiResponseDTO> {
-      return this.http.post<ApiResponseDTO>(`${this.baseUrl}/change-password`, {
-        currentPassword,
-        newPassword,
-      });
-    }
+  changePassword(currentPassword: string, newPassword: string): Observable<ApiResponseDTO> {
+    return this.http.post<ApiResponseDTO>(`${this.baseUrl}/change-password`, {
+      currentPassword,
+      newPassword,
+    });
+  }
 
   //POST /api/auth/forgot-password
   forgotPassword(email: string): Observable<ApiResponseDTO> {
@@ -69,10 +73,7 @@ export class AuthService {
   //POST /api/auth/resend-confirmation
   resendConfirmation(email: string): Observable<ApiResponseDTO> {
     const dto: AuthDTO.ForgotPasswordDTO = { email };
-    return this.http.post<ApiResponseDTO>(
-      `${this.baseUrl}/resend-confirmation`,
-      dto
-    );
+    return this.http.post<ApiResponseDTO>(`${this.baseUrl}/resend-confirmation`, dto);
   }
 
   isAdmin(): boolean {

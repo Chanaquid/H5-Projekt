@@ -26,6 +26,8 @@ export class UserProfile implements OnInit {
   reviews: ReviewDTO.UserReviewResponseDTO[] = [];
   displayedReviews: ReviewDTO.UserReviewResponseDTO[] = [];
 
+  itemsCollapsed = false;
+
   isLoadingProfile = true;
   isLoadingItems = true;
   isLoadingReviews = true;

@@ -13,9 +13,11 @@ export namespace DisputeDTO {
   }
  
   export interface AdminVerdictDTO {
-    verdict: string; // "OwnerFavored" | "BorrowerFavored" | "PartialDamage" | "Inconclusive"
-    customFineAmount?: number;
-    adminNote: string;
+    verdict: string; // "OwnerFavored" | "BorrowerFavored" | "Neutral"
+    adminNote?: string;
+    fineIssuedToUserId?: string;
+    fineAmount?: number;     
+    scoreAdjustment?: number;
   }
  
   export interface AddDisputePhotoDTO {
@@ -28,6 +30,7 @@ export namespace DisputeDTO {
     id: number;
     loanId: number;
     itemTitle: string;
+    filedById: string;
     filedByName: string;
     filedAs: string;
     description: string;
@@ -35,7 +38,6 @@ export namespace DisputeDTO {
     responseDeadline: string;
     status: string;
     adminVerdict?: string;
-    customFineAmount?: number;
     adminNote?: string;
     resolvedAt?: string;
     filedByPhotos: DisputePhotoDTO[];
@@ -49,6 +51,7 @@ export namespace DisputeDTO {
     id: number;
     loanId: number;
     itemTitle: string;
+    filedById: string;
     filedByName: string;
     filedAs: string;
     status: string;
@@ -59,6 +62,7 @@ export namespace DisputeDTO {
   export interface DisputePhotoDTO {
     id: number;
     photoUrl: string;
+    submittedById: string;
     submittedByName: string;
     caption?: string;
     uploadedAt: string;

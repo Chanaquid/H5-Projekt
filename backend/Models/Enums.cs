@@ -88,10 +88,9 @@
         //Given by admin
         public enum DisputeVerdict
         {
-            OwnerFavored = 0,  //Full fine applied to borrower
-            BorrowerFavored = 1,  //No fine — owner accepts pre-existing condition
-            PartialDamage = 2,  //Custom fine amount set by admin
-            Inconclusive = 3   //No fine, note added to both profiles
+            OwnerFavored = 0,  //possible fine applied to borrower
+            BorrowerFavored = 1,  //possbile fine applied to owner
+            Neutral = 2 //both fines or no files to both
         }
 
         //Dispute enum

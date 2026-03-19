@@ -76,6 +76,7 @@ export namespace ItemDTO {
   export interface ItemSummaryDTO {
     id: number;
     title: string;
+    description: string;
     condition: string;
     status: string;
     pickupAddress: string;

@@ -1,6 +1,8 @@
 ﻿using backend.DTOs;
 using backend.Interfaces;
 using backend.Models;
+using backend.Repositories;
+using Microsoft.AspNetCore.Identity;
 
 namespace backend.Services
 {
@@ -203,45 +205,34 @@ namespace backend.Services
                 throw new InvalidOperationException("This dispute has already been resolved.");
 
             if (!Enum.TryParse<DisputeVerdict>(dto.Verdict, out var verdict))
-                throw new ArgumentException("Invalid verdict. Use 'OwnerFavored', 'BorrowerFavored', 'PartialDamage', or 'Inconclusive'.");
+                throw new ArgumentException("Invalid verdict. Use 'OwnerFavored', 'BorrowerFavored' or 'Neutral'.");
 
-            if (verdict == DisputeVerdict.PartialDamage)
+            if (!string.IsNullOrEmpty(dto.FineIssuedToUserId))
             {
-                if (!dto.CustomFineAmount.HasValue || dto.CustomFineAmount <= 0)
-                    throw new ArgumentException("A custom fine amount is required for a PartialDamage verdict.");
+                var isOwner = dispute.Loan.Item.OwnerId == dto.FineIssuedToUserId;
+                var isBorrower = dispute.Loan.BorrowerId == dto.FineIssuedToUserId;
+
+                if (!isOwner && !isBorrower)
+                    throw new ArgumentException("FineIssuedToUserId must be either the owner or borrower of this loan.");
+
+                await _fineService.IssueCustomFineAsync(
+                    dispute.LoanId,
+                    dispute.Id,
+                    dto.FineIssuedToUserId,
+                    amount: dto.FineAmount,
+                    scoreAdjustment: dto.ScoreAdjustment
+                );
             }
 
             dispute.AdminVerdict = verdict;
-            dispute.CustomFineAmount = dto.CustomFineAmount;
-            dispute.AdminNote = dto.AdminNote.Trim();
+            dispute.AdminNote = dto.AdminNote?.Trim();
             dispute.ResolvedByAdminId = adminId;
             dispute.ResolvedAt = DateTime.UtcNow;
             dispute.Status = DisputeStatus.Resolved;
 
-            //Issue fines based on verdict
-            switch (verdict)
-            {
-                case DisputeVerdict.OwnerFavored:
-                    //Borrower is at fault — issue appropriate fine based on dispute context
-                    //Owner filed as damage -> damage fine. Owner filed as lost -> lost fine.
-                    if (dispute.FiledAs == DisputeFiledAs.AsOwner)
-                        await _fineService.IssueDamagedFineAsync(dispute.LoanId, dispute.Id);
-                    break;
-
-                case DisputeVerdict.PartialDamage:
-                    await _fineService.IssueCustomFineAsync(dispute.LoanId, dto.CustomFineAmount!.Value, dispute.Id);
-                    break;
-
-                case DisputeVerdict.BorrowerFavored:
-                case DisputeVerdict.Inconclusive:
-                    //No fine issued
-                    break;
-            }
-
             _disputeRepository.Update(dispute);
             await _disputeRepository.SaveChangesAsync();
 
-            //Notify both parties
             var notifyMessage = $"The dispute for '{dispute.Loan.Item.Title}' has been resolved. Verdict: {verdict}.";
 
             await _notificationService.SendAsync(
@@ -279,21 +270,22 @@ namespace backend.Services
                 Id = d.Id,
                 LoanId = d.LoanId,
                 ItemTitle = d.Loan?.Item?.Title ?? string.Empty,
-                FiledByName = d.FiledBy?.FullName ?? string.Empty,
+                FiledById = d.FiledById ?? string.Empty,
+                FiledByName = d.FiledBy?.UserName ?? string.Empty,
                 FiledAs = d.FiledAs.ToString(),
                 Description = d.Description,
                 ResponseDescription = d.ResponseDescription,
                 ResponseDeadline = d.ResponseDeadline,
                 Status = d.Status.ToString(),
                 AdminVerdict = d.AdminVerdict?.ToString(),
-                CustomFineAmount = d.CustomFineAmount,
                 AdminNote = d.AdminNote,
                 ResolvedAt = d.ResolvedAt,
                 FiledByPhotos = filedByPhotos.Select(p => new DisputeDTO.DisputePhotoDTO
                 {
                     Id = p.Id,
                     PhotoUrl = p.PhotoUrl,
-                    SubmittedByName = p.SubmittedBy?.FullName ?? string.Empty,
+                    SubmittedById = p.SubmittedById ?? string.Empty,
+                    SubmittedByName = p.SubmittedBy?.UserName ?? string.Empty,
                     Caption = p.Caption,
                     UploadedAt = p.UploadedAt
                 }).ToList(),
@@ -301,7 +293,8 @@ namespace backend.Services
                 {
                     Id = p.Id,
                     PhotoUrl = p.PhotoUrl,
-                    SubmittedByName = p.SubmittedBy?.FullName ?? string.Empty,
+                    SubmittedById = p.SubmittedById ?? string.Empty,
+                    SubmittedByName = p.SubmittedBy?.UserName ?? string.Empty,
                     Caption = p.Caption,
                     UploadedAt = p.UploadedAt
                 }).ToList(),
@@ -324,7 +317,8 @@ namespace backend.Services
                 Id = d.Id,
                 LoanId = d.LoanId,
                 ItemTitle = d.Loan?.Item?.Title ?? string.Empty,
-                FiledByName = d.FiledBy?.FullName ?? string.Empty,
+                FiledById = d.FiledById ?? string.Empty,
+                FiledByName = d.FiledBy?.UserName ?? string.Empty,
                 FiledAs = d.FiledAs.ToString(),
                 Status = d.Status.ToString(),
                 ResponseDeadline = d.ResponseDeadline,

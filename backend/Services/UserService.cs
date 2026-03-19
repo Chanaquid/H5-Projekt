@@ -313,6 +313,7 @@ namespace backend.Services
             {
                 Id = i.Id,
                 Title = i.Title,
+                Description = i.Description,
                 Condition = i.Condition.ToString(),
                 PickupAddress = i.PickupAddress,
                 PickupLatitude = i.PickupLatitude,
@@ -385,6 +386,34 @@ namespace backend.Services
             return detail;
         }
 
+        //Gets score history by loanId
+        public async Task<List<UserDTO.ScoreHistoryDTO>> GetScoreHistoryByLoanIdAsync(int loanId, string requestingUserId)
+        {
+            var loan = await _loanRepository.GetByIdWithDetailsAsync(loanId);
+            if (loan == null)
+                throw new KeyNotFoundException("Loan not found.");
+
+            var isOwner = loan.Item.OwnerId == requestingUserId;
+            var isBorrower = loan.BorrowerId == requestingUserId;
+
+            if (!isOwner && !isBorrower)
+            {
+                var user = await _userManager.FindByIdAsync(requestingUserId);
+                var isAdmin = user != null && await _userManager.IsInRoleAsync(user, "Admin");
+                if (!isAdmin)
+                    throw new UnauthorizedAccessException("You are not a party to this loan.");
+            }
+
+            var history = await _userRepository.GetScoreHistoryByLoanIdAsync(loanId);
+            return history.Select(s => new UserDTO.ScoreHistoryDTO
+            {
+                PointsChanged = s.PointsChanged,
+                ScoreAfterChange = s.ScoreAfterChange,
+                Reason = s.Reason.ToString(),
+                Note = s.Note,
+                CreatedAt = s.CreatedAt
+            }).ToList();
+        }
         // Admin edits a user's profile, account fields, score, and unpaid fines total
         public async Task<UserDTO.AdminUserDTO> AdminEditUserAsync(string targetUserId, string adminId, UserDTO.AdminEditUserDTO dto)
         {

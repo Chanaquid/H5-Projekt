@@ -38,6 +38,11 @@ export class FineService {
     return this.http.get<FineDTO.FineResponseDTO[]>(`${this.baseUrl}/admin/user/${userId}`);
   }
 
+  // GET /api/fines/dispute/:disputeId
+  getFinesByDisputeId(disputeId: number): Observable<FineDTO.FineResponseDTO[]> {
+    return this.http.get<FineDTO.FineResponseDTO[]>(`${this.baseUrl}/dispute/${disputeId}`);
+  }
+
   // POST /api/fines/admin/issue
   adminIssueFine(dto: FineDTO.AdminIssueFineDTO): Observable<FineDTO.FineResponseDTO> {
     return this.http.post<FineDTO.FineResponseDTO>(`${this.baseUrl}/admin/issue`, dto);

@@ -148,7 +148,7 @@ export class Home implements OnInit, AfterViewInit {
     }, true);
   }
 
-  
+
 
   private loadUserInfo(): void {
     this.userService.getMe().subscribe({
@@ -257,12 +257,12 @@ export class Home implements OnInit, AfterViewInit {
       result = result.filter(i => !i.isCurrentlyOnLoan);
     }
 
-    if (this.sortBy === 'rating') {
-      result.sort((a, b) => b.averageRating - a.averageRating);
-    } else if (this.sortBy === 'az') {
-      result.sort((a, b) => a.title.localeCompare(b.title));
-    } else {
-      result.sort((a, b) => b.id - a.id);
+    switch (this.sortBy) {
+      case 'oldest': result.sort((a, b) => a.id - b.id); break;
+      case 'rating': result.sort((a, b) => b.averageRating - a.averageRating); break;
+      case 'az': result.sort((a, b) => a.title.localeCompare(b.title)); break;
+      case 'za': result.sort((a, b) => b.title.localeCompare(a.title)); break;
+      default: result.sort((a, b) => b.id - a.id); break;
     }
 
     this.filteredItems = [...result];

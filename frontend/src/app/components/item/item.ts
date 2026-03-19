@@ -84,6 +84,8 @@ export class Item implements OnInit {
   photoUploadError = '';
   photoUploadSuccess = false;
 
+  copiedItemId: number | null = null;
+
   constructor(
     private authService: AuthService,
     private itemService: ItemService,
@@ -302,6 +304,26 @@ export class Item implements OnInit {
     this.addressSuggestions = [];
     this.showAddressSuggestions = false;
     this.cdr.detectChanges();
+  }
+
+  copyShareLink(itemId: number): void {
+    const shareUrl = `${window.location.origin}/items/${itemId}`;
+
+    navigator.clipboard.writeText(shareUrl).then(() => {
+      this.copiedItemId = itemId;
+      
+      // 1. Trigger detection immediately after the promise resolves
+      this.cdr.detectChanges(); 
+      
+      // Reset the button text after 2 seconds
+      setTimeout(() => {
+        this.copiedItemId = null;
+        // 2. Trigger detection again when the timer finishes
+        this.cdr.detectChanges(); 
+      }, 2000);
+    }).catch(err => {
+      console.error('Could not copy text: ', err);
+    });
   }
 
 

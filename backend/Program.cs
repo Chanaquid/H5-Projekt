@@ -103,7 +103,7 @@ namespace backend
             //Token lifespan
             builder.Services.Configure<DataProtectionTokenProviderOptions>(options =>
             {
-                options.TokenLifespan = TimeSpan.FromHours(1);
+                options.TokenLifespan = TimeSpan.FromSeconds(30); //FROM HOURS 1
             });
 
             //Repositories

@@ -54,6 +54,16 @@ namespace backend.Repositories
                 .FirstOrDefaultAsync(f => f.Id == fineId);
         }
 
+        public async Task<List<Fine>> GetByDisputeIdAsync(int disputeId)
+        {
+            return await _context.Fines
+                .Include(f => f.Loan)
+                    .ThenInclude(l => l.Item)
+                .Where(f => f.DisputeId == disputeId)
+                .OrderBy(f => f.CreatedAt)
+                .ToListAsync();
+        }
+
         public async Task<List<Fine>> GetPendingVerificationAsync()
         {
             return await _context.Fines

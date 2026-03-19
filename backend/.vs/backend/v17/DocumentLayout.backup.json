@@ -3,43 +3,56 @@
   "WorkspaceRootPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{E47D2206-A05F-4EC1-A8F0-13F9FB23B7FD}|..\\backend.Tests\\backend.Tests.csproj|c:\\users\\subar\\desktop\\loanapp\\backend.tests\\controllers\\itemcontrollertests.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
       "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\itemservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\itemservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\loanservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\loanservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\userrecentlyviewedservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\userrecentlyviewedservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
-    },
-    {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\dtos\\itemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:dtos\\itemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
       "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\controllers\\itemcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
       "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:controllers\\itemcontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\repositories\\itemrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:repositories\\itemrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\dtos\\itemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:dtos\\itemdto.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\repositories\\userfavoriterepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:repositories\\userfavoriterepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\loanservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\loanservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\controllers\\userfavoritecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:controllers\\userfavoritecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:models\\applicationuser.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\userservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\userrecentlyviewedservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\userrecentlyviewedservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\userfavoriteservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\userfavoriteservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:controllers\\usercontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\fineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\fineservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\controllers\\finecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:controllers\\finecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\controllers\\disputecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:controllers\\disputecontroller.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|c:\\users\\subar\\desktop\\loanapp\\backend\\services\\disputeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{0611B22B-B0D4-4062-A28B-7B1AA192A9CE}|backend.csproj|solutionrelative:services\\disputeservice.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -49,17 +62,17 @@
       "DocumentGroups": [
         {
           "DockedWidth": 298,
-          "SelectedChildIndex": 1,
+          "SelectedChildIndex": 4,
           "Children": [
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "LoanService.cs",
               "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\LoanService.cs",
               "RelativeDocumentMoniker": "Services\\LoanService.cs",
               "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\LoanService.cs",
               "RelativeToolTip": "Services\\LoanService.cs",
-              "ViewState": "AgIAADwCAAAAAAAAAAAmwD4CAAAjAAAAAAAAAA==",
+              "ViewState": "AgIAAGICAAAAAAAAAAAMwG4CAABCAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
               "WhenOpened": "2026-03-14T23:17:31.705Z",
               "IsPinned": true,
@@ -67,119 +80,158 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 0,
-              "Title": "ItemControllerTests.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\Controllers\\ItemControllerTests.cs",
-              "RelativeDocumentMoniker": "..\\backend.Tests\\Controllers\\ItemControllerTests.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\Controllers\\ItemControllerTests.cs",
-              "RelativeToolTip": "..\\backend.Tests\\Controllers\\ItemControllerTests.cs",
-              "ViewState": "AgIAAD0CAAAAAAAAAADwv0gCAAAOAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:44:15.681Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 4,
-              "Title": "UserService.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserService.cs",
-              "RelativeDocumentMoniker": "Services\\UserService.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserService.cs",
-              "RelativeToolTip": "Services\\UserService.cs",
-              "ViewState": "AgIAADIBAAAAAAAAAAAmwDcBAAA5AAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:44:01.877Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 3,
-              "Title": "UserRecentlyViewedService.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserRecentlyViewedService.cs",
-              "RelativeDocumentMoniker": "Services\\UserRecentlyViewedService.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserRecentlyViewedService.cs",
-              "RelativeToolTip": "Services\\UserRecentlyViewedService.cs",
-              "ViewState": "AgIAAEIAAAAAAAAAAAAmwEcAAAAjAAAAAAAAAA==",
-              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:43:53.171Z",
-              "EditorCaption": ""
-            },
-            {
-              "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 1,
               "Title": "ItemController.cs",
               "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\ItemController.cs",
               "RelativeDocumentMoniker": "Controllers\\ItemController.cs",
               "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\ItemController.cs",
               "RelativeToolTip": "Controllers\\ItemController.cs",
-              "ViewState": "AgIAABAAAAAAAAAAAAAgwAAAAAAAAAAAAAAAAA==",
+              "ViewState": "AgIAAM4AAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:28:40.59Z",
+              "WhenOpened": "2026-03-19T01:32:58.222Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
-              "Title": "ItemRepository.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Repositories\\ItemRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\ItemRepository.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Repositories\\ItemRepository.cs",
-              "RelativeToolTip": "Repositories\\ItemRepository.cs",
-              "ViewState": "AgIAAAgAAAAAAAAAAAAQwAAAAAAAAAAAAAAAAA==",
+              "DocumentIndex": 4,
+              "Title": "ApplicationUser.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Models\\ApplicationUser.cs",
+              "RelativeDocumentMoniker": "Models\\ApplicationUser.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Models\\ApplicationUser.cs",
+              "RelativeToolTip": "Models\\ApplicationUser.cs",
+              "ViewState": "AgIAADIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:28:31.319Z",
+              "WhenOpened": "2026-03-19T00:13:41.284Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 1,
+              "DocumentIndex": 6,
+              "Title": "UserRecentlyViewedService.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserRecentlyViewedService.cs",
+              "RelativeDocumentMoniker": "Services\\UserRecentlyViewedService.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserRecentlyViewedService.cs",
+              "RelativeToolTip": "Services\\UserRecentlyViewedService.cs",
+              "ViewState": "AgIAABoAAAAAAAAAAIAwwEoAAAAnAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:16:45.798Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
               "Title": "ItemService.cs",
               "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\ItemService.cs",
               "RelativeDocumentMoniker": "Services\\ItemService.cs",
               "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\ItemService.cs",
               "RelativeToolTip": "Services\\ItemService.cs",
-              "ViewState": "AgIAAD0CAAAAAAAAAAAwwIoCAAAfAAAAAAAAAA==",
+              "ViewState": "AgIAAMoAAAAAAAAAAAAnwNYAAAAzAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:28:11.014Z",
+              "WhenOpened": "2026-03-18T23:16:31.187Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 7,
+              "Title": "UserFavoriteService.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserFavoriteService.cs",
+              "RelativeDocumentMoniker": "Services\\UserFavoriteService.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserFavoriteService.cs",
+              "RelativeToolTip": "Services\\UserFavoriteService.cs",
+              "ViewState": "AgIAAE8AAAAAAAAAAIAwwFsAAAAjAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T23:16:23.443Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "ItemDTO.cs",
               "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\DTOs\\ItemDTO.cs",
               "RelativeDocumentMoniker": "DTOs\\ItemDTO.cs",
               "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\DTOs\\ItemDTO.cs",
               "RelativeToolTip": "DTOs\\ItemDTO.cs",
-              "ViewState": "AgIAADAAAAAAAAAAAAAwwFYAAAAVAAAAAAAAAA==",
+              "ViewState": "AgIAAB0AAAAAAAAAAAA6wFYAAAAjAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T18:00:24.465Z",
+              "WhenOpened": "2026-03-18T23:15:18.613Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 8,
-              "Title": "UserFavoriteRepository.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Repositories\\UserFavoriteRepository.cs",
-              "RelativeDocumentMoniker": "Repositories\\UserFavoriteRepository.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Repositories\\UserFavoriteRepository.cs",
-              "RelativeToolTip": "Repositories\\UserFavoriteRepository.cs",
-              "ViewState": "AgIAAAkAAAAAAAAAAAAAwC0AAAAJAAAAAAAAAA==",
+              "Title": "UserController.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\UserController.cs",
+              "RelativeDocumentMoniker": "Controllers\\UserController.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\UserController.cs",
+              "RelativeToolTip": "Controllers\\UserController.cs",
+              "ViewState": "AgIAADkAAAAAAAAAAAA5wGgAAAAlAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T17:56:09.766Z",
+              "WhenOpened": "2026-03-18T22:32:32.79Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 10,
+              "Title": "FineController.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\FineController.cs",
+              "RelativeDocumentMoniker": "Controllers\\FineController.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\FineController.cs",
+              "RelativeToolTip": "Controllers\\FineController.cs",
+              "ViewState": "AgIAAD0AAAAAAAAAAAAcwEUAAABGAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T22:06:25.075Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 9,
-              "Title": "UserFavoriteController.cs",
-              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\UserFavoriteController.cs",
-              "RelativeDocumentMoniker": "Controllers\\UserFavoriteController.cs",
-              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\UserFavoriteController.cs",
-              "RelativeToolTip": "Controllers\\UserFavoriteController.cs",
-              "ViewState": "AgIAACAAAAAAAAAAAAAUwCsAAAArAAAAAAAAAA==",
+              "Title": "FineService.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\FineService.cs",
+              "RelativeDocumentMoniker": "Services\\FineService.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\FineService.cs",
+              "RelativeToolTip": "Services\\FineService.cs",
+              "ViewState": "AgIAAGUAAAAAAAAAAAAmwNUAAAAgAAAAAAAAAA==",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-03-17T17:28:59.383Z",
+              "WhenOpened": "2026-03-18T20:51:33.253Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 11,
+              "Title": "DisputeController.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\DisputeController.cs",
+              "RelativeDocumentMoniker": "Controllers\\DisputeController.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Controllers\\DisputeController.cs",
+              "RelativeToolTip": "Controllers\\DisputeController.cs",
+              "ViewState": "AgIAABAAAAAAAAAAAAAqwIUAAABoAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T19:48:29.269Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 12,
+              "Title": "DisputeService.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\DisputeService.cs",
+              "RelativeDocumentMoniker": "Services\\DisputeService.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\DisputeService.cs",
+              "RelativeToolTip": "Services\\DisputeService.cs",
+              "ViewState": "AgIAANEAAAAAAAAAAAAMwNwAAAArAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-18T18:44:54.707Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "UserService.cs",
+              "DocumentMoniker": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserService.cs",
+              "RelativeDocumentMoniker": "Services\\UserService.cs",
+              "ToolTip": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\Services\\UserService.cs",
+              "RelativeToolTip": "Services\\UserService.cs",
+              "ViewState": "AgIAAD0BAAAAAAAAAAAMwEIBAABXAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-03-17T18:44:01.877Z",
               "EditorCaption": ""
             }
           ]

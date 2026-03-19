@@ -7,6 +7,8 @@ namespace backend.Interfaces
         //User actions
         Task<List<FineDTO.FineResponseDTO>> GetUserFinesAsync(string userId);
         Task<FineDTO.FineResponseDTO> MarkAsPaidAsync(string userId, FineDTO.PayFineDTO dto);
+        Task<List<FineDTO.FineResponseDTO>> GetByDisputeIdAsync(int disputeId);
+
 
         //Admin actions
         Task<List<FineDTO.FineResponseDTO>> GetAllUnpaidAsync();
@@ -17,6 +19,6 @@ namespace backend.Interfaces
         Task<FineDTO.FineResponseDTO> IssueLateReturnFineAsync(int loanId);
         Task<FineDTO.FineResponseDTO> IssueDamagedFineAsync(int loanId, int? disputeId = null);
         Task<FineDTO.FineResponseDTO> IssueLostFineAsync(int loanId, int? disputeId = null);
-        Task<FineDTO.FineResponseDTO> IssueCustomFineAsync(int loanId, decimal amount, int disputeId);
+        Task<FineDTO.FineResponseDTO?> IssueCustomFineAsync(int loanId, int disputeId, string userId, decimal? amount, int? scoreAdjustment);
     }
 }

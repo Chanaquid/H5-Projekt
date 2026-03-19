@@ -93,6 +93,7 @@ namespace backend.Services
                 {
                     Id = item.Id,
                     Title = item.Title,
+                    Description = item.Description,
                     Condition = item.Condition.ToString(),
                     Status = item.Status.ToString(),
                     PickupAddress = item.PickupAddress,

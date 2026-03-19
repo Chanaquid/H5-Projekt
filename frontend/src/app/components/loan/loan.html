@@ -163,12 +163,14 @@
                     <div class="flex-1 min-w-0">
                         <p class="text-white text-sm font-semibold truncate" style="font-family:'Syne',sans-serif">{{
                             loan.itemTitle }}</p>
-                        <p class="text-zinc-500 text-xs mt-0.5">
+                        <span class="text-cyan-400 text-sm font-mono">Loan Id: {{ loan.id }}</span>
+
+                            <p class="text-zinc-500 text-xs mt-0.5">
                             {{ loanView === 'borrowed' ? 'From' : 'To' }}:
                             <span class="text-zinc-300">{{ loan.otherPartyName }}</span>
                         </p>
                         <div class="flex items-center gap-3 mt-1 flex-wrap">
-                            <p class="text-zinc-500 text-xs">
+                            <p class="text-amber-400 text-xs">
                                 {{ loan.startDate | date:'MMM d' }} →
                                 <span *ngIf="loan.status === 'Returned'">{{ loan.actualReturnDate | date:'MMM d, yyyy'
                                     }}</span>
@@ -191,6 +193,7 @@
                             [ngClass]="getLoanStatusClass(loan.status)">
                             {{ loan.status }}
                         </span>
+
                         <svg class="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" fill="none"
                             viewBox="0 0 24 24" stroke="currentColor">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />

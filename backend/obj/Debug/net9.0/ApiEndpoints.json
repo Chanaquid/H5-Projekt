@@ -652,6 +652,22 @@
   },
   {
     "ContainingType": "backend.Controllers.FineController",
+    "Method": "GetByDisputeId",
+    "RelativePath": "api/fines/dispute/{disputeId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "disputeId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.FineController",
     "Method": "GetMyFines",
     "RelativePath": "api/fines/my",
     "HttpMethod": "GET",
@@ -1798,6 +1814,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.UserController",
+    "Method": "GetScoreHistoryByLoan",
+    "RelativePath": "api/users/score-history/loan/{loanId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "loanId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

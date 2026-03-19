@@ -24,6 +24,10 @@ export class UserService {
     return this.http.get<UserDTO.UserSummaryDTO>(`${this.baseUrl}/${id}/profile`);
   }
 
+  getScoreHistoryByLoanId(loanId: number): Observable<UserDTO.ScoreHistoryDTO[]> {
+    return this.http.get<UserDTO.ScoreHistoryDTO[]>(`${this.baseUrl}/score-history/loan/${loanId}`);
+  }
+
   // PUT: Update your own profile
   updateProfile(dto: UserDTO.UpdateProfileDTO): Observable<UserDTO.UserProfileDTO> {
     return this.http.put<UserDTO.UserProfileDTO>(`${this.baseUrl}/me`, dto);

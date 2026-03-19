@@ -16,6 +16,8 @@ import { AdminGuard } from './services/admin-guard';
 import { AdminItem } from './components/admin-item/admin-item';
 import { UserProfile } from './components/user-profile/user-profile';
 import { Favorites } from './components/favorites/favorites';
+import { ResolutionCenter } from './components/resolution-center/resolution-center';
+import { Chat } from './components/chat/chat';
 
 export const authGuard : CanActivateFn = () => {
     const auth = inject(AuthService);
@@ -28,10 +30,12 @@ export const routes: Routes = [
     {path:'login', component: Login},
     {path:'register', component: Register},
     {path:'home', component: Home, canActivate: [authGuard]},
+    {path:'my-chats', component: Chat, canActivate: [authGuard]},
     {path:'my-items', component: Item, canActivate: [authGuard]},
     {path:'my-loans', component: Loan, canActivate: [authGuard]},
     {path:'favorites', component: Favorites, canActivate: [authGuard]},
     {path:'my-dashboard', component: Profile, canActivate: [authGuard]},
+    {path:'my-resolution-center', component: ResolutionCenter, canActivate: [authGuard]},
     {path: 'items/:id', component: ItemDetails, canActivate: [authGuard]},
     {path: 'loans/:id', component: LoanDetails, canActivate: [authGuard]},
     {path: 'users/:id', component: UserProfile, canActivate: [authGuard]},
