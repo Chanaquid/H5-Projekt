@@ -80,6 +80,11 @@ namespace backend.Services
             return requests.Select(MapToDTO).ToList();
         }
 
+        public async Task<List<VerificationDTO.VerificationRequestResponseDTO>> GetAllAsync()
+        {
+            var requests = await _verificationRepository.GetAllAsync();
+            return requests.Select(MapToDTO).ToList();
+        }
 
         //Admin decides
         public async Task<VerificationDTO.VerificationRequestResponseDTO> DecideAsync(int requestId, string adminId, VerificationDTO.AdminVerificationDecisionDTO dto)

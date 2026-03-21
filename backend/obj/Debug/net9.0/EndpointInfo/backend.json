@@ -953,6 +953,18 @@
         }
       }
     },
+    "/api/fines/admin/all": {
+      "get": {
+        "tags": [
+          "Fine"
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/fines/pay": {
       "post": {
         "tags": [
@@ -3073,6 +3085,18 @@
             }
           }
         },
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/verification/admin/all": {
+      "get": {
+        "tags": [
+          "Verification"
+        ],
         "responses": {
           "200": {
             "description": "Success"

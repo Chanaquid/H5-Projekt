@@ -20,6 +20,10 @@ export class VerificationService {
     return this.http.post<VerificationDTO.VerificationRequestResponseDTO>(this.baseUrl, dto);
   }
 
+  getAllRequests(): Observable<VerificationDTO.VerificationRequestResponseDTO[]> {
+    return this.http.get<VerificationDTO.VerificationRequestResponseDTO[]>(`${this.baseUrl}/admin/all`);
+  }
+
 
   getPendingRequests(): Observable<VerificationDTO.VerificationRequestResponseDTO[]> {
     return this.http.get<VerificationDTO.VerificationRequestResponseDTO[]>(`${this.baseUrl}/admin/pending`);

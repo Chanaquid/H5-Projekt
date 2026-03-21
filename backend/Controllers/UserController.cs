@@ -38,7 +38,7 @@ namespace backend.Controllers
 
 
         //GET — public profile, any authenticated user
-        [HttpGet("{id}/profile")]
+        [HttpGet("{id:guid}/profile")]
         public async Task<IActionResult> GetPublicProfile(string id)
         {
             try
@@ -142,7 +142,8 @@ namespace backend.Controllers
 
         // GET - get all users
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        //[Authorize(Roles = "Admin")]
+        [AllowAnonymous]
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _userService.GetAllUsersAsync();
@@ -150,7 +151,7 @@ namespace backend.Controllers
         }
 
         //GET - get user by id
-        [HttpGet("{id}")]
+        [HttpGet("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetUserById(string id)
         {
@@ -166,7 +167,7 @@ namespace backend.Controllers
         }
 
         //POST - Adjust score for an user
-        [HttpPost("{id}/adjust-score")]
+        [HttpPost("{id:guid}/adjust-score")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdjustScore(string id, [FromBody] UserDTO.AdminScoreAdjustDTO dto)
         {
@@ -186,7 +187,7 @@ namespace backend.Controllers
         }
 
         //PUT - Admin edits user
-        [HttpPut("{id}")]
+        [HttpPut("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminEditUser(string id, [FromBody] UserDTO.AdminEditUserDTO dto)
         {
@@ -196,7 +197,7 @@ namespace backend.Controllers
         }
 
         //DELETE - admin can delete any user
-        [HttpDelete("{id}")]
+        [HttpDelete("{id:guid}")]
         [Authorize(Roles = "Admin")]
         public async Task<IActionResult> AdminDeleteUser(string id)
         {

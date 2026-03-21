@@ -34,22 +34,22 @@
         <div class="flex items-center gap-6 mt-6 flex-wrap">
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
-                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ verifiedCount }}</span>
+                <span class="text-zinc-300 text-sm"><span class="text-white font-semibold">{{ verifiedCount }}</span>
                     Verified</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
-                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ unverifiedCount }}</span>
+                <span class="text-zinc-300 text-sm"><span class="text-white font-semibold">{{ unverifiedCount }}</span>
                     Unverified</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-indigo-400 rounded-full"></span>
-                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ adminCount }}</span>
+                <span class="text-zinc-300 text-sm"><span class="text-white font-semibold">{{ adminCount }}</span>
                     Admins</span>
             </div>
             <div class="flex items-center gap-2">
                 <span class="w-2 h-2 bg-zinc-500 rounded-full"></span>
-                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ deletedCount }}</span>
+                <span class="text-zinc-300 text-sm"><span class="text-white font-semibold">{{ deletedCount }}</span>
                     Deleted</span>
             </div>
         </div>
@@ -63,11 +63,11 @@
                 <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; applyFilters()"
                     class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
                     [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
-                    [class.text-zinc-400]="activeTab !== tab.key">
+                    [class.text-zinc-200]="activeTab !== tab.key">
                     {{ tab.label }}
                     <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                         [class.bg-zinc-900]="activeTab === tab.key" [class.text-amber-400]="activeTab === tab.key"
-                        [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-500]="activeTab !== tab.key">
+                        [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-300]="activeTab !== tab.key">
                         {{ getTabCount(tab.key) }}
                     </span>
                 </button>
@@ -80,7 +80,7 @@
                 </svg>
                 <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
                     placeholder="Search name, username or email..."
-                    class="bg-zinc-900 border border-zinc-800 text-white text-sm rounded-xl pl-9 pr-4 py-2 outline-none placeholder-zinc-600 focus:border-amber-400/50 transition-all duration-200 w-72" />
+                    class="bg-zinc-900 border border-zinc-800 text-white text-sm rounded-xl pl-9 pr-4 py-2 outline-none placeholder-zinc-500 focus:border-amber-400/50 transition-all duration-200 w-72" />
             </div>
         </div>
 
@@ -137,7 +137,7 @@
                                 Verified
                             </span>
                             <span *ngIf="user.role === 'Admin'"
-                                class="text-[9px] font-bold uppercase bg-indigo-400/10 text-indigo-400 border border-indigo-400/20 px-1.5 py-0.5 rounded-md">
+                                class="text-[9px] font-bold uppercase bg-indigo-600/10 text-indigo-400 border border-indigo-400/20 px-1.5 py-0.5 rounded-md">
                                 Admin
                             </span>
                             <span *ngIf="user.isDeleted"
@@ -149,11 +149,11 @@
                                 kr {{ user.unpaidFinesTotal }} unpaid
                             </span>
                         </div>
-                        <p class="text-zinc-500 text-xs">
+                        <p class="text-zinc-400 text-xs">
                             @{{ user.username }}
-                            <span class="text-zinc-700 mx-1.5">·</span>
+                            <span class="text-zinc-200 mx-1.5">·</span>
                             {{ user.email }}
-                            <span class="text-zinc-700 mx-1.5">·</span>
+                            <span class="text-zinc-200 mx-1.5">·</span>
                             Joined {{ user.membershipDate | date:'MMM d, yyyy' }}
                         </p>
                     </div>
@@ -161,7 +161,7 @@
                     <!-- Score + arrow -->
                     <div class="flex items-center gap-4 shrink-0">
                         <div class="text-right">
-                            <p class="text-[10px] text-zinc-500 uppercase tracking-widest">Score</p>
+                            <p class="text-[10px] text-zinc-400 uppercase tracking-widest">Score</p>
                             <p class="font-black text-lg leading-none" [ngClass]="getScoreClass(user.score)"
                                 style="font-family:'Syne',sans-serif">
                                 {{ user.score }}
@@ -203,7 +203,7 @@
                         <span *ngIf="selectedUser.isVerified"
                             class="text-[9px] font-bold uppercase bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-1.5 py-0.5 rounded-md">Verified</span>
                     </div>
-                    <p class="text-zinc-500 text-xs">@{{ selectedUser.username }} · {{ selectedUser.email }}</p>
+                    <p class="text-zinc-400 text-xs">@{{ selectedUser.username }} · {{ selectedUser.email }}</p>
                 </div>
             </div>
             <button (click)="showUserModal = false"
@@ -219,28 +219,37 @@
             <div class="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
         </div>
 
+        <!-- Error -->
+        <div *ngIf="!isLoadingDetail && !userDetail && actionError" class="p-6 text-center">
+            <p class="text-red-400 text-sm">{{ actionError }}</p>
+            <button (click)="showUserModal = false"
+                class="mt-4 px-4 py-2 bg-zinc-800 text-zinc-300 text-xs rounded-xl cursor-pointer hover:bg-zinc-700">
+                Close
+            </button>
+        </div>
+
         <div *ngIf="!isLoadingDetail && userDetail" class="p-6 space-y-5">
 
             <!-- Key stats -->
             <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Score</p>
+                    <p class="text-zinc-300 mb-0.5">Score</p>
                     <p class="font-black text-lg leading-none" [ngClass]="getScoreClass(userDetail.score)"
                         style="font-family:'Syne',sans-serif">{{ userDetail.score }}</p>
                 </div>
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Unpaid Fines</p>
+                    <p class="text-zinc-300 mb-0.5">Unpaid Fines</p>
                     <p class="font-semibold" [class.text-red-400]="userDetail.unpaidFinesTotal > 0"
                         [class.text-emerald-400]="userDetail.unpaidFinesTotal === 0">
                         kr {{ userDetail.unpaidFinesTotal }}
                     </p>
                 </div>
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Role</p>
+                    <p class="text-zinc-300 mb-0.5">Role</p>
                     <p class="text-white font-medium">{{ userDetail.role }}</p>
                 </div>
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Joined</p>
+                    <p class="text-zinc-300 mb-0.5">Joined</p>
                     <p class="text-white font-medium">{{ userDetail.membershipDate | date:'MMM d, yyyy' }}</p>
                 </div>
             </div>
@@ -248,34 +257,34 @@
             <!-- Profile details -->
             <div class="grid grid-cols-2 gap-3 text-xs">
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Gender</p>
+                    <p class="text-zinc-300 mb-0.5">Gender</p>
                     <p class="text-white font-medium">{{ userDetail.gender || '—' }}</p>
                 </div>
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
-                    <p class="text-zinc-500 mb-0.5">Age</p>
+                    <p class="text-zinc-300 mb-0.5">Age</p>
                     <p class="text-white font-medium">{{ userDetail.age || '—' }}</p>
                 </div>
                 <div class="bg-zinc-800 rounded-xl px-3 py-2.5 col-span-2">
-                    <p class="text-zinc-500 mb-0.5">Address</p>
+                    <p class="text-zinc-300 mb-0.5">Address</p>
                     <p class="text-white font-medium">{{ userDetail.address || '—' }}</p>
                 </div>
             </div>
 
             <!-- Deleted notice -->
             <div *ngIf="userDetail.isDeleted"
-                class="bg-zinc-800/50 border border-zinc-700 rounded-xl px-4 py-3 flex items-center gap-2">
+                class="bg-red-900/50 border border-zinc-700 rounded-xl px-4 py-3 flex items-center gap-2">
                 <svg class="w-4 h-4 text-zinc-500 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor"
                     stroke-width="2">
                     <path stroke-linecap="round" stroke-linejoin="round"
                         d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                 </svg>
-                <p class="text-zinc-500 text-xs">This account was deleted on {{ userDetail.deletedAt | date:'MMM d, yyyy
+                <p class="text-red-500 text-xs">This account was deleted on {{ userDetail.deletedAt | date:'MMM d, yyyy
                     HH:mm' }}.</p>
             </div>
 
             <!-- Actions -->
             <div class="bg-zinc-800 rounded-xl p-4 space-y-3">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Actions</p>
+                <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">Actions</p>
                 <div class="flex gap-2 flex-wrap">
 
                     <!-- View public profile -->
@@ -308,7 +317,7 @@
                     <button *ngIf="!userDetail.isDeleted" (click)="showEditForm ? showEditForm = false : openEdit()"
                         class="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer"
                         [class.bg-amber-400]="showEditForm" [class.text-zinc-900]="showEditForm"
-                        [class.bg-zinc-700]="!showEditForm" [class.text-zinc-300]="!showEditForm">
+                        [class.bg-blue-700]="!showEditForm" [class.text-white]="!showEditForm">
                         <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                             <path stroke-linecap="round" stroke-linejoin="round"
                                 d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
@@ -399,14 +408,14 @@
 
             <!-- Score adjustment -->
             <div *ngIf="!userDetail.isDeleted" class="bg-zinc-800 rounded-xl p-4 space-y-3">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Adjust Score</p>
+                <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">Adjust Score</p>
                 <div class="flex gap-2">
                     <input type="number" [(ngModel)]="scoreAdjustment" placeholder="e.g. -10 or +5"
-                        class="flex-1 bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-500 transition-all duration-200" />
+                        class="flex-1 bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-400 transition-all duration-200" />
                     <input type="text" [(ngModel)]="scoreNote" placeholder="Reason (optional)"
-                        class="flex-1 bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-500 transition-all duration-200" />
+                        class="flex-1 bg-zinc-700 border border-zinc-600 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-400 transition-all duration-200" />
                     <button (click)="adjustScore()" [disabled]="isAdjustingScore || !scoreAdjustment"
-                        class="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-500 text-zinc-900 font-semibold text-xs rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap">
+                        class="px-4 py-2.5 bg-amber-400 hover:bg-amber-300 disabled:bg-zinc-700 disabled:text-zinc-400 text-zinc-900 font-semibold text-xs rounded-xl transition-all duration-200 cursor-pointer whitespace-nowrap">
                         {{ isAdjustingScore ? '...' : 'Apply' }}
                     </button>
                 </div>
@@ -419,123 +428,208 @@
             </div>
 
             <!-- Score history -->
-            <div *ngIf="userDetail.scoreHistory && userDetail.scoreHistory.length > 0">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Score History</p>
-                <div class="space-y-2">
-                    <div *ngFor="let entry of userDetail.scoreHistory.slice(0, visibleScoreHistory)"
-                        class="flex items-center justify-between rounded-xl px-3 py-2.5 border"
-                        [class.bg-emerald-500/5]="entry.pointsChanged > 0"
-                        [class.border-emerald-500/20]="entry.pointsChanged > 0"
-                        [class.bg-red-500/5]="entry.pointsChanged < 0"
-                        [class.border-red-500/20]="entry.pointsChanged < 0"
-                        [class.bg-zinc-800]="entry.pointsChanged === 0"
-                        [class.border-zinc-700]="entry.pointsChanged === 0">
-                        <div>
-                            <p class="text-xs font-semibold" [class.text-emerald-400]="entry.pointsChanged > 0"
-                                [class.text-red-400]="entry.pointsChanged < 0"
-                                [class.text-zinc-300]="entry.pointsChanged === 0">
-                                {{ entry.pointsChanged > 0 ? '+' : '' }}{{ entry.pointsChanged }} pts
-                            </p>
-                            <p *ngIf="entry.note" class="text-zinc-500 text-[10px]">{{ entry.note }}</p>
-                            <p class="text-zinc-600 text-[10px]">{{ entry.reason }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-zinc-400 text-xs font-semibold">→ {{ entry.scoreAfterChange }}</p>
-                            <p class="text-zinc-600 text-[10px]">{{ entry.createdAt | date:'MMM d, yyyy' }}</p>
-                        </div>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden">
+                <button (click)="scoreHistoryCollapsed = !scoreHistoryCollapsed"
+                    class="w-full flex items-center justify-between px-4 py-3 cursor-pointer group">
+                    <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">
+                        Score History
+                        <span class="text-zinc-400 ml-1">({{ userDetail.scoreHistory?.length ?? 0 }})</span>
+                    </p>
+                    <svg class="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-all duration-200"
+                        [class.rotate-180]="!scoreHistoryCollapsed" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div *ngIf="!scoreHistoryCollapsed" class="px-4 pb-4 space-y-2">
+                    <div *ngIf="!userDetail.scoreHistory || userDetail.scoreHistory.length === 0"
+                        class="text-center py-6">
+                        <p class="text-zinc-400 text-xs">No score history.</p>
                     </div>
-                    <button *ngIf="visibleScoreHistory < userDetail.scoreHistory.length"
-                        (click)="visibleScoreHistory += 5"
-                        class="w-full py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-all duration-200 cursor-pointer">
-                        Load more ({{ userDetail.scoreHistory.length - visibleScoreHistory }} remaining)
-                    </button>
+                    <ng-container *ngIf="userDetail.scoreHistory && userDetail.scoreHistory.length > 0">
+                        <div *ngFor="let entry of userDetail.scoreHistory.slice(0, visibleScoreHistory)"
+                            class="flex items-center justify-between rounded-xl px-3 py-2.5 border"
+                            [class.bg-emerald-500/5]="entry.pointsChanged > 0"
+                            [class.border-emerald-500/20]="entry.pointsChanged > 0"
+                            [class.bg-red-500/5]="entry.pointsChanged < 0"
+                            [class.border-red-500/20]="entry.pointsChanged < 0"
+                            [class.bg-zinc-700]="entry.pointsChanged === 0"
+                            [class.border-zinc-600]="entry.pointsChanged === 0">
+                            <div>
+                                <p class="text-xs font-semibold" [class.text-emerald-400]="entry.pointsChanged > 0"
+                                    [class.text-red-400]="entry.pointsChanged < 0"
+                                    [class.text-zinc-300]="entry.pointsChanged === 0">
+                                    {{ entry.pointsChanged > 0 ? '+' : '' }}{{ entry.pointsChanged }} pts
+                                </p>
+                                <p *ngIf="entry.note" class="text-zinc-200 text-[10px]">Note: {{ entry.note }}</p>
+                                <p class="text-amber-400 text-[10px]">Reason: {{ entry.reason }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-zinc-400 text-xs font-semibold">→ {{ entry.scoreAfterChange }}</p>
+                                <p class="text-zinc-400 text-[10px]">{{ entry.createdAt | date:'MMM d, yyyy · HH:mm' }}
+                                </p>
+                            </div>
+                        </div>
+                        <button *ngIf="visibleScoreHistory < userDetail.scoreHistory.length"
+                            (click)="visibleScoreHistory = userDetail.scoreHistory.length"
+                            class="w-full py-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-700 hover:bg-zinc-600 rounded-xl transition-all duration-200 cursor-pointer">
+                            Load all ({{ userDetail.scoreHistory.length - visibleScoreHistory }} more)
+                        </button>
+                    </ng-container>
                 </div>
             </div>
 
             <!-- Fines -->
-            <div *ngIf="userDetail.fines && userDetail.fines.length > 0">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">
-                    Fines <span class="text-zinc-600">({{ userDetail.fines.length }})</span>
-                </p>
-                <div class="space-y-2">
-                    <div *ngFor="let fine of userDetail.fines"
-                        class="flex items-center justify-between bg-zinc-800 rounded-xl px-4 py-3">
-                        <div>
-                            <p class="text-white text-xs font-semibold">{{ fine.type }}</p>
-                            <p class="text-zinc-500 text-[10px]">{{ fine.itemTitle }} · {{ fine.createdAt | date:'MMM d,
-                                yyyy' }}</p>
-                        </div>
-                        <div class="text-right">
-                            <p class="text-white text-sm font-black" style="font-family:'Syne',sans-serif">kr {{
-                                fine.amount }}</p>
-                            <span class="text-[10px] font-bold uppercase" [ngClass]="getFineStatusClass(fine.status)">{{
-                                fine.status }}</span>
-                        </div>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden">
+                <button (click)="finesCollapsed = !finesCollapsed"
+                    class="w-full flex items-center justify-between px-4 py-3 cursor-pointer group">
+                    <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">
+                        Fines
+                        <span class="text-zinc-400 ml-1">({{ userDetail.fines?.length ?? 0 }})</span>
+                    </p>
+                    <svg class="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-all duration-200"
+                        [class.rotate-180]="!finesCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div *ngIf="!finesCollapsed" class="px-4 pb-4 space-y-2">
+                    <div *ngIf="!userDetail.fines || userDetail.fines.length === 0" class="text-center py-6">
+                        <p class="text-zinc-400 text-xs">No fines.</p>
                     </div>
+                    <ng-container *ngIf="userDetail.fines && userDetail.fines.length > 0">
+                        <div *ngFor="let fine of userDetail.fines.slice(0, visibleFines)"
+                            class="flex items-center justify-between bg-zinc-700 rounded-xl px-4 py-3">
+                            <div>
+                                <p class="text-white text-xs font-semibold">{{ fine.type }}</p>
+                                <p class="text-zinc-300 text-[10px]">{{ fine.itemTitle }} · {{ fine.createdAt |
+                                    date:'MMM d, yyyy · HH:mm' }}</p>
+                            </div>
+                            <div class="text-right">
+                                <p class="text-white text-sm font-black" style="font-family:'Syne',sans-serif">kr {{
+                                    fine.amount }}</p>
+                                <span class="text-[10px] font-bold uppercase"
+                                    [ngClass]="getFineStatusClass(fine.status)">{{ fine.status }}</span>
+                            </div>
+                        </div>
+                        <button *ngIf="visibleFines < userDetail.fines.length"
+                            (click)="visibleFines = userDetail.fines.length"
+                            class="w-full py-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-700 hover:bg-zinc-600 rounded-xl transition-all duration-200 cursor-pointer">
+                            Load all ({{ userDetail.fines.length - visibleFines }} more)
+                        </button>
+                    </ng-container>
                 </div>
             </div>
 
             <!-- Loans as borrower -->
-            <div *ngIf="userDetail.loansAsBorrower && userDetail.loansAsBorrower.length > 0">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">
-                    Loans as Borrower <span class="text-zinc-600">({{ userDetail.loansAsBorrower.length }})</span>
-                </p>
-                <div class="space-y-2">
-                    <div *ngFor="let loan of userDetail.loansAsBorrower" (click)="router.navigate(['/loans', loan.id])"
-                        class="flex items-center justify-between bg-zinc-800 hover:bg-zinc-700 rounded-xl px-4 py-3 cursor-pointer transition-all duration-200 group">
-                        <div class="flex-1 min-w-0">
-                            <p class="text-white text-xs font-semibold truncate">{{ loan.itemTitle }}</p>
-                            <p class="text-zinc-500 text-[10px]">
-                                from {{ loan.otherPartyName }}
-                                · {{ loan.startDate | date:'MMM d' }} → {{ loan.endDate | date:'MMM d, yyyy' }}
-                            </p>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0 ml-3">
-                            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md border"
-                                [ngClass]="getLoanStatusClass(loan.status)">{{ loan.status }}</span>
-                            <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden">
+                <button (click)="loansCollapsed = !loansCollapsed"
+                    class="w-full flex items-center justify-between px-4 py-3 cursor-pointer group">
+                    <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">
+                        Loans as Borrower
+                        <span class="text-zinc-400 ml-1">({{ userDetail.loansAsBorrower?.length ?? 0 }})</span>
+                    </p>
+                    <svg class="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-all duration-200"
+                        [class.rotate-180]="!loansCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div *ngIf="!loansCollapsed" class="px-4 pb-4 space-y-2">
+                    <div *ngIf="!userDetail.loansAsBorrower || userDetail.loansAsBorrower.length === 0"
+                        class="text-center py-6">
+                        <p class="text-zinc-400 text-xs">No loans.</p>
                     </div>
+                    <ng-container *ngIf="userDetail.loansAsBorrower && userDetail.loansAsBorrower.length > 0">
+                        <div *ngFor="let loan of userDetail.loansAsBorrower.slice(0, visibleLoans)"
+                            (click)="router.navigate(['/loans', loan.id])"
+                            class="flex items-center justify-between bg-zinc-700 hover:bg-zinc-400 rounded-xl px-4 py-3 cursor-pointer transition-all duration-200 group">
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-xs font-semibold truncate">{{ loan.itemTitle }}</p>
+                                <p class="text-zinc-300 text-[10px]">
+                                    from {{ loan.otherPartyName }} · {{ loan.startDate | date:'MMM d' }} → {{
+                                    loan.endDate | date:'MMM d, yyyy · HH:mm' }}
+                                </p>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0 ml-3">
+                                <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md border"
+                                    [ngClass]="getLoanStatusClass(loan.status)">{{ loan.status }}</span>
+                                <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <button *ngIf="visibleLoans < userDetail.loansAsBorrower.length"
+                            (click)="visibleLoans = userDetail.loansAsBorrower.length"
+                            class="w-full py-2 text-xs font-semibold text-zinc-300 hover:text-white bg-zinc-700 hover:bg-zinc-600 rounded-xl transition-all duration-200 cursor-pointer">
+                            Load all ({{ userDetail.loansAsBorrower.length - visibleLoans }} more)
+                        </button>
+                    </ng-container>
                 </div>
             </div>
 
             <!-- Items -->
-            <div *ngIf="userDetail.items && userDetail.items.length > 0">
-                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">
-                    Listed Items <span class="text-zinc-600">({{ userDetail.items.length }})</span>
-                </p>
-                <div class="space-y-2">
-                    <div *ngFor="let item of userDetail.items" (click)="router.navigate(['/items', item.id])"
-                        class="flex items-center gap-3 bg-zinc-800 hover:bg-zinc-700 rounded-xl px-4 py-3 cursor-pointer transition-all duration-200 group">
-                        <div class="w-10 h-10 rounded-lg overflow-hidden bg-zinc-700 shrink-0">
-                            <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl"
-                                class="w-full h-full object-cover" />
-                            <div *ngIf="!item.primaryPhotoUrl"
-                                class="w-full h-full flex items-center justify-center text-lg">📦</div>
-                        </div>
-                        <div class="flex-1 min-w-0">
-                            <p class="text-white text-xs font-semibold truncate">{{ item.title }}</p>
-                            <p class="text-zinc-500 text-[10px]">{{ item.categoryName }} · {{ item.condition }}</p>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md"
-                                [class.bg-emerald-400/10]="item.status === 'Approved'"
-                                [class.text-emerald-400]="item.status === 'Approved'"
-                                [class.bg-amber-400/10]="item.status === 'Pending'"
-                                [class.text-amber-400]="item.status === 'Pending'"
-                                [class.bg-red-400/10]="item.status === 'Rejected'"
-                                [class.text-red-400]="item.status === 'Rejected'">
-                                {{ item.status }}
-                            </span>
-                            <svg class="w-3.5 h-3.5 text-zinc-600 group-hover:text-zinc-400 transition-colors"
-                                fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                            </svg>
-                        </div>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden">
+                <button (click)="itemsCollapsed = !itemsCollapsed"
+                    class="w-full flex items-center justify-between px-4 py-3 cursor-pointer group">
+                    <p class="text-zinc-300 text-[10px] uppercase tracking-widest font-medium">
+                        Listed Items
+                        <span class="text-zinc-400 ml-1">({{ userDetail.items?.length ?? 0 }})</span>
+                    </p>
+                    <svg class="w-4 h-4 text-zinc-500 group-hover:text-zinc-300 transition-all duration-200"
+                        [class.rotate-180]="!itemsCollapsed" fill="none" viewBox="0 0 24 24" stroke="currentColor"
+                        stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                    </svg>
+                </button>
+                <div *ngIf="!itemsCollapsed" class="px-4 pb-4 space-y-2">
+                    <div *ngIf="!userDetail.items || userDetail.items.length === 0" class="text-center py-6">
+                        <p class="text-zinc-400 text-xs">No items listed.</p>
                     </div>
+                    <ng-container *ngIf="userDetail.items && userDetail.items.length > 0">
+                        <div *ngFor="let item of userDetail.items.slice(0, visibleItems)"
+                            (click)="router.navigate(['/items', item.id])"
+                            class="flex items-center gap-3 bg-zinc-700 hover:bg-zinc-600 rounded-xl px-4 py-3 cursor-pointer transition-all duration-200 group">
+                            <div class="w-10 h-10 rounded-lg overflow-hidden bg-zinc-600 shrink-0">
+                                <img *ngIf="item.primaryPhotoUrl" [src]="item.primaryPhotoUrl"
+                                    class="w-full h-full object-cover" />
+                                <div *ngIf="!item.primaryPhotoUrl"
+                                    class="w-full h-full flex items-center justify-center text-lg">📦</div>
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p class="text-white text-xs font-semibold truncate">{{ item.title }}</p>
+                                <div class="flex items-center gap-1.5 mt-0.5">
+                                    <span class="text-zinc-300 text-[10px]">{{ item.categoryName }}</span>
+                                    <span class="text-zinc-600">·</span>
+                                    <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md border"
+                                        [ngClass]="getConditionClass(item.condition)">
+                                        {{ item.condition }}
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[9px] font-bold uppercase px-1.5 py-0.5 rounded-md"
+                                    [class.bg-emerald-400/10]="item.status === 'Approved'"
+                                    [class.text-emerald-400]="item.status === 'Approved'"
+                                    [class.bg-amber-400/10]="item.status === 'Pending'"
+                                    [class.text-amber-400]="item.status === 'Pending'"
+                                    [class.bg-red-400/10]="item.status === 'Rejected'"
+                                    [class.text-red-400]="item.status === 'Rejected'">
+                                    {{ item.status }}
+                                </span>
+                                <svg class="w-3.5 h-3.5 text-zinc-500 group-hover:text-zinc-300 transition-colors"
+                                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </div>
+                        </div>
+                        <button *ngIf="visibleItems < userDetail.items.length"
+                            (click)="visibleItems = userDetail.items.length"
+                            class="w-full py-2 text-xs font-semibold text-zinc-400 hover:text-white bg-zinc-700 hover:bg-zinc-600 rounded-xl transition-all duration-200 cursor-pointer">
+                            Load all ({{ userDetail.items.length - visibleItems }} more)
+                        </button>
+                    </ng-container>
                 </div>
             </div>
 

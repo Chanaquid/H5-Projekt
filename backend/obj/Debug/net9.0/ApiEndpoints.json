@@ -600,6 +600,16 @@
   },
   {
     "ContainingType": "backend.Controllers.FineController",
+    "Method": "GetAll",
+    "RelativePath": "api/fines/admin/all",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.FineController",
     "Method": "ConfirmPayment",
     "RelativePath": "api/fines/admin/confirm-payment",
     "HttpMethod": "POST",
@@ -1899,6 +1909,16 @@
         "IsRequired": true
       }
     ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.VerificationController",
+    "Method": "GetAllRequests",
+    "RelativePath": "api/verification/admin/all",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [],
     "ReturnTypes": []
   },
   {

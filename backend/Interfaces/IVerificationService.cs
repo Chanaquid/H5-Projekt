@@ -10,6 +10,8 @@ namespace backend.Interfaces
 
         //Admin actions
         Task<List<VerificationDTO.VerificationRequestResponseDTO>> GetAllPendingAsync();
+        Task<List<VerificationDTO.VerificationRequestResponseDTO>> GetAllAsync();
+
         Task<VerificationDTO.VerificationRequestResponseDTO> DecideAsync(int requestId, string adminId, VerificationDTO.AdminVerificationDecisionDTO dto);
     }
 }

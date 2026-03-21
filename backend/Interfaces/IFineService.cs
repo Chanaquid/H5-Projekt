@@ -11,6 +11,7 @@ namespace backend.Interfaces
 
 
         //Admin actions
+        Task<List<FineDTO.FineResponseDTO>> GetAllFinesAsync();
         Task<List<FineDTO.FineResponseDTO>> GetAllUnpaidAsync();
         Task<List<FineDTO.FineResponseDTO>> GetPendingVerificationAsync();
         Task<FineDTO.FineResponseDTO> AdminIssueFineAsync(FineDTO.AdminIssueFineDTO dto); //Custom fine 

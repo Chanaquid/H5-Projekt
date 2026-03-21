@@ -25,6 +25,15 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Fine>> GetAllAsync()
+        {
+            return await _context.Fines
+                .Include(f => f.Loan)
+                    .ThenInclude(l => l.Item)
+                .OrderByDescending(f => f.CreatedAt)
+                .ToListAsync();
+        }
+
         //get all unpaidFines
         public async Task<List<Fine>> GetAllUnpaidAsync()
         {

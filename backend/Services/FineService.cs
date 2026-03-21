@@ -86,6 +86,12 @@ namespace backend.Services
             return fines.Select(MapToFineDTO).ToList();
         }
 
+        public async Task<List<FineDTO.FineResponseDTO>> GetAllFinesAsync()
+        {
+            var fines = await _fineRepository.GetAllAsync();
+            return fines.Select(MapToFineDTO).ToList();
+        }
+
         public async Task<List<FineDTO.FineResponseDTO>> GetByDisputeIdAsync(int disputeId)
         {
             var fines = await _fineRepository.GetByDisputeIdAsync(disputeId);

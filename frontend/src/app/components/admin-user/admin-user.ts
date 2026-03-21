@@ -35,6 +35,15 @@ export class AdminUser implements OnInit {
   scoreError = '';
   scoreSuccess = '';
   visibleScoreHistory = 5;
+
+  //Stats
+  visibleFines = 5;
+  visibleLoans = 5;
+  visibleItems = 5;
+  finesCollapsed = false;
+  loansCollapsed = false;
+  itemsCollapsed = false;
+  scoreHistoryCollapsed = false;
  
   // Edit
   showEditForm = false;
@@ -75,7 +84,6 @@ export class AdminUser implements OnInit {
     this.loadUsers();
   }
  
-  // ─── Load ────────────────────────────────────────────────────────────────
  
   private loadUsers(): void {
     this.isLoading = true;
@@ -84,6 +92,7 @@ export class AdminUser implements OnInit {
         this.allUsers = users;
         this.applyFilters();
         this.isLoading = false;
+        console.log('Loaded users:', users);
         this.cdr.detectChanges();
       },
       error: () => {
@@ -93,7 +102,6 @@ export class AdminUser implements OnInit {
     });
   }
  
-  // ─── Filters ─────────────────────────────────────────────────────────────
  
   applyFilters(): void {
     let result = [...this.allUsers];
@@ -135,7 +143,6 @@ export class AdminUser implements OnInit {
   get adminCount()      { return this.allUsers.filter(u => u.role === 'Admin' && !u.isDeleted).length; }
   get deletedCount()    { return this.allUsers.filter(u => u.isDeleted).length; }
  
-  // ─── Modal ───────────────────────────────────────────────────────────────
  
   openUserModal(user: UserDTO.AdminUserDTO): void {
     this.selectedUser      = user;
@@ -153,22 +160,30 @@ export class AdminUser implements OnInit {
     this.editError         = '';
     this.editSuccess       = '';
     this.visibleScoreHistory = 5;
+    this.visibleFines = 5;
+    this.visibleLoans = 5;
+    this.visibleItems = 5;
+    this.finesCollapsed = false;
+    this.loansCollapsed = false;
+    this.itemsCollapsed = false;
+    this.scoreHistoryCollapsed = false;
  
     this.userService.getUserById(user.id).subscribe({
       next: (detail) => {
+        console.log('User detail loaded:', detail);
         this.userDetail      = detail;
         this.isLoadingDetail = false;
         this.cdr.detectChanges();
       },
-      error: () => {
+      error: (err) => {
+        console.error('Failed to load user detail:', err);
         this.isLoadingDetail = false;
-        this.showUserModal   = false;
+        this.actionError = err.error?.message ?? 'Failed to load user details.';
         this.cdr.detectChanges();
       }
     });
   }
  
-  // ─── Score adjustment ────────────────────────────────────────────────────
  
   adjustScore(): void {
     if (!this.userDetail || !this.scoreAdjustment) return;
@@ -203,7 +218,6 @@ export class AdminUser implements OnInit {
     });
   }
  
-  // ─── Edit ────────────────────────────────────────────────────────────────
  
   openEdit(): void {
     if (!this.userDetail) return;
@@ -244,8 +258,6 @@ export class AdminUser implements OnInit {
     });
   }
  
-  // ─── Toggle verified ─────────────────────────────────────────────────────
- 
   toggleVerified(): void {
     if (!this.userDetail) return;
     this.actionError = '';
@@ -267,8 +279,6 @@ export class AdminUser implements OnInit {
       }
     });
   }
- 
-  // ─── Delete ──────────────────────────────────────────────────────────────
  
   deleteUser(): void {
     if (!this.userDetail) return;
@@ -294,7 +304,6 @@ export class AdminUser implements OnInit {
     });
   }
  
-  // ─── Helpers ─────────────────────────────────────────────────────────────
  
   getInitials(name: string): string {
     return name?.split(' ').map(n => n[0]).join('').toUpperCase().slice(0, 2) ?? '';
@@ -317,15 +326,15 @@ export class AdminUser implements OnInit {
  
   getLoanStatusClass(status: string): string {
     switch (status?.toLowerCase()) {
-      case 'active':       return 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20';
-      case 'approved':     return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-      case 'returned':     return 'bg-cyan-400/10 text-cyan-400 border-cyan-400/20';
-      case 'late':         return 'bg-red-400/10 text-red-400 border-red-400/20';
-      case 'pending':
-      case 'adminpending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
-      case 'cancelled':
-      case 'rejected':     return 'bg-zinc-700 text-zinc-400 border-zinc-600';
-      default:             return 'bg-zinc-800 text-zinc-400 border-zinc-700';
+      case 'active': return 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20';
+      case 'approved': return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
+      case 'returned': return 'bg-cyan-600 text-white border-zinc-400/20';
+      case 'late': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
+      case 'adminpending': return 'bg-indigo-400/10 text-indigo-400 border-indigo-400/20';
+      case 'cancelled': return 'bg-zinc-700/50 text-zinc-500 border-zinc-600/50';
+      case 'rejected': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
   }
  
@@ -335,6 +344,16 @@ export class AdminUser implements OnInit {
       case 'PendingVerification': return 'text-amber-400';
       case 'Paid':                return 'text-emerald-400';
       default:                    return 'text-zinc-400';
+    }
+  }
+
+  getConditionClass(condition: string): string {
+    switch (condition?.toLowerCase()) {
+      case 'excellent': return 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20';
+      case 'good': return 'bg-blue-500/10 text-blue-400 border-blue-500/20';
+      case 'fair': return 'bg-amber-500/10 text-amber-400 border-amber-500/20';
+      case 'poor': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
+      default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
   }
 }

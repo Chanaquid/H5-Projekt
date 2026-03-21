@@ -20,6 +20,7 @@ import { ResolutionCenter } from './components/resolution-center/resolution-cent
 import { Chat } from './components/chat/chat';
 import { AdminLoan } from './components/admin-loan/admin-loan';
 import { AdminUser } from './components/admin-user/admin-user';
+import { AdminVerification } from './components/admin-verification/admin-verification';
 
 export const authGuard : CanActivateFn = () => {
     const auth = inject(AuthService);
@@ -45,6 +46,7 @@ export const routes: Routes = [
     { path: 'admin-items', component: AdminItem, canActivate: [AdminGuard] },
     { path: 'admin-loans', component: AdminLoan, canActivate: [AdminGuard] },
     { path: 'admin-users', component: AdminUser, canActivate: [AdminGuard] },
+    { path: 'admin-verifications', component: AdminVerification, canActivate: [AdminGuard] },
 
     { path: '404', component: PageNotFound },
     { path: '**', redirectTo: '/404' }

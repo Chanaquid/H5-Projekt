@@ -57,6 +57,15 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<VerificationRequest>> GetAllAsync()
+        {
+            return await _context.VerificationRequests
+                .Include(v => v.User)
+                .Include(v => v.ReviewedByAdmin)
+                .OrderByDescending(v => v.SubmittedAt)
+                .ToListAsync();
+        }
+
         //Admin use — full verification history for a specific user
         public async Task<List<VerificationRequest>> GetAllByUserIdAsync(string userId)
         {

@@ -41,6 +41,15 @@ namespace backend.Controllers
         }
 
 
+        [HttpGet("admin/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAllRequests()
+        {
+            var requests = await _verificationService.GetAllAsync();
+            return Ok(requests);
+        }
+
+
         //GET - Admin gets all verification pending requests
         [HttpGet("admin/pending")]
         [Authorize(Roles = "Admin")]

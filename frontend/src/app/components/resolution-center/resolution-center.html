@@ -36,11 +36,11 @@
             <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; onTabChange()"
                 class="flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer"
                 [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
-                [class.text-zinc-400]="activeTab !== tab.key" [class.hover:text-white]="activeTab !== tab.key">
+                [class.text-zinc-200]="activeTab !== tab.key" [class.hover:text-white]="activeTab !== tab.key">
                 <span>{{ tab.icon }}</span>
                 {{ tab.label }}
                 <span *ngIf="tab.count !== null" class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
-                    [class.bg-zinc-900]="activeTab === tab.key" [class.text-zinc-700]="activeTab === tab.key"
+                    [class.bg-zinc-900]="activeTab === tab.key" [class.text-zinc-200]="activeTab === tab.key"
                     [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-500]="activeTab !== tab.key">
                     {{ tab.count }}
                 </span>

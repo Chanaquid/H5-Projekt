@@ -1,0 +1,474 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10"></div>
+
+<app-navbar></app-navbar>
+
+<main class="pt-16 min-h-screen">
+
+  <!-- Header -->
+  <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+    <div class="flex items-center gap-3 mb-1">
+      <a routerLink="/admin-dashboard" class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors no-underline">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+        Dashboard
+      </a>
+      <span class="text-zinc-700">/</span>
+      <span class="text-zinc-500 text-xs">Verifications</span>
+    </div>
+    <div class="mt-2">
+      <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight" style="font-family:'Syne',sans-serif">
+        Verifications
+      </h1>
+      <p class="text-zinc-500 text-sm mt-1">Review identity and payment verification requests</p>
+    </div>
+    <div class="flex items-center gap-6 mt-6 flex-wrap">
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
+        <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ userPendingCount }}</span> Identity pending</span>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
+        <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ paymentPendingCount }}</span> Payment pending</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="px-6 md:px-10 py-8">
+
+    <!-- Main tabs -->
+    <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit mb-8">
+      <button (click)="activeTab = 'user'"
+        class="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+        [class.bg-amber-400]="activeTab === 'user'" [class.text-zinc-900]="activeTab === 'user'"
+        [class.text-zinc-400]="activeTab !== 'user'">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+        </svg>
+        Identity Verifications
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+          [class.bg-zinc-900]="activeTab === 'user'" [class.text-amber-400]="activeTab === 'user'"
+          [class.bg-zinc-800]="activeTab !== 'user'" [class.text-zinc-500]="activeTab !== 'user'">
+          {{ userPendingCount }}
+        </span>
+      </button>
+      <button (click)="activeTab = 'payment'"
+        class="flex items-center gap-2 px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+        [class.bg-amber-400]="activeTab === 'payment'" [class.text-zinc-900]="activeTab === 'payment'"
+        [class.text-zinc-400]="activeTab !== 'payment'">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+        </svg>
+        Payment Verifications
+        <span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+          [class.bg-zinc-900]="activeTab === 'payment'" [class.text-amber-400]="activeTab === 'payment'"
+          [class.bg-zinc-800]="activeTab !== 'payment'" [class.text-zinc-500]="activeTab !== 'payment'">
+          {{ paymentPendingCount }}
+        </span>
+      </button>
+    </div>
+
+    <!-- ══ USER VERIFICATIONS ══ -->
+    <div *ngIf="activeTab === 'user'">
+
+      <!-- Filter tabs -->
+      <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit mb-6">
+        <button (click)="userVerificationFilter = 'all'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="userVerificationFilter === 'all'" [class.text-zinc-900]="userVerificationFilter === 'all'"
+          [class.text-zinc-400]="userVerificationFilter !== 'all'">
+          All ({{ allUserVerifications.length }})
+        </button>
+        <button (click)="userVerificationFilter = 'Pending'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="userVerificationFilter === 'Pending'" [class.text-zinc-900]="userVerificationFilter === 'Pending'"
+          [class.text-zinc-400]="userVerificationFilter !== 'Pending'">
+          Pending ({{ userPendingCount }})
+        </button>
+        <button (click)="userVerificationFilter = 'Approved'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="userVerificationFilter === 'Approved'" [class.text-zinc-900]="userVerificationFilter === 'Approved'"
+          [class.text-zinc-400]="userVerificationFilter !== 'Approved'">
+          Approved ({{ userApprovedCount }})
+        </button>
+        <button (click)="userVerificationFilter = 'Rejected'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="userVerificationFilter === 'Rejected'" [class.text-zinc-900]="userVerificationFilter === 'Rejected'"
+          [class.text-zinc-400]="userVerificationFilter !== 'Rejected'">
+          Rejected ({{ userRejectedCount }})
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingUser" class="space-y-3">
+        <div *ngFor="let _ of [1,2,3]" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 animate-pulse">
+          <div class="flex items-center gap-4">
+            <div class="w-12 h-12 bg-zinc-800 rounded-xl shrink-0"></div>
+            <div class="flex-1 space-y-2">
+              <div class="h-4 bg-zinc-800 rounded w-48"></div>
+              <div class="h-3 bg-zinc-800 rounded w-64"></div>
+            </div>
+            <div class="w-24 h-8 bg-zinc-800 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!isLoadingUser && filteredUserVerifications.length === 0"
+        class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">Nothing here</h3>
+        <p class="text-zinc-500 text-sm">No {{ userVerificationFilter === 'all' ? '' : userVerificationFilter.toLowerCase() }} identity verification requests.</p>
+      </div>
+
+      <!-- List -->
+      <div *ngIf="!isLoadingUser && filteredUserVerifications.length > 0" class="space-y-4">
+        <div *ngFor="let v of filteredUserVerifications"
+          class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+          <div class="flex items-center gap-4 p-5">
+            <div class="w-12 h-12 rounded-xl bg-zinc-700 shrink-0 flex items-center justify-center text-sm font-bold text-amber-400">
+              {{ getInitials(v.userName) }}
+            </div>
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                <p class="text-white text-sm font-semibold" style="font-family:'Syne',sans-serif">{{ v.userName }}</p>
+                <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md border" [ngClass]="getVerificationStatusClass(v.status)">
+                  {{ v.status }}
+                </span>
+                <span class="text-[10px] font-bold uppercase bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded-md">
+                  {{ getDocTypeLabel(v.documentType) }}
+                </span>
+              </div>
+              <p class="text-zinc-500 text-xs">
+                {{ v.userEmail }}
+                <span class="text-zinc-700 mx-1.5">·</span>
+                Submitted {{ v.submittedAt | date:'MMM d, yyyy · HH:mm' }}
+                <ng-container *ngIf="v.reviewedAt">
+                  <span class="text-zinc-700 mx-1.5">·</span>
+                  Reviewed {{ v.reviewedAt | date:'MMM d, yyyy' }}
+                </ng-container>
+              </p>
+              <p *ngIf="v.adminNote" class="text-zinc-400 text-xs mt-1 italic">Note: "{{ v.adminNote }}"</p>
+              <p *ngIf="v.reviewedByAdminName" class="text-zinc-600 text-[10px] mt-0.5">By {{ v.reviewedByAdminName }}</p>
+            </div>
+            <button *ngIf="v.status === 'Pending'" (click)="openUserDecision(v)"
+              class="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              Review
+            </button>
+          </div>
+
+          <!-- Document preview -->
+          <div class="px-5 pb-5">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Document</p>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative"
+              (click)="lightboxUrl = v.documentUrl">
+              <img [src]="v.documentUrl" class="w-full max-h-48 object-cover"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+              <div class="hidden items-center justify-center gap-2 py-8 text-zinc-500">
+                <a [href]="v.documentUrl" target="_blank" class="text-amber-400 text-xs hover:text-amber-300">Open document ↗</a>
+              </div>
+              <div class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded-lg">Click to enlarge</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PAYMENT VERIFICATIONS ══ -->
+    <div *ngIf="activeTab === 'payment'">
+
+      <!-- Filter tabs -->
+      <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 w-fit mb-6">
+        <button (click)="paymentVerificationFilter = 'all'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="paymentVerificationFilter === 'all'" [class.text-zinc-900]="paymentVerificationFilter === 'all'"
+          [class.text-zinc-400]="paymentVerificationFilter !== 'all'">
+          All ({{ allPaymentVerifications.length }})
+        </button>
+        <button (click)="paymentVerificationFilter = 'PendingVerification'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="paymentVerificationFilter === 'PendingVerification'" [class.text-zinc-900]="paymentVerificationFilter === 'PendingVerification'"
+          [class.text-zinc-400]="paymentVerificationFilter !== 'PendingVerification'">
+          Pending ({{ paymentPendingCount }})
+        </button>
+        <button (click)="paymentVerificationFilter = 'Paid'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="paymentVerificationFilter === 'Paid'" [class.text-zinc-900]="paymentVerificationFilter === 'Paid'"
+          [class.text-zinc-400]="paymentVerificationFilter !== 'Paid'">
+          Paid ({{ paymentPaidCount }})
+        </button>
+        <button (click)="paymentVerificationFilter = 'Unpaid'"
+          class="px-3 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
+          [class.bg-amber-400]="paymentVerificationFilter === 'Unpaid'" [class.text-zinc-900]="paymentVerificationFilter === 'Unpaid'"
+          [class.text-zinc-400]="paymentVerificationFilter !== 'Unpaid'">
+          Unpaid ({{ paymentUnpaidCount }})
+        </button>
+      </div>
+
+      <!-- Loading -->
+      <div *ngIf="isLoadingPayment" class="space-y-3">
+        <div *ngFor="let _ of [1,2,3]" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 animate-pulse">
+          <div class="flex items-center gap-4">
+            <div class="flex-1 space-y-2">
+              <div class="h-4 bg-zinc-800 rounded w-48"></div>
+              <div class="h-3 bg-zinc-800 rounded w-64"></div>
+            </div>
+            <div class="w-24 h-8 bg-zinc-800 rounded-xl"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Empty -->
+      <div *ngIf="!isLoadingPayment && filteredPaymentVerifications.length === 0"
+        class="flex flex-col items-center justify-center py-24 text-center">
+        <div class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-zinc-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="1.5">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+        </div>
+        <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">Nothing here</h3>
+        <p class="text-zinc-500 text-sm">No {{ paymentVerificationFilter === 'all' ? '' : paymentVerificationFilter.toLowerCase() }} payment verifications.</p>
+      </div>
+
+      <!-- List -->
+      <div *ngIf="!isLoadingPayment && filteredPaymentVerifications.length > 0" class="space-y-4">
+        <div *ngFor="let fine of filteredPaymentVerifications"
+          class="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
+
+          <div class="flex items-center gap-4 p-5">
+            <div class="flex-1 min-w-0">
+              <div class="flex items-center gap-2 mb-1 flex-wrap">
+                <p class="text-white text-sm font-semibold" style="font-family:'Syne',sans-serif">{{ fine.itemTitle }}</p>
+                <span class="text-xs font-bold uppercase px-2 py-0.5 rounded-lg border" [ngClass]="getFineStatusClass(fine.status)">
+                  {{ fine.status }}
+                </span>
+                <span class="text-[10px] font-bold uppercase bg-zinc-800 text-zinc-400 border border-zinc-700 px-1.5 py-0.5 rounded-md">
+                  {{ fine.type }}
+                </span>
+              </div>
+              <p class="text-zinc-500 text-xs">
+                Fine #{{ fine.id }}
+                <span class="text-zinc-700 mx-1.5">·</span>
+                Loan #{{ fine.loanId }}
+                <span class="text-zinc-700 mx-1.5">·</span>
+                Issued {{ fine.createdAt | date:'MMM d, yyyy' }}
+              </p>
+              <p *ngIf="fine.paymentDescription" class="text-zinc-400 text-xs mt-1 italic">"{{ fine.paymentDescription }}"</p>
+              <p *ngIf="fine.rejectionReason" class="text-red-400 text-xs mt-1">Rejected: {{ fine.rejectionReason }}</p>
+            </div>
+            <div class="text-right shrink-0 mr-2">
+              <p class="font-black text-xl text-white leading-none" style="font-family:'Syne',sans-serif">kr {{ fine.amount }}</p>
+              <p class="text-zinc-500 text-[10px] mt-0.5">fine amount</p>
+            </div>
+            <button *ngIf="fine.status === 'PendingVerification'" (click)="openPaymentDecision(fine)"
+              class="flex items-center gap-1.5 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 text-xs font-semibold rounded-xl transition-all duration-200 cursor-pointer shrink-0">
+              <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+              </svg>
+              Review
+            </button>
+          </div>
+
+          <!-- Payment proof -->
+          <div *ngIf="fine.paymentProofImageUrl" class="px-5 pb-5">
+            <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Payment Proof</p>
+            <div class="bg-zinc-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity relative"
+              (click)="lightboxUrl = fine.paymentProofImageUrl!">
+              <img [src]="fine.paymentProofImageUrl" class="w-full max-h-48 object-cover"
+                onerror="this.style.display='none'; this.nextElementSibling.style.display='flex'"/>
+              <div class="hidden items-center justify-center gap-2 py-8 text-zinc-500">
+                <a [href]="fine.paymentProofImageUrl" target="_blank" class="text-amber-400 text-xs hover:text-amber-300">Open proof ↗</a>
+              </div>
+              <div class="absolute top-2 right-2 bg-black/60 text-white text-[10px] px-2 py-1 rounded-lg">Click to enlarge</div>
+            </div>
+          </div>
+
+          <div *ngIf="!fine.paymentProofImageUrl && fine.status === 'PendingVerification'" class="px-5 pb-5">
+            <div class="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
+              <p class="text-amber-400 text-xs">No payment proof image was submitted.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+
+<!-- ══ USER DECISION MODAL ══ -->
+<div *ngIf="showUserDecisionModal && selectedVerification" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showUserDecisionModal = false"></div>
+  <div class="relative z-10 w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-5">
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">Review Identity</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">{{ selectedVerification.userName }} · {{ selectedVerification.userEmail }}</p>
+      </div>
+      <button (click)="showUserDecisionModal = false"
+        class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 text-xs">
+      <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+        <p class="text-zinc-500 mb-0.5">Document Type</p>
+        <p class="text-white font-medium">{{ getDocTypeLabel(selectedVerification.documentType) }}</p>
+      </div>
+      <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+        <p class="text-zinc-500 mb-0.5">Submitted</p>
+        <p class="text-white font-medium">{{ selectedVerification.submittedAt | date:'MMM d, yyyy · HH:mm' }}</p>
+      </div>
+    </div>
+
+    <div>
+      <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Document</p>
+      <div class="bg-zinc-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+        (click)="lightboxUrl = selectedVerification.documentUrl">
+        <img [src]="selectedVerification.documentUrl" class="w-full max-h-48 object-cover rounded-xl"/>
+      </div>
+      <a [href]="selectedVerification.documentUrl" target="_blank"
+        class="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-xs mt-2 transition-colors no-underline">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Open in new tab
+      </a>
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">
+        Admin Note <span class="text-red-400">(required when rejecting)</span>
+      </label>
+      <textarea [(ngModel)]="userDecisionNote" rows="3" placeholder="Add a note..."
+        class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
+    </div>
+
+    <p *ngIf="userDecisionError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{{ userDecisionError }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="decideUser(false)" [disabled]="isDecidingUser"
+        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-zinc-800 hover:bg-red-500/10 border border-zinc-700 hover:border-red-500/30 text-zinc-300 hover:text-red-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Reject
+      </button>
+      <button (click)="decideUser(true)" [disabled]="isDecidingUser"
+        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ isDecidingUser ? 'Processing...' : 'Approve' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- ══ PAYMENT DECISION MODAL ══ -->
+<div *ngIf="showPaymentDecisionModal && selectedFine" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+  <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showPaymentDecisionModal = false"></div>
+  <div class="relative z-10 w-full max-w-md bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl p-6 space-y-5">
+
+    <div class="flex items-center justify-between">
+      <div>
+        <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">Review Payment</h2>
+        <p class="text-zinc-500 text-xs mt-0.5">Fine #{{ selectedFine.id }} · {{ selectedFine.itemTitle }}</p>
+      </div>
+      <button (click)="showPaymentDecisionModal = false"
+        class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800 cursor-pointer">
+        <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="grid grid-cols-2 gap-3 text-xs">
+      <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+        <p class="text-zinc-500 mb-0.5">Amount</p>
+        <p class="font-black text-white text-lg leading-none" style="font-family:'Syne',sans-serif">kr {{ selectedFine.amount }}</p>
+      </div>
+      <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+        <p class="text-zinc-500 mb-0.5">Type</p>
+        <p class="text-white font-medium">{{ selectedFine.type }}</p>
+      </div>
+      <div *ngIf="selectedFine.paymentDescription" class="bg-zinc-800 rounded-xl px-3 py-2.5 col-span-2">
+        <p class="text-zinc-500 mb-0.5">User's Note</p>
+        <p class="text-zinc-300 italic">"{{ selectedFine.paymentDescription }}"</p>
+      </div>
+    </div>
+
+    <div *ngIf="selectedFine.paymentProofImageUrl">
+      <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Payment Proof</p>
+      <div class="bg-zinc-800 rounded-xl overflow-hidden cursor-pointer hover:opacity-90 transition-opacity"
+        (click)="lightboxUrl = selectedFine.paymentProofImageUrl!">
+        <img [src]="selectedFine.paymentProofImageUrl" class="w-full max-h-48 object-cover rounded-xl"/>
+      </div>
+      <a [href]="selectedFine.paymentProofImageUrl" target="_blank"
+        class="flex items-center gap-1 text-amber-400 hover:text-amber-300 text-xs mt-2 transition-colors no-underline">
+        <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+        </svg>
+        Open in new tab
+      </a>
+    </div>
+
+    <div *ngIf="!selectedFine.paymentProofImageUrl"
+      class="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3">
+      <p class="text-amber-400 text-xs">No payment proof image was submitted.</p>
+    </div>
+
+    <div class="space-y-1.5">
+      <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">
+        Rejection Reason <span class="text-red-400">(required when rejecting)</span>
+      </label>
+      <textarea [(ngModel)]="paymentDecisionNote" rows="2" placeholder="Explain why the payment is rejected..."
+        class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
+    </div>
+
+    <p *ngIf="paymentDecisionError" class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{{ paymentDecisionError }}</p>
+
+    <div class="flex gap-3">
+      <button (click)="decidePayment(false)" [disabled]="isDecidingPayment"
+        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-zinc-800 hover:bg-red-500/10 border border-zinc-700 hover:border-red-500/30 text-zinc-300 hover:text-red-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+        </svg>
+        Reject
+      </button>
+      <button (click)="decidePayment(true)" [disabled]="isDecidingPayment"
+        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7"/>
+        </svg>
+        {{ isDecidingPayment ? 'Processing...' : 'Confirm Paid' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+
+<!-- Lightbox -->
+<div *ngIf="lightboxUrl" class="fixed inset-0 z-[110] flex items-center justify-center p-4 bg-black/90"
+  (click)="lightboxUrl = null">
+  <img [src]="lightboxUrl" class="max-w-full max-h-full rounded-2xl shadow-2xl object-contain"/>
+  <button class="absolute top-4 right-4 text-white/60 hover:text-white transition-colors cursor-pointer">
+    <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"/>
+    </svg>
+  </button>
+</div>

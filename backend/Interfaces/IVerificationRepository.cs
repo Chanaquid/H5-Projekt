@@ -10,6 +10,7 @@ namespace backend.Interfaces
         Task<VerificationRequest?> GetLatestByUserIdAsync(string userId); //Most recent regardless of status
         Task<List<VerificationRequest>> GetAllPendingAsync();
         Task<List<VerificationRequest>> GetAllByUserIdAsync(string userId);//Admin use — get full verification history for a user
+        Task<List<VerificationRequest>> GetAllAsync();
 
         Task AddAsync(VerificationRequest request);
         void Update(VerificationRequest request);

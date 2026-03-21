@@ -40,8 +40,8 @@ export class Landing implements OnInit {
     this.itemService.getAll().subscribe({
       next: (items) => {
         this.stats.activeItems = items.length.toString() + '+';
-        console.log(items);
-
+          console.log(items);
+          console.log(this.stats.members)
         // Take the 4 most recent and map to template shape
         this.featuredItems = items.slice(0, 4).map(item => ({
           id: item.id,

@@ -8,6 +8,7 @@ namespace backend.Interfaces
         Task<List<Fine>> GetAllUnpaidAsync();
         Task<Fine?> GetByIdAsync(int fineId);
         Task<List<Fine>> GetByDisputeIdAsync(int disputeId);
+        Task<List<Fine>> GetAllAsync();
 
         Task<Fine?> GetByIdWithDetailsAsync(int fineId); //Includes Loan + Loan.Item
         Task<List<Fine>> GetPendingVerificationAsync();

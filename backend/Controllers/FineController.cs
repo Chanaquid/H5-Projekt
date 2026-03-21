@@ -36,6 +36,16 @@ namespace backend.Controllers
             return Ok(fines);
         }
 
+
+        [HttpGet("admin/all")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> GetAll()
+        {
+            var fines = await _fineService.GetAllFinesAsync();
+            return Ok(fines);
+        }
+
+
         //POST - User marks fine as paid for themselves
         [HttpPost("pay")]
         public async Task<IActionResult> MarkAsPaid([FromBody] FineDTO.PayFineDTO dto)

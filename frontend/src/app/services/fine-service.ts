@@ -43,6 +43,10 @@ export class FineService {
     return this.http.get<FineDTO.FineResponseDTO[]>(`${this.baseUrl}/dispute/${disputeId}`);
   }
 
+  getAllAdmin(): Observable<FineDTO.FineResponseDTO[]> {
+    return this.http.get<FineDTO.FineResponseDTO[]>(`${this.baseUrl}/admin/all`);
+  }
+
   // POST /api/fines/admin/issue
   adminIssueFine(dto: FineDTO.AdminIssueFineDTO): Observable<FineDTO.FineResponseDTO> {
     return this.http.post<FineDTO.FineResponseDTO>(`${this.baseUrl}/admin/issue`, dto);
