@@ -291,6 +291,19 @@ namespace backend.Services
             return loans.Select(l => MapToSummaryDTO(l, ownerId)).ToList();
         }
 
+        public async Task<List<LoanDTO.LoanSummaryDTO>> GetLoanHistoryByItemIdAsync(int itemId, string requestingUserId, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdAsync(itemId);
+            if (item == null)
+                throw new KeyNotFoundException($"Item {itemId} not found.");
+
+            if (!isAdmin && item.OwnerId != requestingUserId)
+                throw new UnauthorizedAccessException("You do not have access to this item's loan history.");
+
+            var loans = await _loanRepository.GetLoanHistoryByItemIdAsync(itemId);
+            return loans.Select(l => MapToSummaryDTO(l, requestingUserId)).ToList();
+        }
+
         //Get loan by id
         public async Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId, bool isAdmin = false)
         {
@@ -551,8 +564,6 @@ namespace backend.Services
             await _loanRepository.SaveChangesAsync();
         }
 
-
-
         private static LoanDTO.LoanDetailDTO MapToDetailDTO(Loan l, string? requestingUserId)
         {
             var daysOverdue = l.Status == LoanStatus.Late || (l.Status == LoanStatus.Active && l.EndDate < DateTime.UtcNow)
@@ -585,7 +596,9 @@ namespace backend.Services
                     AvailableUntil = l.Item.AvailableUntil,
                     PrimaryPhotoUrl = l.SnapshotPhotos?.OrderBy(p => p.DisplayOrder).FirstOrDefault()?.PhotoUrl,
                     OwnerId = l.Item.OwnerId,
-                    OwnerName = l.Item.Owner?.FullName ?? string.Empty
+                    OwnerName = l.Item.Owner?.FullName ?? string.Empty,
+                    OwnerUsername = l.Item.Owner?.UserName ?? string.Empty,
+                    OwnerAvatarUrl = l.Item.Owner?.AvatarUrl ?? string.Empty
                 },
                 Owner = new UserDTO.UserSummaryDTO
                 {
@@ -602,7 +615,7 @@ namespace backend.Services
                     FullName = l.Borrower.FullName,
                     Username = l.Borrower.UserName ?? string.Empty,
                     Score = l.Borrower.Score,
-                    IsVerified = l.Item.Owner.IsVerified,
+                    IsVerified = l.Borrower.IsVerified,
                     AvatarUrl = l.Borrower.AvatarUrl
                 },
                 SnapshotPhotos = l.SnapshotPhotos?.OrderBy(p => p.DisplayOrder).Select(p => new LoanDTO.LoanSnapshotPhotoDTO
@@ -646,10 +659,13 @@ namespace backend.Services
             {
                 Id = l.Id,
                 ItemTitle = l.Item?.Title ?? string.Empty,
-                ItemPrimaryPhoto = l.Item?.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl,
+                ItemPrimaryPhoto = l.Item?.Photos?.FirstOrDefault(p => p.IsPrimary)?.PhotoUrl ?? l.SnapshotPhotos?.OrderBy(p => p.DisplayOrder).FirstOrDefault()?.PhotoUrl,
                 OtherPartyName = isViewingAsBorrower
-                                        ? l.Item?.Owner?.FullName ?? string.Empty
-                                        : l.Borrower?.FullName ?? string.Empty,
+                    ? l.Item?.Owner?.FullName ?? string.Empty
+                    : l.Borrower?.FullName ?? string.Empty,
+                OtherPartyUsername = isViewingAsBorrower
+                    ? l.Item?.Owner?.UserName ?? string.Empty
+                    : l.Borrower?.UserName ?? string.Empty,
                 StartDate = l.StartDate,
                 EndDate = l.EndDate,
                 ActualReturnDate = l.ActualReturnDate,

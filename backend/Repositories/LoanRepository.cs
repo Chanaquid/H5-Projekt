@@ -71,7 +71,22 @@ namespace backend.Repositories
         {
             return await _context.Loans
                 .Include(l => l.Item)
+                    .ThenInclude(i => i.Photos)
                 .Include(l => l.Borrower)
+                .OrderByDescending(l => l.CreatedAt)
+                .ToListAsync();
+        }
+
+
+        public async Task<List<Loan>> GetLoanHistoryByItemIdAsync(int itemId)
+        {
+            return await _context.Loans
+                .Include(l => l.Item)
+                    .ThenInclude(i => i.Photos)
+                .Include(l => l.Item)
+                    .ThenInclude(i => i.Owner)
+                .Include(l => l.Borrower)
+                .Where(l => l.ItemId == itemId)
                 .OrderByDescending(l => l.CreatedAt)
                 .ToListAsync();
         }

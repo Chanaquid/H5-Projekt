@@ -24,7 +24,8 @@ namespace backend.Controllers
         public async Task<IActionResult> GetThread(int loanId)
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
-            var thread = await _loanMessageService.GetThreadAsync(loanId, userId);
+            var isAdmin = User.IsInRole("Admin");
+            var thread = await _loanMessageService.GetThreadAsync(loanId, userId, isAdmin);
             return Ok(thread);
         }
 

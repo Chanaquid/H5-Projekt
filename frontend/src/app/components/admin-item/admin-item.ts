@@ -263,15 +263,17 @@ export class AdminItem implements OnInit {
     });
   }
 
+ 
   getLoanStatusClass(status: string): string {
     switch (status?.toLowerCase()) {
       case 'active': return 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20';
       case 'approved': return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-      case 'returned': return 'bg-zinc-300/10 text-zinc-300 border-zinc-300/20';
-      case 'late': return 'bg-red-400/10 text-red-400 border-red-400/20';
+      case 'returned': return 'bg-cyan-600 text-white border-zinc-400/20';
+      case 'late': return 'bg-red-500/10 text-red-400 border-red-500/20';
       case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
-      case 'cancelled':
-      case 'rejected': return 'bg-zinc-700 text-zinc-400 border-zinc-600';
+      case 'adminpending': return 'bg-indigo-400/10 text-indigo-400 border-indigo-400/20';
+      case 'cancelled': return 'bg-zinc-700/50 text-zinc-500 border-zinc-600/50';
+      case 'rejected': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
   }

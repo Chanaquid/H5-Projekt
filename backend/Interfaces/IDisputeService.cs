@@ -9,6 +9,7 @@ namespace backend.Interfaces
         Task<DisputeDTO.DisputeDetailDTO> SubmitResponseAsync(int disputeId, string responderId, DisputeDTO.DisputeResponseDTO dto);
         Task<DisputeDTO.DisputeDetailDTO> GetByIdAsync(int disputeId, string requestingUserId);
         Task<List<DisputeDTO.DisputeSummaryDTO>> GetDisputesByUserIdAsync(string userId);
+        Task<List<DisputeDTO.DisputeSummaryDTO>> GetDisputeHistoryByItemIdAsync(int itemId, string requestingUserId, bool isAdmin = false);
 
         //Photo upload
         Task AddPhotoAsync(int disputeId, string submittedById, string photoUrl, string? caption);

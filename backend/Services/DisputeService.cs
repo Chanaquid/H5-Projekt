@@ -12,18 +12,20 @@ namespace backend.Services
         private readonly ILoanRepository _loanRepository;
         private readonly IFineService _fineService;
         private readonly INotificationService _notificationService;
-
+        private readonly IItemRepository _itemRepository;
         private const int ResponseWindowHours = 72; //Dispute will be closed in favor of the initiator if the other party doesnt respond within 72 hours
 
         public DisputeService(
             IDisputeRepository disputeRepository,
             ILoanRepository loanRepository,
             IFineService fineService,
+            IItemRepository itemRepository,
             INotificationService notificationService)
         {
             _disputeRepository = disputeRepository;
             _loanRepository = loanRepository;
             _fineService = fineService;
+            _itemRepository = itemRepository;
             _notificationService = notificationService;
         }
 
@@ -194,6 +196,17 @@ namespace backend.Services
         }
 
 
+        public async Task<List<DisputeDTO.DisputeSummaryDTO>> GetDisputeHistoryByItemIdAsync(int itemId, string requestingUserId, bool isAdmin = false)
+        {
+            var item = await _itemRepository.GetByIdAsync(itemId);
+            if (item == null) throw new KeyNotFoundException($"Item {itemId} not found.");
+            if (!isAdmin && item.OwnerId != requestingUserId)
+                throw new UnauthorizedAccessException("You do not have access to this item's dispute history.");
+            var disputes = await _disputeRepository.GetDisputeHistoryByItemIdAsync(itemId);
+            return disputes.Select(MapToSummaryDTO).ToList();
+        }
+
+
         //Admin issues a verdict
         public async Task<DisputeDTO.DisputeDetailDTO> IssueVerdictAsync(int disputeId, string adminId, DisputeDTO.AdminVerdictDTO dto)
         {
@@ -318,7 +331,8 @@ namespace backend.Services
                 LoanId = d.LoanId,
                 ItemTitle = d.Loan?.Item?.Title ?? string.Empty,
                 FiledById = d.FiledById ?? string.Empty,
-                FiledByName = d.FiledBy?.UserName ?? string.Empty,
+                FiledByName = d.FiledBy?.FullName ?? string.Empty,
+                FiledByUsername = d.FiledBy?.UserName ?? string.Empty,
                 FiledAs = d.FiledAs.ToString(),
                 Status = d.Status.ToString(),
                 ResponseDeadline = d.ResponseDeadline,

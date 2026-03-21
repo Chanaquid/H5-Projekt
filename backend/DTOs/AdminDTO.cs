@@ -11,7 +11,8 @@
             public int PendingLoanApprovals { get; set; }  //Low-score users waiting for admin approval
             public int OpenDisputes { get; set; }
             public int PendingAppeals { get; set; }
-            public int PendingVerifications { get; set; } //New users waiting to be verified
+            public int PendingUserVerifications { get; set; } //New users waiting to be verified
+            public int PendingPaymentVerifications { get; set; }
 
             //Platform stats
             public int TotalUsers { get; set; }

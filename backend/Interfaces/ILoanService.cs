@@ -15,6 +15,7 @@ namespace backend.Interfaces
         Task<LoanDTO.LoanDetailDTO> DecideAsync(int loanId, string ownerId, LoanDTO.LoanDecisionDTO dto);
         Task<LoanDTO.LoanDetailDTO> DecideExtensionAsync(int loanId, string ownerId, LoanDTO.ExtensionDecisionDTO dto);
         Task<List<LoanDTO.LoanSummaryDTO>> GetOwnedLoansAsync(string ownerId);
+        Task<List<LoanDTO.LoanSummaryDTO>> GetLoanHistoryByItemIdAsync(int itemId, string requestingUserId, bool isAdmin = false);
 
         //Shared
         Task<LoanDTO.LoanDetailDTO> GetByIdAsync(int loanId, string requestingUserId, bool isAdmin = false);

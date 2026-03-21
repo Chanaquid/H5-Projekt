@@ -737,6 +737,29 @@
         }
       }
     },
+    "/api/disputes/item/{itemId}": {
+      "get": {
+        "tags": [
+          "Dispute"
+        ],
+        "parameters": [
+          {
+            "name": "itemId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
     "/api/disputes": {
       "post": {
         "tags": [
@@ -1684,6 +1707,29 @@
         "parameters": [
           {
             "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Success"
+          }
+        }
+      }
+    },
+    "/api/loans/item/{itemId}": {
+      "get": {
+        "tags": [
+          "Loan"
+        ],
+        "parameters": [
+          {
+            "name": "itemId",
             "in": "path",
             "required": true,
             "schema": {

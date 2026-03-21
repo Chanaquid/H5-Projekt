@@ -12,7 +12,7 @@
     <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
         <div class="flex items-center justify-between gap-4 flex-wrap">
             <div>
-                <p class="text-zinc-500 text-sm font-medium mb-1">Track your borrowing & lending</p>
+                <p class="text-zinc-500 text-sm font-medium mb-1">Track your loans</p>
                 <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight"
                     style="font-family:'Syne',sans-serif">
                     My Loans
@@ -38,7 +38,7 @@
                     Pending</span>
             </div>
             <div class="flex items-center gap-2">
-                <span class="w-2 h-2 bg-zinc-500 rounded-full"></span>
+                <span class="w-2 h-2 bg-rose-500 rounded-full"></span>
                 <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ rejectedCount }}</span>
                     Rejected</span>
             </div>
@@ -66,24 +66,24 @@
                     <button (click)="loanView = 'borrowed'; applyFilters()"
                         class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
                         [class.bg-amber-400]="loanView === 'borrowed'" [class.text-zinc-900]="loanView === 'borrowed'"
-                        [class.text-zinc-400]="loanView !== 'borrowed'">
+                        [class.text-zinc-300]="loanView !== 'borrowed'">
                         📦 Borrowed
                         <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                             [class.bg-zinc-900]="loanView === 'borrowed'"
                             [class.text-amber-400]="loanView === 'borrowed'"
                             [class.bg-zinc-800]="loanView !== 'borrowed'"
-                            [class.text-zinc-500]="loanView !== 'borrowed'">
+                            [class.text-zinc-300]="loanView !== 'borrowed'">
                             {{ borrowedLoans.length }}
                         </span>
                     </button>
                     <button (click)="loanView = 'lent'; applyFilters()"
                         class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
                         [class.bg-amber-400]="loanView === 'lent'" [class.text-zinc-900]="loanView === 'lent'"
-                        [class.text-zinc-400]="loanView !== 'lent'">
+                        [class.text-zinc-300]="loanView !== 'lent'">
                         🤝 Lent out
                         <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                             [class.bg-zinc-900]="loanView === 'lent'" [class.text-amber-400]="loanView === 'lent'"
-                            [class.bg-zinc-800]="loanView !== 'lent'" [class.text-zinc-500]="loanView !== 'lent'">
+                            [class.bg-zinc-800]="loanView !== 'lent'" [class.text-zinc-300]="loanView !== 'lent'">
                             {{ ownedLoans.length }}
                         </span>
                     </button>
@@ -94,11 +94,11 @@
                     <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; applyFilters() "
                         class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer"
                         [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
-                        [class.text-zinc-400]="activeTab !== tab.key">
+                        [class.text-zinc-300]="activeTab !== tab.key">
                         {{ tab.label }}
                         <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
                             [class.bg-zinc-900]="activeTab === tab.key" [class.text-amber-400]="activeTab === tab.key"
-                            [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-500]="activeTab !== tab.key">
+                            [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-300]="activeTab !== tab.key">
                             {{ getTabCount(tab.key) }}
                         </span>
                     </button>
@@ -165,13 +165,15 @@
                             loan.itemTitle }}</p>
                         <span class="text-cyan-400 text-sm font-mono">Loan Id: {{ loan.id }}</span>
 
-                            <p class="text-zinc-500 text-xs mt-0.5">
+                            <p class="text-zinc-400 text-xs mt-0.5">
                             {{ loanView === 'borrowed' ? 'From' : 'To' }}:
                             <span class="text-zinc-300">{{ loan.otherPartyName }}</span>
+                                <span class="text-emerald-400"> (@{{ loan.otherPartyUsername }})</span>
+
                         </p>
                         <div class="flex items-center gap-3 mt-1 flex-wrap">
                             <p class="text-amber-400 text-xs">
-                                {{ loan.startDate | date:'MMM d' }} →
+                                {{ loan.startDate | date:'MMM d, yyyy' }} →
                                 <span *ngIf="loan.status === 'Returned'">{{ loan.actualReturnDate | date:'MMM d, yyyy'
                                     }}</span>
                                 <span *ngIf="loan.status !== 'Returned'">{{ loan.endDate | date:'MMM d, yyyy' }}</span>

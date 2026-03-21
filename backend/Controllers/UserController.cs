@@ -142,8 +142,7 @@ namespace backend.Controllers
 
         // GET - get all users
         [HttpGet]
-        //[Authorize(Roles = "Admin")]
-        [AllowAnonymous]
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsers()
         {
             var result = await _userService.GetAllUsersAsync();

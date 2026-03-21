@@ -9,7 +9,8 @@ export namespace AdminDTO {
     pendingLoanApprovals: number;
     openDisputes: number;
     pendingAppeals: number;
-    pendingVerifications: number;
+    pendingUserVerifications: number;
+    pendingPaymentVerifications: number;
     //Platform stats
     totalUsers: number;
     totalActiveItems: number;

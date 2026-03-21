@@ -23,6 +23,10 @@ export class DisputeService {
     return this.http.get<DisputeDTO.DisputeDetailDTO>(`${this.baseUrl}/${id}`);
   }
 
+  getDisputeHistoryByItemId(itemId: number): Observable<DisputeDTO.DisputeSummaryDTO[]> {
+  return this.http.get<any[]>(`${this.baseUrl}/item/${itemId}`);
+}
+
   // POST create dispute
   create(dto: DisputeDTO.CreateDisputeDTO): Observable<DisputeDTO.DisputeDetailDTO> {
     return this.http.post<DisputeDTO.DisputeDetailDTO>(this.baseUrl, dto);

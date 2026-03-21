@@ -62,6 +62,17 @@ namespace backend.Repositories
                 .ToListAsync();
         }
 
+        public async Task<List<Dispute>> GetDisputeHistoryByItemIdAsync(int itemId)
+        {
+            return await _context.Disputes
+                .Include(d => d.Loan)
+                .Include(d => d.FiledBy)
+                .Where(d => d.Loan.ItemId == itemId)
+                .OrderByDescending(d => d.CreatedAt)
+                .ToListAsync();
+        }
+
+
         //CRUD - cant delete dispute
         public async Task AddAsync(Dispute dispute)
         {

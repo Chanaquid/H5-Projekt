@@ -1,4 +1,5 @@
-﻿using backend.Models;
+﻿using backend.DTOs;
+using backend.Models;
 
 namespace backend.Interfaces
 {
@@ -13,6 +14,7 @@ namespace backend.Interfaces
         Task<List<Loan>> GetPendingAdminApprovalsAsync(); //AdminPending status — low score queue
         Task<List<Loan>> GetActiveAndOverdueAsync(); //For late loan processing job
         Task<bool> HasActiveLoansAsync(string userId); //Used by UserService delete check
+        Task<List<Loan>> GetLoanHistoryByItemIdAsync(int itemId);
 
 
         //CRUD but no delete since we dont want loan to be deleted

@@ -54,9 +54,31 @@ namespace backend.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(403, new { message = ex.Message });
             }
         }
+
+        // GET - Get loan history for an item
+        [HttpGet("item/{itemId}")]
+        public async Task<IActionResult> GetLoanHistoryByItemId(int itemId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+            try
+            {
+                var result = await _loanService.GetLoanHistoryByItemIdAsync(itemId, userId, isAdmin);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex)
+            {
+                return StatusCode(403, new { message = ex.Message });
+            }
+            catch (KeyNotFoundException ex)
+            {
+                return NotFound(new { message = ex.Message });
+            }
+        }
+
 
         //POST — borrower requests a loan
         [HttpPost]
@@ -98,7 +120,7 @@ namespace backend.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
@@ -122,7 +144,7 @@ namespace backend.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
@@ -146,7 +168,7 @@ namespace backend.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {
@@ -174,7 +196,7 @@ namespace backend.Controllers
             }
             catch (UnauthorizedAccessException ex)
             {
-                return Forbid(ex.Message);
+                return StatusCode(403, new { message = ex.Message });
             }
             catch (InvalidOperationException ex)
             {

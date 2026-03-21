@@ -5,7 +5,7 @@
         dispute{{ filteredDisputes.length !== 1 ? 's' : '' }}
     </p>
     <div class="flex items-center gap-2">
-         <button (click)="showCreateModal = true"
+        <button (click)="showCreateModal = true"
             class="flex items-center gap-2 px-4 py-2 bg-amber-400 hover:bg-amber-300 text-zinc-900 font-semibold text-xs rounded-xl transition-all duration-200 cursor-pointer">
             <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
@@ -19,7 +19,7 @@
             <option value="deadline">Deadline soonest</option>
             <option value="status">By status</option>
         </select>
-       
+
     </div>
 </div>
 
@@ -330,7 +330,6 @@
                     </p>
                 </div>
 
-          
 
                 <!-- Other party response -->
                 <div *ngIf="selectedDispute.responseDescription">
@@ -340,8 +339,6 @@
                         <p class="text-zinc-200 text-sm leading-relaxed">{{ selectedDispute.responseDescription }}</p>
                     </div>
                 </div>
-
-
 
                 <!-- Response photos -->
                 <div *ngIf="(selectedDispute.responsePhotos || []).length > 0">
@@ -457,7 +454,7 @@
 
                         <!-- Verdict -->
                         <div class="flex items-center justify-between">
-                            <span class="text-zinc-500 text-xs">Verdict</span>
+                            <span class="text-zinc-400 text-xs">Verdict</span>
                             <span class="text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg border"
                                 [ngClass]="getVerdictClass(selectedDispute.adminVerdict)">
                                 {{ selectedDispute.adminVerdict || '—' }}
@@ -466,7 +463,7 @@
 
                         <!-- Winner -->
                         <div class="flex items-center justify-between">
-                            <span class="text-zinc-500 text-xs">Outcome</span>
+                            <span class="text-zinc-400 text-xs">Outcome</span>
                             <span class="text-white text-xs font-medium">
                                 <ng-container *ngIf="selectedDispute.adminVerdict === 'OwnerFavored'">
                                     🏠 Owner's favour
@@ -482,7 +479,7 @@
 
                         <!-- Resolved on -->
                         <div class="flex items-center justify-between">
-                            <span class="text-zinc-500 text-xs">Resolved on</span>
+                            <span class="text-zinc-400 text-xs">Resolved on</span>
                             <span class="text-white text-xs font-medium">{{ selectedDispute.resolvedAt | date:'MMM d,
                                 yyyy HH:mm' }}</span>
                         </div>
@@ -490,7 +487,7 @@
                         <!-- Fines issued -->
                         <ng-container *ngIf="disputeFines.length > 0">
                             <div class="pt-2 border-t border-zinc-700">
-                                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Fines
+                                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Fine
                                     Issued</p>
                                 <div class="space-y-2">
                                     <div *ngFor="let fine of disputeFines"
@@ -500,12 +497,14 @@
                                             <p class="text-zinc-500 text-[10px]">{{ fine.type }} fine</p>
                                         </div>
                                         <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-md"
-                                            [class.bg-amber-400/10]="fine.status === 'Unpaid'"
-                                            [class.text-amber-400]="fine.status === 'Unpaid'"
+                                            [class.bg-rose-400/10]="fine.status === 'Unpaid'"
+                                            [class.text-rose-400]="fine.status === 'Unpaid'"
+                                            [class.bg-amber-400/10]="fine.status === 'PendingVerification'"
+                                            [class.text-amber-400]="fine.status === 'PendingVerification'"
                                             [class.bg-emerald-400/10]="fine.status === 'Paid'"
                                             [class.text-emerald-400]="fine.status === 'Paid'"
-                                            [class.bg-zinc-700]="fine.status !== 'Unpaid' && fine.status !== 'Paid'"
-                                            [class.text-zinc-400]="fine.status !== 'Unpaid' && fine.status !== 'Paid'">
+                                            [class.bg-zinc-700]="fine.status !== 'Unpaid' && fine.status !== 'Paid' && fine.status !== 'PendingVerification'"
+                                            [class.text-zinc-400]="fine.status !== 'Unpaid' && fine.status !== 'Paid' && fine.status !== 'PendingVerification'">
                                             {{ fine.status }}
                                         </span>
                                     </div>
@@ -514,6 +513,7 @@
                         </ng-container>
 
                         <!-- Score adjustments -->
+                        <!--
                         <ng-container *ngIf="disputeScoreHistory.length > 0">
                             <div class="pt-2 border-t border-zinc-700">
                                 <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">Score
@@ -541,7 +541,7 @@
                                     </div>
                                 </div>
                             </div>
-                        </ng-container>
+                        </ng-container> -->
 
                         <!-- Admin note -->
                         <div *ngIf="selectedDispute.adminNote" class="pt-2 border-t border-zinc-700">

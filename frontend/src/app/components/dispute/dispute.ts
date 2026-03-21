@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpClient } from '@angular/common/http';
 import { DisputeDTO } from '../../dtos/disputeDTO';
-import { Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { DisputeService } from '../../services/dispute-service';
 import { FineService } from '../../services/fine-service';
 import { UserDTO } from '../../dtos/userDTO';
@@ -64,6 +64,7 @@ export class Dispute implements OnInit {
 
   constructor(
     public router: Router,
+    private route: ActivatedRoute,
     private disputeService: DisputeService,
     private fineService: FineService,
     private userService: UserService,
@@ -79,6 +80,14 @@ export class Dispute implements OnInit {
       } catch { }
     }
     this.loadDisputes();
+
+    // Auto-open detail modal if disputeId is in query params
+    this.route.queryParams.subscribe(params => {
+      const disputeId = params['disputeId'];
+      if (disputeId) {
+        this.openDetail(Number(disputeId));
+      }
+    });
   }
 
   private loadDisputes(): void {

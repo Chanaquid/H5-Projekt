@@ -1,4 +1,6 @@
-﻿namespace backend.DTOs
+﻿using System.Text.Json.Serialization;
+
+namespace backend.DTOs
 {
     public class ApiDTO
     {

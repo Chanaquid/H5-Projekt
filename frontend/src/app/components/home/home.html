@@ -167,8 +167,9 @@
           <div class="flex items-center justify-between">
             <div class="flex items-center gap-1.5 text-lg text-zinc-400">
               <div
-                class="w-5 h-5 rounded-full bg-zinc-700 flex items-center justify-center text-[9px] font-bold text-white">
-                {{ getInitials(item.ownerName) }}
+                class="w-5 h-5 rounded-full bg-zinc-700 overflow-hidden flex items-center justify-center text-[9px] font-bold text-white shrink-0">
+                <img *ngIf="item.ownerAvatarUrl" [src]="item.ownerAvatarUrl" class="w-full h-full object-cover" />
+                <span *ngIf="!item.ownerAvatarUrl">{{ getInitials(item.ownerName) }}</span>
               </div>
               {{ item.ownerName }}
             </div>

@@ -3,6 +3,7 @@ using backend.Hubs;
 using backend.Interfaces;
 using backend.Models;
 using backend.Repositories;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
 
 namespace backend.Services
@@ -14,19 +15,22 @@ namespace backend.Services
         private readonly INotificationService _notificationService;
         private readonly IHubContext<ChatHub> _hubContext;
         private readonly IOnlineTracker _onlineTracker;
+        private readonly UserManager<ApplicationUser> _userManager;
 
         public LoanMessageService(
             ILoanMessageRepository loanMessageRepository,
             ILoanRepository loanRepository,
             IHubContext<ChatHub> hubContext,
             INotificationService notificationService,
-            IOnlineTracker onlineTracker)
+            IOnlineTracker onlineTracker,
+            UserManager<ApplicationUser> userManager)
         {
             _loanMessageRepository = loanMessageRepository;
             _loanRepository = loanRepository;
             _hubContext = hubContext;
             _notificationService = notificationService;
             _onlineTracker = onlineTracker;
+            _userManager = userManager;
         }
 
         //Send a message in a loan chat thread
@@ -44,6 +48,16 @@ namespace backend.Services
 
             if (string.IsNullOrWhiteSpace(dto.Content))
                 throw new ArgumentException("Message content cannot be empty.");
+
+            //lock chat agter a week
+            var terminalStatuses = new[] { LoanStatus.Returned, LoanStatus.Cancelled, LoanStatus.Rejected };
+            if (terminalStatuses.Contains(loan.Status))
+            {
+                var lockedAt = loan.ActualReturnDate ?? loan.UpdatedAt ?? loan.CreatedAt;
+                if (lockedAt < DateTime.UtcNow.AddDays(-7))
+                    throw new InvalidOperationException("This loan chat has been locked. Chats are disabled 1 week after a loan is completed.");
+            }
+
 
             var message = new LoanMessage
             {
@@ -111,7 +125,7 @@ namespace backend.Services
         }
 
         //Get full loan chat thread, auto-marks incoming messages as read
-        public async Task<ChatDTO.LoanMessageDTO.LoanMessageThreadDTO> GetThreadAsync(int loanId, string requestingUserId)
+        public async Task<ChatDTO.LoanMessageDTO.LoanMessageThreadDTO> GetThreadAsync(int loanId, string requestingUserId, bool isAdmin = false)
         {
             var loan = await _loanRepository.GetByIdWithDetailsAsync(loanId);
             if (loan == null)
@@ -120,22 +134,25 @@ namespace backend.Services
             var isOwner = loan.Item.OwnerId == requestingUserId;
             var isBorrower = loan.BorrowerId == requestingUserId;
 
-            if (!isOwner && !isBorrower)
+            if (!isOwner && !isBorrower && !isAdmin)
                 throw new UnauthorizedAccessException("You are not a party to this loan.");
 
             var messages = await _loanMessageRepository.GetByLoanIdAsync(loanId);
 
-            //Mark messages from the other party as read on open
-            var unread = messages.Where(m => m.SenderId != requestingUserId && !m.IsRead).ToList();
-            foreach (var m in unread)
-                m.IsRead = true;
-
-            if (unread.Any())
+            // Only mark as read if the user is an actual party, not admin viewing
+            if (!isAdmin)
             {
-                await _loanMessageRepository.SaveChangesAsync();
-                await _hubContext.Clients
-                   .Group($"loan_{loanId}")
-                   .SendAsync("MessagesRead", new { LoanId = loanId, ReadBy = requestingUserId });
+                var unread = messages.Where(m => m.SenderId != requestingUserId && !m.IsRead).ToList();
+                foreach (var m in unread)
+                    m.IsRead = true;
+
+                if (unread.Any())
+                {
+                    await _loanMessageRepository.SaveChangesAsync();
+                    await _hubContext.Clients
+                        .Group($"loan_{loanId}")
+                        .SendAsync("MessagesRead", new { LoanId = loanId, ReadBy = requestingUserId });
+                }
             }
 
             var otherParty = isOwner ? loan.Borrower : loan.Item.Owner;
@@ -185,7 +202,12 @@ namespace backend.Services
             var loan = await _loanRepository.GetByIdWithDetailsAsync(loanId);
             if (loan == null) return false;
 
-            return loan.Item.OwnerId == userId || loan.BorrowerId == userId;
+            var isParty = loan.Item.OwnerId == userId || loan.BorrowerId == userId;
+            if (isParty) return true;
+
+            // Allow admins to join for read-only real-time viewing
+            var user = await _userManager.FindByIdAsync(userId);
+            return user != null && await _userManager.IsInRoleAsync(user, "Admin");
         }
 
         //Mapper

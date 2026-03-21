@@ -53,7 +53,8 @@ export class AdminDashboard implements OnInit {
       this.dashboard.pendingLoanApprovals === 0 &&
       this.dashboard.openDisputes === 0 &&
       this.dashboard.pendingAppeals === 0 &&
-      this.dashboard.pendingVerifications === 0
+      this.dashboard.pendingUserVerifications === 0 &&
+      this.dashboard.pendingPaymentVerifications === 0
     );
   }
 

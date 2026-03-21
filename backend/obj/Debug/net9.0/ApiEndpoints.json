@@ -490,6 +490,22 @@
   },
   {
     "ContainingType": "backend.Controllers.DisputeController",
+    "Method": "GetDisputeHistoryByItemId",
+    "RelativePath": "api/disputes/item/{itemId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "itemId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.DisputeController",
     "Method": "GetMyDisputes",
     "RelativePath": "api/disputes/my",
     "HttpMethod": "GET",
@@ -1188,6 +1204,22 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "backend.Controllers.LoanController",
+    "Method": "GetLoanHistoryByItemId",
+    "RelativePath": "api/loans/item/{itemId}",
+    "HttpMethod": "GET",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "itemId",
+        "Type": "System.Int32",
+        "IsRequired": true
+      }
+    ],
     "ReturnTypes": []
   },
   {

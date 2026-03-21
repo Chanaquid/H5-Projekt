@@ -89,6 +89,9 @@ export namespace ItemDTO {
     categoryIcon?: string;
     ownerId: string;
     ownerName: string;
+    ownerUsername: string;
+    ownerAvatarUrl: string;
+    ownerScore: number;
     averageRating: number;
     reviewCount: number;
     isActive: boolean;

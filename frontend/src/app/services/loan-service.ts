@@ -26,6 +26,10 @@ export class LoanService {
     return this.http.get<LoanDTO.LoanDetailDTO>(`${this.baseUrl}/${id}`);
   }
 
+  getLoansByItemId(itemId: number): Observable<LoanDTO.LoanSummaryDTO[]> {
+    return this.http.get<LoanDTO.LoanSummaryDTO[]>(`${this.baseUrl}/item/${itemId}`);
+  }
+
   // POST — borrower requests a loan
   createLoan(dto: LoanDTO.CreateLoanDTO): Observable<LoanDTO.LoanDetailDTO> {
     return this.http.post<LoanDTO.LoanDetailDTO>(this.baseUrl, dto);

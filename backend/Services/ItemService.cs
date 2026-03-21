@@ -675,6 +675,8 @@ namespace backend.Services
                 CategoryIcon = i.Category?.Icon,
                 OwnerId = i.OwnerId,
                 OwnerName = i.Owner?.FullName ?? string.Empty,
+                OwnerUsername = i.Owner?.UserName ?? string.Empty,
+                OwnerAvatarUrl = i.Owner?.AvatarUrl ?? string.Empty,
                 AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
                 ReviewCount = reviews.Count,
                 IsActive = i.IsActive,

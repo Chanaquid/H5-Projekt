@@ -47,6 +47,21 @@ namespace backend.Controllers
             }
         }
 
+        [HttpGet("item/{itemId}")]
+        public async Task<IActionResult> GetDisputeHistoryByItemId(int itemId)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier)!;
+            var isAdmin = User.IsInRole("Admin");
+            try
+            {
+                var result = await _disputeService.GetDisputeHistoryByItemIdAsync(itemId, userId, isAdmin);
+                return Ok(result);
+            }
+            catch (UnauthorizedAccessException ex) { return StatusCode(403, new { message = ex.Message }); }
+            catch (KeyNotFoundException ex) { return NotFound(new { message = ex.Message }); }
+        }
+
+
         // POST create a dispute
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] DisputeDTO.CreateDisputeDTO dto)

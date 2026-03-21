@@ -53,6 +53,7 @@ export namespace DisputeDTO {
     itemTitle: string;
     filedById: string;
     filedByName: string;
+    filedByUsername: string;
     filedAs: string;
     status: string;
     responseDeadline: string;

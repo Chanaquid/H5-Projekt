@@ -82,6 +82,7 @@
             public string FiledById { get; set; } = string.Empty;
 
             public string FiledByName { get; set; } = string.Empty;
+            public string FiledByUsername {  get; set; } = string.Empty;
             public string FiledAs { get; set; } = string.Empty;
             public string Status { get; set; } = string.Empty;
             public DateTime ResponseDeadline { get; set; }

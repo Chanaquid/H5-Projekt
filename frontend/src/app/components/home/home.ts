@@ -168,6 +168,7 @@ export class Home implements OnInit, AfterViewInit {
         this.allItems = items;
         this.applyFilters();
         this.isLoading = false;
+        console.log('Loaded items:', this.allItems);
         this.cdr.detectChanges();
       },
       error: (err) => {

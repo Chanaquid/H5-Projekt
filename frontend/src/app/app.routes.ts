@@ -18,6 +18,8 @@ import { UserProfile } from './components/user-profile/user-profile';
 import { Favorites } from './components/favorites/favorites';
 import { ResolutionCenter } from './components/resolution-center/resolution-center';
 import { Chat } from './components/chat/chat';
+import { AdminLoan } from './components/admin-loan/admin-loan';
+import { AdminUser } from './components/admin-user/admin-user';
 
 export const authGuard : CanActivateFn = () => {
     const auth = inject(AuthService);
@@ -41,6 +43,8 @@ export const routes: Routes = [
     {path: 'users/:id', component: UserProfile, canActivate: [authGuard]},
     { path: 'admin-dashboard', component: AdminDashboard, canActivate: [AdminGuard] },
     { path: 'admin-items', component: AdminItem, canActivate: [AdminGuard] },
+    { path: 'admin-loans', component: AdminLoan, canActivate: [AdminGuard] },
+    { path: 'admin-users', component: AdminUser, canActivate: [AdminGuard] },
 
     { path: '404', component: PageNotFound },
     { path: '**', redirectTo: '/404' }

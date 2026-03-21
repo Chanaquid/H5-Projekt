@@ -102,6 +102,7 @@ export class Loan implements OnInit {
     }
 
     this.filteredLoans = result;
+    console.log(this.filteredLoans)
     this.cdr.detectChanges();
   }
 

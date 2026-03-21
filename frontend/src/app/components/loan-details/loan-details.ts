@@ -70,6 +70,12 @@ export class LoanDetails implements OnInit, OnDestroy {
   completeError = '';
   qrCodeInput = '';
 
+  //loan cancel
+    isCancellingLoan = false;
+  cancelLoanError = '';
+  showCancelConfirm = false;
+
+
   // Dispute
   showDisputeModal = false;
   disputeForm = { description: '', photoUrl: '', photoCaption: '' };
@@ -152,21 +158,17 @@ export class LoanDetails implements OnInit, OnDestroy {
 
     // If already connected, just join the group
     if (this.signalRService.isConnected) {
-      if (this.effectiveRole !== 'Admin') {
-        this.signalRService.joinLoanGroup(loanId).catch(err =>
-          console.warn('Could not join loan group:', err)
-        );
-      }
+      this.signalRService.joinLoanGroup(loanId).catch(err =>
+        console.warn('Could not join loan group:', err)
+      );
       return;
     }
 
     // Otherwise start and then join
     this.signalRService.startConnection().then(() => {
-      if (this.effectiveRole !== 'Admin') {
-        this.signalRService.joinLoanGroup(loanId).catch(err =>
-          console.warn('Could not join loan group:', err)
-        );
-      }
+      this.signalRService.joinLoanGroup(loanId).catch(err =>
+        console.warn('Could not join loan group:', err)
+      ); 
     }).catch(err => console.error('SignalR connection failed:', err));
   }
 
@@ -199,6 +201,14 @@ export class LoanDetails implements OnInit, OnDestroy {
       },
       error: () => { }
     });
+  }
+
+  get isChatLocked(): boolean {
+    if (!this.loan) return false;
+    const terminalStatuses = ['Returned', 'Cancelled', 'Rejected'];
+    if (!terminalStatuses.includes(this.loan.status)) return false;
+    const lockedAt = this.loan.actualReturnDate ?? this.loan.createdAt;
+    return new Date(lockedAt) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   }
 
   private checkExistingReviews(loanId: number): void {
@@ -318,6 +328,25 @@ export class LoanDetails implements OnInit, OnDestroy {
     });
   }
 
+  cancelLoan(): void {
+    if (!this.loan) return;
+    this.isCancellingLoan = true;
+    this.cancelLoanError = '';
+
+    this.loanService.cancelLoan(this.loan.id, { reason: '' }).subscribe({
+      next: () => {
+        this.isCancellingLoan  = false;
+        this.showCancelConfirm = false;
+        this.loadLoan(this.loan!.id);
+      },
+      error: (err) => {
+        this.cancelLoanError   = err.error?.message ?? 'Failed to cancel loan.';
+        this.isCancellingLoan  = false;
+        this.cdr.detectChanges();
+      }
+    });
+  }
+
   completeLoan(): void {
     if (!this.qrCodeInput.trim()) return;
     this.isCompletingLoan = true;
@@ -381,7 +410,6 @@ export class LoanDetails implements OnInit, OnDestroy {
     this.cdr.detectChanges(); // ← add this
     this.loadLoan(this.loan!.id);
   }
-
 
   setItemRating(r: number): void { this.itemReviewRating = r; }
 
@@ -455,7 +483,7 @@ export class LoanDetails implements OnInit, OnDestroy {
 
   get otherParty(): UserDTO.UserSummaryDTO | null {
     if (!this.loan) return null;
-    console.log("Other party", this.isOwner ? this.loan.borrower : this.loan.owner);
+    // console.log("Other party", this.isOwner ? this.loan.borrower : this.loan.owner);
     return this.isOwner ? this.loan.borrower : this.loan.owner;
   }
 
@@ -486,6 +514,8 @@ export class LoanDetails implements OnInit, OnDestroy {
       case 'late':
       case 'overdue': return 'bg-red-400/10 text-red-400 border-red-400/20';
       case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
+      case 'adminpending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
+
       case 'cancelled':
       case 'rejected': return 'bg-rose-400/10 text-rose-400 border-rose-400/20';
       default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
@@ -500,6 +530,14 @@ export class LoanDetails implements OnInit, OnDestroy {
       case 'poor': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
+  }
+
+  get isDisputeLocked(): boolean {
+    if (!this.loan) return false;
+    if (this.loan.status !== 'Returned') return false;
+    const completedAt = this.loan.actualReturnDate ?? this.loan.updatedAt;
+    if (!completedAt) return false;
+    return new Date(completedAt) < new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
   }
 
 

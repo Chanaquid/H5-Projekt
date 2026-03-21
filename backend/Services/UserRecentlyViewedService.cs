@@ -86,6 +86,8 @@ namespace backend.Services
                     CategoryIcon = item.Category?.Icon,
                     OwnerId = item.OwnerId,
                     OwnerName = item.Owner?.FullName ?? string.Empty,
+                    OwnerUsername = item.Owner?.UserName ?? string.Empty,
+                    OwnerAvatarUrl = item.Owner?.AvatarUrl ?? string.Empty,
                     AverageRating = reviews.Any() ? Math.Round(reviews.Average(r => r.Rating), 1) : 0,
                     ReviewCount = reviews.Count,
                     IsCurrentlyOnLoan = activeLoans.Any()

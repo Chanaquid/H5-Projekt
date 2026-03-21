@@ -38,7 +38,8 @@ namespace backend.Services
             var pendingLoans = await _loanRepository.GetPendingAdminApprovalsAsync();
             var openDisputes = await _disputeRepository.GetAllOpenAsync();
             var pendingAppeals = await _appealRepository.GetAllPendingAsync();
-            var pendingVerifications = await _verificationRepository.GetAllPendingAsync();
+            var pendingUserVerifications = await _verificationRepository.GetAllPendingAsync();
+            var pendingPaymentVerifications = await _fineRepository.GetPendingVerificationAsync();
             var allUsers = await _userRepository.GetAllAsync();
             var unpaidFines = await _fineRepository.GetAllUnpaidAsync();
             var allItems = await _itemRepository.GetAllApprovedAsync();
@@ -52,7 +53,8 @@ namespace backend.Services
                 PendingLoanApprovals = pendingLoans.Count,
                 OpenDisputes = openDisputes.Count,
                 PendingAppeals = pendingAppeals.Count,
-                PendingVerifications = pendingVerifications.Count,
+                PendingUserVerifications = pendingUserVerifications.Count,
+                PendingPaymentVerifications = pendingPaymentVerifications.Count,
                 TotalUsers = allUsers.Count,
                 TotalActiveItems = allItems.Count,
                 TotalActiveLoans = allLoans.Count(l => l.Status == Models.LoanStatus.Active),
@@ -118,7 +120,8 @@ namespace backend.Services
                         LoanId = d.LoanId,
                         ItemTitle = item.Title,
                         FiledById = d.FiledById ?? string.Empty,
-                        FiledByName = d.FiledBy?.UserName ?? string.Empty,
+                        FiledByName = d.FiledBy?.FullName ?? string.Empty,
+                        FiledByUsername = d.FiledBy?.UserName ?? string.Empty,
                         FiledAs = d.FiledAs.ToString(),
                         Status = d.Status.ToString(),
                         ResponseDeadline = d.ResponseDeadline,

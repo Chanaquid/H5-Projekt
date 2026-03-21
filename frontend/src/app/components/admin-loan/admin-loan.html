@@ -1,0 +1,432 @@
+<!-- Background -->
+<div class="fixed inset-0 bg-zinc-950 -z-10"></div>
+<div
+    class="fixed inset-0 bg-[linear-gradient(rgba(255,255,255,0.02)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.02)_1px,transparent_1px)] bg-[size:52px_52px] -z-10">
+</div>
+
+<app-navbar></app-navbar>
+
+<main class="pt-16 min-h-screen">
+
+    <!-- Header -->
+    <div class="px-6 md:px-10 pt-10 pb-8 border-b border-zinc-800/60">
+        <div class="flex items-center gap-3 mb-1">
+            <a routerLink="/admin-dashboard"
+                class="flex items-center gap-1.5 text-zinc-500 hover:text-white text-xs font-medium transition-colors no-underline">
+                <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+                Dashboard
+            </a>
+            <span class="text-zinc-700">/</span>
+            <span class="text-zinc-500 text-xs">Loans</span>
+        </div>
+        <div class="flex items-center justify-between gap-4 flex-wrap mt-2">
+            <div>
+                <h1 class="font-black text-3xl md:text-4xl text-white tracking-tight"
+                    style="font-family:'Syne',sans-serif">
+                    All Loans
+                </h1>
+                <p class="text-zinc-500 text-sm mt-1">{{ allLoans.length }} total loans on the platform</p>
+            </div>
+        </div>
+
+        <!-- Stats row -->
+        <div class="flex items-center gap-6 mt-6 flex-wrap">
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-slate-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ allLoans.length }}</span>
+                    All</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-amber-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ pendingCount }}</span>
+                    Pending</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-indigo-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ adminPendingCount
+                        }}</span>
+                    Admin Pending</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-violet-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ approvedCount }}</span>
+                    Approved</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-emerald-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ activeCount }}</span>
+                    Active</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-rose-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ lateCount }}</span>
+                    Late</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <span class="w-2 h-2 bg-teal-400 rounded-full"></span>
+                <span class="text-zinc-400 text-sm"><span class="text-white font-semibold">{{ returnedCount }}</span>
+                    Returned</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="px-6 md:px-10 py-8">
+
+        <!-- Tabs + Search -->
+        <div class="flex items-center justify-between gap-4 mb-6 flex-wrap">
+            <div class="flex items-center gap-1 bg-zinc-900 border border-zinc-800 rounded-xl p-1 overflow-x-auto">
+                <button *ngFor="let tab of tabs" (click)="activeTab = tab.key; applyFilters()"
+                    class="px-4 py-1.5 text-xs font-semibold rounded-lg transition-all duration-200 cursor-pointer whitespace-nowrap"
+                    [class.bg-amber-400]="activeTab === tab.key" [class.text-zinc-900]="activeTab === tab.key"
+                    [class.text-zinc-400]="activeTab !== tab.key">
+                    {{ tab.label }}
+                    <span class="ml-1.5 text-[10px] font-bold px-1.5 py-0.5 rounded-full"
+                        [class.bg-zinc-900]="activeTab === tab.key" [class.text-amber-400]="activeTab === tab.key"
+                        [class.bg-zinc-800]="activeTab !== tab.key" [class.text-zinc-500]="activeTab !== tab.key">
+                        {{ getTabCount(tab.key) }}
+                    </span>
+                </button>
+            </div>
+            <div class="relative">
+                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" fill="none"
+                    viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />
+                </svg>
+                <input type="text" [(ngModel)]="searchQuery" (ngModelChange)="applyFilters()"
+                    placeholder="Search item, borrower or owner..."
+                    class="bg-zinc-900 border border-zinc-800 text-white text-sm rounded-xl pl-9 pr-4 py-2 outline-none placeholder-zinc-600 focus:border-amber-400/50 transition-all duration-200 w-72" />
+            </div>
+        </div>
+
+        <!-- Loading -->
+        <div *ngIf="isLoading" class="space-y-3">
+            <div *ngFor="let _ of [1,2,3,4,5]" class="bg-zinc-900 border border-zinc-800 rounded-2xl p-5 animate-pulse">
+                <div class="flex items-center gap-4">
+                    <div class="w-14 h-14 bg-zinc-800 rounded-xl shrink-0"></div>
+                    <div class="flex-1 space-y-2">
+                        <div class="h-4 bg-zinc-800 rounded w-48"></div>
+                        <div class="h-3 bg-zinc-800 rounded w-32"></div>
+                    </div>
+                    <div class="w-20 h-6 bg-zinc-800 rounded-xl"></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Empty state -->
+        <div *ngIf="!isLoading && filteredLoans.length === 0"
+            class="flex flex-col items-center justify-center py-24 text-center">
+            <div
+                class="w-16 h-16 bg-zinc-900 border border-zinc-800 rounded-2xl flex items-center justify-center text-3xl mb-4">
+                📋</div>
+            <h3 class="font-bold text-white text-lg mb-2" style="font-family:'Syne',sans-serif">No loans found</h3>
+            <p class="text-zinc-500 text-sm">Try a different tab or search term.</p>
+        </div>
+
+        <!-- Loans list -->
+        <div *ngIf="!isLoading && filteredLoans.length > 0" class="space-y-3">
+            <div *ngFor="let loan of filteredLoans" (click)="openLoanModal(loan)"
+                class="bg-zinc-900 border border-zinc-800 hover:border-zinc-600 rounded-2xl p-5 transition-all duration-200 cursor-pointer group hover:-translate-y-0.5 hover:shadow-xl hover:shadow-black/40">
+
+                <div class="flex items-center gap-4">
+
+                    <!-- Item photo -->
+                    <div
+                        class="w-14 h-14 rounded-xl bg-zinc-800 overflow-hidden shrink-0 flex items-center justify-center text-2xl">
+                        <img *ngIf="loan.itemPrimaryPhoto" [src]="loan.itemPrimaryPhoto"
+                            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+                        <span *ngIf="!loan.itemPrimaryPhoto">📦</span>
+                    </div>
+
+                    <!-- Info -->
+                    <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <p class="text-white text-sm font-semibold truncate" style="font-family:'Syne',sans-serif">
+                                {{ loan.itemTitle }}</p>
+                            <span *ngIf="loan.daysOverdue && loan.daysOverdue > 0"
+                                class="flex items-center gap-1 text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 px-1.5 py-0.5 rounded-md">
+                                ⚠️ {{ loan.daysOverdue }}d overdue
+                            </span>
+                            <span *ngIf="loan.hasUnreadMessages"
+                                class="flex items-center gap-1 text-[10px] font-bold bg-amber-400/10 text-amber-400 border border-amber-400/20 px-1.5 py-0.5 rounded-md">
+                                💬 Unread
+                            </span>
+                        </div>
+                        <p class="text-zinc-500 text-xs">
+                            <span class="text-zinc-400">{{ loan.otherPartyName }}</span>
+                            <span class="text-zinc-700 mx-1.5">·</span>
+                            Loan <span class="text-zinc-400 font-mono">#{{ loan.id }}</span>
+                            <span class="text-zinc-700 mx-1.5">·</span>
+                            {{ loan.startDate | date:'MMM d' }} → {{ loan.endDate | date:'MMM d, yyyy' }}
+                        </p>
+                    </div>
+
+                    <!-- Status + arrow -->
+                    <div class="flex items-center gap-3 shrink-0">
+                        <span class="text-[10px] font-bold uppercase px-2.5 py-1 rounded-lg border"
+                            [ngClass]="getLoanStatusClass(loan.status)">
+                            {{ loan.status }}
+                        </span>
+                        <svg class="w-4 h-4 text-zinc-600 group-hover:text-zinc-400 transition-colors" fill="none"
+                            viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+
+<!-- ══════════════ LOAN DETAIL MODAL ══════════════ -->
+<div *ngIf="showLoanModal && selectedLoan" class="fixed inset-0 z-[100] flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-black/80 backdrop-blur-sm" (click)="showLoanModal = false"></div>
+    <div
+        class="relative z-10 w-full max-w-2xl bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl max-h-[90vh] overflow-y-auto">
+
+        <!-- Modal header -->
+        <div class="px-6 py-5 border-b border-zinc-800 flex items-center justify-between sticky top-0 bg-zinc-900 z-10">
+            <div>
+                <div class="flex items-center gap-2 mb-0.5">
+                    <h2 class="font-black text-lg text-white" style="font-family:'Syne',sans-serif">{{
+                        selectedLoan.itemTitle }}</h2>
+                    <span class="text-[10px] font-bold uppercase px-2 py-0.5 rounded-lg border"
+                        [ngClass]="getLoanStatusClass(selectedLoan.status)">
+                        {{ selectedLoan.status }}
+                    </span>
+                </div>
+                <p class="text-zinc-500 text-xs">Loan <span class="font-mono">#{{ selectedLoan.id }}</span></p>
+            </div>
+            <button (click)="showLoanModal = false"
+                class="w-8 h-8 flex items-center justify-center text-zinc-400 hover:text-white transition-colors rounded-lg hover:bg-zinc-800 cursor-pointer">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+        </div>
+
+        <!-- Loading detail -->
+        <div *ngIf="isLoadingDetail" class="flex items-center justify-center py-16">
+            <div class="w-6 h-6 border-2 border-amber-400 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+
+        <div *ngIf="!isLoadingDetail && loanDetail" class="p-6 space-y-5">
+
+            <!-- Timeline -->
+            <div class="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+                <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+                    <p class="text-zinc-500 mb-0.5">Start</p>
+                    <p class="text-white font-medium">{{ loanDetail.startDate | date:'MMM d, yyyy' }}</p>
+                </div>
+                <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+                    <p class="text-zinc-500 mb-0.5">Due</p>
+                    <p class="font-medium" [class.text-red-400]="loanDetail.daysOverdue && loanDetail.daysOverdue > 0"
+                        [class.text-white]="!loanDetail.daysOverdue">
+                        {{ loanDetail.endDate | date:'MMM d, yyyy' }}
+                    </p>
+                </div>
+                <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+                    <p class="text-zinc-500 mb-0.5">Returned</p>
+                    <p class="font-medium" [class.text-emerald-400]="loanDetail.actualReturnDate"
+                        [class.text-zinc-600]="!loanDetail.actualReturnDate">
+                        {{ loanDetail.actualReturnDate ? (loanDetail.actualReturnDate | date:'MMM d, yyyy') : '—' }}
+                    </p>
+                </div>
+                <div class="bg-zinc-800 rounded-xl px-3 py-2.5">
+                    <p class="text-zinc-500 mb-0.5">Created</p>
+                    <p class="text-white font-medium">{{ loanDetail.createdAt | date:'MMM d, yyyy' }}</p>
+                </div>
+            </div>
+
+            <!-- Overdue warning -->
+            <div *ngIf="loanDetail.daysOverdue && loanDetail.daysOverdue > 0"
+                class="bg-red-500/10 border border-red-500/20 rounded-xl px-4 py-3 flex items-center gap-2">
+                <span class="text-red-400 text-base">⚠️</span>
+                <p class="text-red-400 text-sm font-medium">{{ loanDetail.daysOverdue }} day{{ loanDetail.daysOverdue >
+                    1 ? 's' : '' }} overdue</p>
+            </div>
+
+            <!-- Parties -->
+            <div class="grid grid-cols-2 gap-3">
+                <!-- Owner -->
+                <div class="bg-zinc-800 rounded-xl p-4">
+                    <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">Owner</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-xs font-bold text-amber-400 cursor-pointer"
+                            (click)="router.navigate(['/users', loanDetail.owner?.id])">
+                            <img *ngIf="loanDetail.owner?.avatarUrl" [src]="loanDetail.owner!.avatarUrl!"
+                                class="w-full h-full object-cover" />
+                            <span *ngIf="!loanDetail.owner?.avatarUrl">{{ getInitials(loanDetail.owner?.fullName || '')
+                                }}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-white text-xs font-semibold truncate cursor-pointer hover:text-amber-400 transition-colors"
+                                (click)="router.navigate(['/users', loanDetail.owner?.id])">{{
+                                loanDetail.owner?.fullName }}</p>
+                            <p class="text-zinc-500 text-[10px]">@{{ loanDetail.owner?.username }}</p>
+                        </div>
+                    </div>
+                </div>
+                <!-- Borrower -->
+                <div class="bg-zinc-800 rounded-xl p-4">
+                    <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">Borrower</p>
+                    <div class="flex items-center gap-3">
+                        <div class="w-9 h-9 rounded-xl overflow-hidden bg-zinc-700 shrink-0 flex items-center justify-center text-xs font-bold text-amber-400 cursor-pointer"
+                            (click)="router.navigate(['/users', loanDetail.borrower?.id])">
+                            <img *ngIf="loanDetail.borrower?.avatarUrl" [src]="loanDetail.borrower!.avatarUrl!"
+                                class="w-full h-full object-cover" />
+                            <span *ngIf="!loanDetail.borrower?.avatarUrl">{{ getInitials(loanDetail.borrower?.fullName
+                                || '') }}</span>
+                        </div>
+                        <div class="min-w-0">
+                            <p class="text-white text-xs font-semibold truncate cursor-pointer hover:text-amber-400 transition-colors"
+                                (click)="router.navigate(['/users', loanDetail.borrower?.id])">{{
+                                loanDetail.borrower?.fullName }}</p>
+                            <p class="text-zinc-500 text-[10px]">@{{ loanDetail.borrower?.username }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Item snapshot -->
+            <div class="bg-zinc-800 rounded-xl p-4">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-3">Item at Loan Time</p>
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-12 h-12 rounded-xl overflow-hidden bg-zinc-700 shrink-0 cursor-pointer"
+                        (click)="router.navigate(['/items', loanDetail.item?.id])">
+                        <img *ngIf="loanDetail.item?.primaryPhotoUrl" [src]="loanDetail.item!.primaryPhotoUrl!"
+                            class="w-full h-full object-cover" />
+                        <div *ngIf="!loanDetail.item?.primaryPhotoUrl"
+                            class="w-full h-full flex items-center justify-center text-xl">📦</div>
+                    </div>
+                    <div>
+                        <p class="text-white text-sm font-semibold cursor-pointer hover:text-amber-400 transition-colors"
+                            (click)="router.navigate(['/items', loanDetail.item?.id])">{{ loanDetail.item?.title }}</p>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-[10px] font-bold uppercase px-1.5 py-0.5 rounded-md border"
+                                [ngClass]="getConditionClass(loanDetail.snapshotCondition)">
+                                {{ loanDetail.snapshotCondition }}
+                            </span>
+                            <span class="text-zinc-500 text-[10px]">at pickup</span>
+                        </div>
+                    </div>
+                </div>
+                <!-- Snapshot photos -->
+                <div *ngIf="loanDetail.snapshotPhotos && loanDetail.snapshotPhotos.length > 0"
+                    class="flex gap-2 overflow-x-auto pb-1">
+                    <div *ngFor="let photo of loanDetail.snapshotPhotos"
+                        class="shrink-0 w-16 h-16 rounded-lg overflow-hidden bg-zinc-700 cursor-pointer hover:opacity-80 transition-opacity"
+                        (click)="selectedPhoto = photo.photoUrl">
+                        <img [src]="photo.photoUrl" class="w-full h-full object-cover" />
+                    </div>
+                </div>
+            </div>
+
+            <!-- Decision note -->
+            <div *ngIf="loanDetail.decisionNote" class="bg-zinc-800 rounded-xl px-4 py-3">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-1">Owner's Decision Note
+                </p>
+                <p class="text-zinc-300 text-sm">{{ loanDetail.decisionNote }}</p>
+            </div>
+
+            <!-- Fines -->
+            <div *ngIf="loanDetail.fines && loanDetail.fines.length > 0">
+                <p class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium mb-2">
+                    Fines <span class="text-zinc-600">({{ loanDetail.fines.length }})</span>
+                </p>
+                <div class="space-y-2">
+                    <div *ngFor="let fine of loanDetail.fines"
+                        class="flex items-center justify-between bg-zinc-800 rounded-xl px-4 py-3">
+                        <div>
+                            <p class="text-white text-xs font-semibold">{{ fine.type }}</p>
+                            <p class="text-zinc-500 text-[10px]">{{ fine.createdAt | date:'MMM d, yyyy' }}</p>
+                        </div>
+                        <div class="text-right">
+                            <p class="text-white text-sm font-black" style="font-family:'Syne',sans-serif">kr {{
+                                fine.amount }}</p>
+                            <span class="text-[10px] font-bold uppercase"
+                                [class.text-red-400]="fine.status === 'Unpaid'"
+                                [class.text-amber-400]="fine.status === 'PendingVerification'"
+                                [class.text-emerald-400]="fine.status === 'Paid'">
+                                {{ fine.status }}
+                            </span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Disputes -->
+            <div *ngIf="loanDetail.hasOpenDispute"
+                class="bg-amber-400/5 border border-amber-400/20 rounded-xl px-4 py-3 flex items-center justify-between gap-3">
+                <div class="flex items-center gap-2">
+                    <span class="text-base">⚖️</span>
+                    <p class="text-amber-400 text-sm font-medium">This loan has an open dispute</p>
+                </div>
+                <span (click)="router.navigate(['/my-resolution-center'], { queryParams: { tab: 'disputes' } })"
+                    class="text-amber-400 hover:text-amber-300 text-xs font-semibold cursor-pointer transition-colors whitespace-nowrap underline">
+                    View →
+                </span>
+            </div>
+
+
+            <!-- Admin approval section (for loans requiring admin approval) -->
+            <div *ngIf="requiresAdminApproval"
+                class="bg-amber-400/5 border border-amber-400/20 rounded-xl p-5 space-y-4">
+                <p class="text-amber-400 text-sm font-semibold" style="font-family:'Syne',sans-serif">
+                    <ng-container *ngIf="loanDetail.status === 'AdminPending'">⚠️ Requires Admin Approval</ng-container>
+                    <ng-container *ngIf="loanDetail.status === 'Pending'">📋 Pending Owner Decision</ng-container>
+                </p>
+                <div class="space-y-1.5">
+                    <label class="text-zinc-500 text-[10px] uppercase tracking-widest font-medium">Decision Note
+                        (optional)</label>
+                    <textarea [(ngModel)]="adminDecisionNote" rows="2" placeholder="Add a note..."
+                        class="w-full bg-zinc-800 border border-zinc-700 focus:border-amber-400/50 text-white text-sm rounded-xl px-3 py-2.5 outline-none placeholder-zinc-600 resize-none transition-all duration-200"></textarea>
+                </div>
+                <p *ngIf="decisionError"
+                    class="text-red-400 text-xs bg-red-500/10 border border-red-500/20 rounded-lg px-3 py-2">{{
+                    decisionError }}</p>
+                <p *ngIf="decisionSuccess"
+                    class="text-emerald-400 text-xs bg-emerald-500/10 border border-emerald-500/20 rounded-lg px-3 py-2">
+                    {{ decisionSuccess }}</p>
+                <div class="flex gap-3">
+                    <button (click)="adminDecide(false)" [disabled]="isDeciding"
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-zinc-800 hover:bg-red-500/10 border border-zinc-700 hover:border-red-500/30 text-zinc-300 hover:text-red-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                        Reject
+                    </button>
+                    <button (click)="adminDecide(true)" [disabled]="isDeciding"
+                        class="flex-1 flex items-center justify-center gap-2 py-2.5 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/20 text-emerald-400 font-semibold text-sm rounded-xl transition-all duration-200 disabled:opacity-50 cursor-pointer">
+                        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                        </svg>
+                        {{ isDeciding ? 'Processing...' : 'Approve' }}
+                    </button>
+                </div>
+            </div>
+
+            <!-- View full loan button -->
+            <button (click)="router.navigate(['/loans', loanDetail.id])"
+                class="w-full flex items-center justify-center gap-2 py-2.5 bg-zinc-800 hover:bg-zinc-700 border border-zinc-700 text-zinc-300 hover:text-white font-semibold text-sm rounded-xl transition-all duration-200 cursor-pointer">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                    <path stroke-linecap="round" stroke-linejoin="round"
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                View Full Loan
+            </button>
+
+        </div>
+    </div>
+</div>
+
+<!-- Photo lightbox -->
+<div *ngIf="selectedPhoto" class="fixed inset-0 z-[110] flex items-center justify-center p-4"
+    (click)="selectedPhoto = null">
+    <div class="absolute inset-0 bg-black/90 backdrop-blur-sm"></div>
+    <img [src]="selectedPhoto" class="relative z-10 max-w-[90vw] max-h-[85vh] rounded-2xl object-contain shadow-2xl" />
+</div>

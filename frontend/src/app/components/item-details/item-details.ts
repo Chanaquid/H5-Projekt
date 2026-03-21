@@ -11,6 +11,7 @@ import { ReviewDTO } from '../../dtos/reviewDTO';
 import { Navbar } from '../navbar/navbar';
 import { LoanService } from '../../services/loan-service';
 import { LoanDTO } from '../../dtos/loanDTO';
+import { DisputeService } from '../../services/dispute-service';
 
 @Component({
   selector: 'app-item-details',
@@ -36,6 +37,18 @@ export class ItemDetails implements OnInit {
   existingLoan: LoanDTO.LoanDetailDTO | null = null;
   isCancellingLoan = false;
   cancelError = '';
+
+  //Loan history
+  loanHistory: LoanDTO.LoanSummaryDTO[] = [];
+  isLoadingHistory = false;
+  historyCollapsed = false;
+  visibleLoans = 5;
+
+  //dispute history
+  disputeHistory: any[] = [];
+  isLoadingDisputes = false;
+  disputesCollapsed = false;
+  visibleDisputes = 5;
 
   // Edit modal
   showEditModal = false;
@@ -102,6 +115,7 @@ export class ItemDetails implements OnInit {
     private reviewService: ReviewService,
     private userService: UserService,
     private loanService: LoanService,
+    private disputeService: DisputeService,
     private cdr: ChangeDetectorRef,
   ) { }
 
@@ -117,6 +131,7 @@ export class ItemDetails implements OnInit {
 
     const id = Number(this.route.snapshot.paramMap.get('id'));
     this.loadItem(id);
+
   }
 
   private loadItem(id: number): void {
@@ -130,12 +145,20 @@ export class ItemDetails implements OnInit {
         if (this.authService.isLoggedIn() && !this.isOwner) {
           this.checkExistingLoan();
         }
+
+      // Only load history for owner or admin
+        if (this.isOwner || this.isAdmin) {
+        this.loadLoanHistory(id);
+        this.loadDisputeHistory(id);
+      }
       },
       error: () => {
         this.isLoading = false;
         this.cdr.detectChanges();
       }
     });
+
+
   }
 
   private checkExistingLoan(): void {
@@ -173,6 +196,32 @@ export class ItemDetails implements OnInit {
         this.isLoadingReviews = false;
         this.cdr.detectChanges();
       }
+    });
+  }
+
+  private loadLoanHistory(itemId: number): void {
+    this.isLoadingHistory = true;
+    this.loanService.getLoansByItemId(itemId).subscribe({
+      next: (loans) => {
+        this.loanHistory = loans;
+        this.isLoadingHistory = false;
+        console.log('Loan History Loaded:', this.loanHistory);
+        this.cdr.detectChanges();
+      },
+      error: () => { this.isLoadingHistory = false; }
+    });
+  }
+
+  private loadDisputeHistory(itemId: number): void {
+    this.isLoadingDisputes = true;
+    this.disputeService.getDisputeHistoryByItemId(itemId).subscribe({
+      next: (disputes) => {
+        this.disputeHistory = disputes;
+        this.isLoadingDisputes = false;
+        console.log('Dispute History Loaded:', this.disputeHistory);
+        this.cdr.detectChanges();
+      },
+      error: () => { this.isLoadingDisputes = false; }
     });
   }
 
@@ -402,12 +451,20 @@ export class ItemDetails implements OnInit {
     switch (status?.toLowerCase()) {
       case 'active': return 'bg-emerald-400/10 text-emerald-400 border-emerald-400/20';
       case 'approved': return 'bg-blue-400/10 text-blue-400 border-blue-400/20';
-      case 'pending':
-      case 'adminpending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
-      case 'late': return 'bg-red-400/10 text-red-400 border-red-400/20';
-      case 'cancelled':
-      case 'rejected': return 'bg-zinc-700 text-zinc-400 border-zinc-600';
+      case 'returned': return 'bg-cyan-600 text-white border-zinc-400/20';
+      case 'late': return 'bg-red-500/10 text-red-400 border-red-500/20';
+      case 'pending': return 'bg-amber-400/10 text-amber-400 border-amber-400/20';
+      case 'adminpending': return 'bg-indigo-400/10 text-indigo-400 border-indigo-400/20';
+      case 'cancelled': return 'bg-zinc-500/50 text-white border-zinc-600/50';
+      case 'rejected': return 'bg-rose-500/10 text-rose-400 border-rose-500/20';
       default: return 'bg-zinc-800 text-zinc-400 border-zinc-700';
     }
   }
+
+
+  get displayedDisputes() { return this.disputeHistory.slice(0, this.visibleDisputes); }
+  get displayedLoanHistory() { return this.loanHistory.slice(0, this.visibleLoans); }
+  loadMoreDisputes() { this.visibleDisputes += 5; }
+  loadMoreLoanHistory() { this.visibleLoans += 5; }
+
 }

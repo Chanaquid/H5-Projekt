@@ -102,6 +102,8 @@ namespace backend.DTOs
             public string OwnerId { get; set; } = string.Empty;
 
             public string OwnerName { get; set; } = string.Empty;
+            public string OwnerUsername { get; set; } = string.Empty;
+            public string OwnerAvatarUrl {  get; set; } = string.Empty;
             public double AverageRating { get; set; }
             public int ReviewCount { get; set; }
             public bool IsActive { get; set; }

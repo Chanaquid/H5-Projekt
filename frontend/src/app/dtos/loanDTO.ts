@@ -55,6 +55,7 @@ export namespace LoanDTO {
     itemTitle: string;
     itemPrimaryPhoto?: string;
     otherPartyName: string;
+    otherPartyUsername: string;
     startDate: string;
     endDate: string;
     actualReturnDate?: string;

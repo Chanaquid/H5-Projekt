@@ -77,6 +77,7 @@
             public string ItemTitle { get; set; } = string.Empty;
             public string? ItemPrimaryPhoto { get; set; }
             public string OtherPartyName { get; set; } = string.Empty; //Owner name if viewing as borrower, borrower name if viewing as owner
+            public string OtherPartyUsername {  get; set; } = string.Empty;
             public DateTime StartDate { get; set; }
             public DateTime EndDate { get; set; }
             public DateTime? ActualReturnDate { get; set; }
