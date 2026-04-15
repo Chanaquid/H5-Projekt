@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\backend.Tests.csproj": {}
+    "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend.Tests\\backend.Tests.csproj": {}
   },
   "projects": {
-    "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\backend.Tests.csproj": {
+    "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend.Tests\\backend.Tests.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\backend.Tests.csproj",
+        "projectUniqueName": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend.Tests\\backend.Tests.csproj",
         "projectName": "backend.Tests",
-        "projectPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\backend.Tests.csproj",
+        "projectPath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend.Tests\\backend.Tests.csproj",
         "packagesPath": "C:\\Users\\subar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend.Tests\\obj\\",
+        "outputPath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend.Tests\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -32,8 +32,8 @@
           "net9.0": {
             "targetAlias": "net9.0",
             "projectReferences": {
-              "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj": {
-                "projectPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj"
+              "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj": {
+                "projectPath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj"
               }
             }
           }
@@ -95,18 +95,18 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     },
-    "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj": {
+    "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj",
+        "projectUniqueName": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj",
         "projectName": "backend",
-        "projectPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj",
+        "projectPath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj",
         "packagesPath": "C:\\Users\\subar\\.nuget\\packages\\",
-        "outputPath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\obj\\",
+        "outputPath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\obj\\",
         "projectStyle": "PackageReference",
         "fallbackFolders": [
           "C:\\Program Files (x86)\\Microsoft Visual Studio\\Shared\\NuGetPackages"
@@ -217,7 +217,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.311/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\9.0.305/PortableRuntimeIdentifierGraph.json"
         }
       }
     }

@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "tdHPEedPgFQ=",
+  "dgSpecHash": "7APE6/kLPKE=",
   "success": true,
-  "projectFilePath": "C:\\Users\\subar\\Desktop\\LoanApp\\backend\\backend.csproj",
+  "projectFilePath": "C:\\Users\\subar\\Desktop\\H5-Projekt\\backend\\backend.csproj",
   "expectedPackageFiles": [
     "C:\\Users\\subar\\.nuget\\packages\\azure.core\\1.38.0\\azure.core.1.38.0.nupkg.sha512",
     "C:\\Users\\subar\\.nuget\\packages\\azure.identity\\1.11.4\\azure.identity.1.11.4.nupkg.sha512",

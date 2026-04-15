@@ -48,16 +48,17 @@ namespace backend.Services
                 throw new ArgumentException("You cannot borrow your own item.");
 
             //Date validations
-            if (dto.StartDate < DateTime.UtcNow.Date)
+            if (dto.StartDate.Date < DateTime.UtcNow.Date)
                 throw new ArgumentException("Start date cannot be in the past.");
 
-            if (dto.StartDate >= dto.EndDate)
+            // Start/End ordering
+            if (dto.StartDate.Date >= dto.EndDate.Date)
                 throw new ArgumentException("End date must be after start date.");
 
             //EndDate is capped till item's AvailableUntil
             var endDate = dto.EndDate > item.AvailableUntil ? item.AvailableUntil : dto.EndDate;
 
-            if (dto.StartDate < item.AvailableFrom || dto.StartDate > item.AvailableUntil)
+            if (dto.StartDate.Date < item.AvailableFrom.Date || dto.StartDate.Date > item.AvailableUntil.Date)
                 throw new ArgumentException("Start date must fall within the item's availability window.");
 
             //Mininum loan days check

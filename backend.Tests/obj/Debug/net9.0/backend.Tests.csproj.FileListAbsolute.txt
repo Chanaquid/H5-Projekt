@@ -172,3 +172,14 @@ C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\ref\backend.Tests.
 C:\Users\subar\Desktop\LoanApp\backend.Tests\bin\Debug\net9.0\FluentAssertions.dll
 C:\Users\subar\Desktop\LoanApp\backend.Tests\obj\Debug\net9.0\backend.Tests.sourcelink.json
 C:\Users\subar\Desktop\LoanApp\backend.Tests\bin\Debug\net9.0\Microsoft.EntityFrameworkCore.InMemory.dll
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\bin\Debug\net9.0\.msCoverageSourceRootsMapping_backend.Tests
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\bin\Debug\net9.0\CoverletSourceRootsMapping_backend.Tests
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.csproj.AssemblyReference.cache
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.AssemblyInfoInputs.cache
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.AssemblyInfo.cs
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.csproj.CoreCompileInputs.cache
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.sourcelink.json
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.dll
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\refint\backend.Tests.dll
+C:\Users\subar\Desktop\H5-Projekt\backend.Tests\obj\Debug\net9.0\backend.Tests.pdb

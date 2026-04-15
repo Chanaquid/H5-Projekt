@@ -140,6 +140,7 @@ export class ItemDetails implements OnInit {
       next: (item) => {
         this.item = item;
         this.isLoading = false;
+        console.log("Item", item)
         this.cdr.detectChanges();
         this.loadReviews(id);
         if (this.authService.isLoggedIn() && !this.isOwner) {

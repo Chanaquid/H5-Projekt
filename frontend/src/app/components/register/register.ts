@@ -81,6 +81,9 @@ export class Register {
       next: () => {
         this.isLoading = false;
         this.successMessage = 'Account created! Please check your email to confirm your account.';
+        //Route
+        this.router.navigate(["/login"]);
+
         this.cdr.detectChanges();
       },
       error: (err) => {
